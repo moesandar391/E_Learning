@@ -1,0 +1,15 @@
+{
+    "require": {
+        "dompdf/dompdf": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dompdf\\": "vendor/dompdf/dompdf/src/",
+            "FontLib\\": "vendor/dompdf/php-font-lib/src/",
+            "Svg\\": "vendor/dompdf/php-svg-lib/src/"
+        },
+        "classmap": [
+            "vendor/dompdf/dompdf/lib/"
+        ]
+    }
+}

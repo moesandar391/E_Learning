@@ -1,0 +1,253 @@
+<?php require_once 'includes/header.php'; ?>
+<?php require_once 'includes/sidebar.php'; ?>
+<?php require_once '../config/db.php'; ?>
+
+<?php
+ $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+ $total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
+ $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
+ $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
+ $result = $conn->query("
+    SELECT e.id, u.name AS student_name, u.email AS student_email, m.name AS module_name, m.price, c.course_name, pm.name AS payment_method, e.enroll_date, e.status, e.created_at
+    FROM enrollments e
+    JOIN users u ON e.user_id = u.id
+    JOIN modules m ON e.module_id = m.id
+    JOIN courses c ON m.course_id = c.id
+    LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
+    ORDER BY e.created_at DESC
+");
+?>
+
+<div class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
+        <div>
+            <h1 class="text-lg font-semibold text-gray-800">Payments</h1>
+            <p class="text-sm text-gray-500">Manage enrollment payments</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Total</p>
+                        <p class="text-3xl font-bold text-gray-800 mt-1"><?= $total_enrollments ?></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pending</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-1"><?= $total_pending ?></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Confirmed</p>
+                        <p class="text-3xl font-bold text-green-600 mt-1"><?= $total_confirmed ?></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Rejected</p>
+                        <p class="text-3xl font-bold text-red-600 mt-1"><?= $total_rejected ?></p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h3 class="font-semibold text-gray-800">All Enrollments</h3>
+                    <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full"><?= $total_enrollments ?> total</span>
+                </div>
+                <div class="relative">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" id="searchInput" placeholder="Search..." class="pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent w-60">
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full" id="paymentsTable">
+                    <thead>
+                        <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                            <th class="px-4 py-4">#</th>
+                            <th class="px-4 py-4">Student</th>
+                            <th class="px-4 py-4">Course / Module</th>
+                            <th class="px-4 py-4">Method</th>
+                            <th class="px-4 py-4">Amount</th>
+                            <th class="px-4 py-4">Date</th>
+                            <th class="px-4 py-4">Status</th>
+                            <th class="px-4 py-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php if ($result && $result->num_rows > 0): ?>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr class="hover:bg-gray-50 transition-colors payment-row" data-id="<?= $row['id'] ?>">
+                                <td class="px-4 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold">
+                                            <?php echo strtoupper(substr($row['student_name'], 0, 1)); ?>
+                                        </span>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($row['student_name']) ?></p>
+                                            <p class="text-xs text-gray-400"><?= htmlspecialchars($row['student_email']) ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <p class="text-sm text-gray-700"><?= htmlspecialchars($row['course_name']) ?></p>
+                                    <p class="text-xs text-gray-400"><?= htmlspecialchars($row['module_name']) ?></p>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <?php if ($row['payment_method']): ?>
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                                            <?= htmlspecialchars($row['payment_method']) ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-xs text-gray-400">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-4 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                    <?php if ($row['price'] > 0): ?>
+                                        <?= number_format($row['price']); ?> MMK
+                                    <?php else: ?>
+                                        <span class="text-gray-400">Free</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-500"><?= htmlspecialchars($row['enroll_date']) ?></td>
+                                <td class="px-4 py-4">
+                                    <?php
+                                    $s = strtolower($row['status']);
+                                    if ($s === 'completed') $s = 'confirmed';
+                                    $badge = match($s) {
+                                        'confirmed' => 'bg-green-50 text-green-700 border-green-200',
+                                        'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                                        'rejected' => 'bg-red-50 text-red-700 border-red-200',
+                                        default => 'bg-gray-50 text-gray-600 border-gray-200'
+                                    };
+                                    $icon = match($s) {
+                                        'confirmed' => '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+                                        'pending' => '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                                        'rejected' => '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
+                                        default => ''
+                                    };
+                                    ?>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border <?= $badge ?>">
+                                        <?= $icon ?>
+                                        <?= ucfirst($s) ?>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-1.5">
+                                        <button class="confirm-btn px-2 py-1 text-xs font-semibold rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition" data-id="<?= $row['id'] ?>">
+                                            Confirm
+                                        </button>
+                                        <button class="reject-btn px-2 py-1 text-xs font-semibold rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition" data-id="<?= $row['id'] ?>">
+                                            Reject
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8" class="px-6 py-12 text-center">
+                                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <p class="text-sm text-gray-400 mb-1">No enrollments yet</p>
+                                    <p class="text-xs text-gray-300">Enrollments will appear once students purchase a module.</p>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var q = this.value.trim();
+    if (!q) { document.querySelectorAll('.payment-row').forEach(function(r) { r.style.display = ''; }); return; }
+    var words = q.toLowerCase().split(/\s+/);
+    document.querySelectorAll('.payment-row').forEach(function(r) {
+        var name = r.querySelector('td:nth-child(4)').textContent.toLowerCase();
+        var match = words.some(function(w) { return name.split(/\s+/).some(function(n) { return n.startsWith(w); }); });
+        r.style.display = match ? '' : 'none';
+    });
+});
+
+document.querySelectorAll('.confirm-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var row = this.closest('tr');
+        if (confirm('Confirm this enrollment?')) {
+            var formData = new FormData();
+            formData.append('action', 'confirm');
+            formData.append('id', id);
+            fetch('payments_ajax.php', { method: 'POST', body: formData })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var statusCell = row.querySelector('td:nth-child(7)');
+                        statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-green-50 text-green-700 border-green-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmed</span>';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+    });
+});
+
+document.querySelectorAll('.reject-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var row = this.closest('tr');
+        if (confirm('Reject this enrollment?')) {
+            var formData = new FormData();
+            formData.append('action', 'reject');
+            formData.append('id', id);
+            fetch('payments_ajax.php', { method: 'POST', body: formData })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        var statusCell = row.querySelector('td:nth-child(7)');
+                        statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Rejected</span>';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+    });
+});
+</script>
+
+<?php require_once 'includes/footer.php'; ?>
