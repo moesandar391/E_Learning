@@ -113,9 +113,17 @@ include_once('../includes/header.php');
 
             <button type="submit" class="w-full bg-brandOrange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition">Create Free Account</button>
 
-            <div class="text-center mt-4">
+            <!-- <div class="text-center mt-4">
                 <a href="login.php" class="text-brandOrange hover:underline">Already have an account? Login</a>
-            </div>
+            </div> -->
+            <div class="text-center mt-5 pt-5 border-t border-gray-100">
+                    <p class="text-sm text-gray-500">
+                        Already have an account?
+                        <a href="login.php" class="text-brandOrange font-semibold hover:text-orange-600 hover:underline transition-colors ml-1">
+                            Login
+                        </a>
+                    </p>
+                </div>
         </form>
     </div>
 </div>

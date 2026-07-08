@@ -34,16 +34,22 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
             </p>
 
             <div class="pt-4 flex flex-wrap gap-4">
-                <a href="<?php echo isset($_SESSION['user_id']) ? '../users/enroll.php' : '../auth/login.php'; ?>" 
-                    class="px-7 py-3.5 bg-brandOrange hover:bg-brandOrangeHover text-white font-semibold rounded-xl transition-all shadow-md flex items-center space-x-2">
-                    <span>Enroll Now</span>
-                </a>
+    <a href="<?php echo isset($_SESSION['user_id']) ? '../users/enroll.php' : '../auth/login.php'; ?>" 
+       class="group relative px-7 py-3.5 font-semibold text-white rounded-xl transition-all shadow-md overflow-hidden border-2 border-brandOrange">
+        
+        <span class="absolute inset-0 bg-brandOrange -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
+        
+        <span class="relative z-10 transition-colors duration-500 text-brandOrange hover:text-white">Enroll Now</span>
+    </a>
 
-                <a href="../users/courses.php" 
-                    class="px-7 py-3.5 border border-gray-300 bg-white text-slate-700 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm">
-                    <span>Browse Courses</span>
-                </a>
-            </div>
+    <a href="../users/courses.php" 
+       class="group relative px-7 py-3.5 font-semibold text-slate-700 rounded-xl transition-all shadow-sm overflow-hidden border-2 border-gray-300 hover:text-white">
+        
+        <span class="absolute inset-0 bg-slate-700 -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
+        
+        <span class="relative z-10 transition-colors duration-500">Browse Courses</span>
+    </a>
+</div>
         </div>
 
         <div class="lg:col-span-7 h-[400px] sm:h-[520px] relative w-full rounded-2xl overflow-hidden shadow-xl border border-gray-100">
@@ -82,7 +88,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
             
             <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
                 <div>
-                    <h2 class="font-serif font-bold text-[30px] text-[#0F172A] leading-tight tracking-tight">
+                    <h2 class="font-serif font-bold text-[30px] text-brandOchre leading-tight tracking-tight">
                         Explore Categories
                     </h2>
                     <p class="text-sm text-[#566473] mt-2 font-medium">
@@ -145,24 +151,17 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
     <div class="max-w-7xl mx-auto">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-[#0F172A] tracking-tight">
+            <h2 class="font-serif font-bold text-3xl text-brandOchre tracking-tight">
                 Popular Courses
             </h2>
-            <div>
-                <a href="courses.php" class="inline-flex items-center gap-2 bg-[#3B5266] hover:bg-[#2C3E4F] text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 shadow-sm">
-                    <span>Load More Courses</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
-                </a>
-            </div>
+        
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <?php $cardColors = ['orange', 'blue', 'green']; ?>
             <?php foreach ($popularModules as $index => $module): ?>
             <?php $color = $cardColors[$index % count($cardColors)]; ?>
-            <div class="group relative bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-3">
+            <div class="group relative bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl">
                 
                 <div class="absolute inset-0 bg-gradient-to-br from-<?php echo $color; ?>-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
 
@@ -214,14 +213,23 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between border-t border-gray-50 pt-4">
-                            <div></div>
-                            <a href="<?php echo isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
-                             class="inline-flex items-center gap-2 bg-[#3B5266] hover:bg-[#FF8A00] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95">
-                                <span>Enroll</span>
-                                <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
+                        <div class="flex items-center gap-2">
+    <a href="details.php?module_id=<?php echo $module['module_id']; ?>"
+   class="flex-1 text-center text-xs font-medium py-3 rounded-xl transition-all duration-300
+          border border-gray-400 text-gray-500
+          hover:bg-gray-500 hover:text-white hover:border-gray-500
+          hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
+   View Details
+</a>
+
+    <a href="<?php echo isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
+       class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
+              border border-orange-600 text-orange-600
+              hover:bg-orange-600 hover:text-white
+              hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
+       Enroll Now
+    </a>
+</div>
                     </div>
                 </div>
 

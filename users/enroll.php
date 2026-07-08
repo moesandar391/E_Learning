@@ -110,7 +110,7 @@ $payment_methods = $result_methods->fetch_all(MYSQLI_ASSOC);
 </div>
             <div class="w-full">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Upload Receipt</label>
-                <input type="file" name="receipt" class="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" required>
+                <input type="file" name="receipt" id="receiptInput" class="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" required>
             </div>
             <button onclick="processPurchase(event)" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg">
                 Purchase Now - <?php echo number_format($price); ?> MMK
@@ -234,6 +234,18 @@ function processPurchase(event) {
         return;
     }
 
+    const receiptInput = document.querySelector('input[name="receipt"]');
+    
+    if (!receiptInput.files || receiptInput.files.length === 0) {
+        Swal.fire({
+            title: 'Receipt Required',
+            text: 'Please upload your payment receipt.',
+            icon: 'warning',
+            confirmButtonColor: '#ea580c'
+        });
+        return;
+    }
+
     const button = event.target;
     button.innerText = "Processing...";
     button.disabled = true;
@@ -241,6 +253,7 @@ function processPurchase(event) {
     const formData = new FormData();
     formData.append('module_id', '<?php echo $module_id; ?>');
     formData.append('payment_method_id', selectedMethodId);
+    formData.append('receipt', receiptInput.files[0]);
 
     fetch('process_enrollment.php', {
         method: 'POST',
@@ -253,7 +266,9 @@ function processPurchase(event) {
                 title: 'Payment Successful!',
                 text: data.message,
                 icon: 'success',
-                confirmButtonColor: '#ea580c'
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
             }).then(function() {
                 window.location.href = data.redirect;
             });
@@ -278,6 +293,7 @@ function processPurchase(event) {
         button.innerText = "Purchase Now - <?php echo number_format($price); ?> MMK";
         button.disabled = false;
     });
+
 }
 </script>
 

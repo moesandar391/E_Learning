@@ -1,6 +1,4 @@
 <?php
-// 1. ALL PHP LOGIC GOES HERE AT THE VERY TOP
-// Force session to be accessible across the entire domain path
 session_set_cookie_params(['path' => '/']);
 session_start();
 require_once '../config/db.php';
@@ -10,112 +8,131 @@ $error_message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $role = $_POST['role']; // Ensure your select name="role" is correct
 
-    $table = ($role === 'admin') ? 'admin' : 'users';
+    $tables = ['users', 'admin'];
+    $found = false;
 
-    $sql = "SELECT * FROM $table WHERE email = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    foreach ($tables as $table) {
+        $sql = "SELECT * FROM $table WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
+        if ($result->num_rows == 1) {
+            $user = $result->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                $found = true;
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['name'];
+                $_SESSION['role'] = ($table === 'admin') ? 'admin' : 'user';
+                session_write_close();
 
-        if (password_verify($password, $user['password'])) {
-            // Success logic
-            session_regenerate_id(true); 
-            
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['name'];
-            $_SESSION['role'] = $role; // This is the key for your dashboard check
-
-            // CRITICAL: Force the session data to save to the server before redirecting
-            session_write_close(); 
-
-            if ($role === 'admin') {
-                header("Location: ../admin/dashboard.php");
-            } else {
-                $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                header("Location: ../users/courses.php");
+                if ($table === 'admin') {
+                    header("Location: ../admin/dashboard.php");
+                } else {
+                    $_SESSION['profile_image'] = $user['profile_image'] ?? null;
+                    header("Location: ../users/courses.php");
+                }
+                exit();
             }
-            exit(); 
-        } else {
-            $error_message = "Invalid email or password.";
         }
-    } else {
+        $stmt->close();
+    }
+    if (!$found) {
         $error_message = "Invalid email or password.";
     }
-    $stmt->close();
 }
 ?>
 
 <?php include_once('../includes/header.php'); ?>
 
-    <div class="w-full bg-gray-50 flex items-center justify-center py-16 px-6 min-h-[70vh]">
-        
-        <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-md border border-gray-100">
-            
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-800">Welcome Back</h2>
-                <p class="text-xs text-slate-500 mt-1">Sign in to resume mastering your language journey.</p>
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-orange-50 via-white to-amber-50">
+    <div class="max-w-md w-full">
+
+        <div class="bg-white rounded-3xl shadow-xl shadow-orange-100/50 border border-orange-100/60 px-8 py-8">
+
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-brandOrange">Welcome Back</h2>
+                <p class="text-sm text-gray-500 mt-1">Sign in to continue your learning journey</p>
             </div>
 
-            <?php if (!empty($error_message)): ?>
-                <div class="bg-red-50 text-red-600 border border-red-200 rounded-lg p-3 text-xs font-semibold mb-4 text-center">
-                    <?php echo $error_message; ?>
-                </div>
-            <?php endif; ?>
+                <?php if (!empty($error_message)): ?>
+                    <div class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium mb-6">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span><?php echo $error_message; ?></span>
+                    </div>
+                <?php endif; ?>
 
-            <form action="" method="POST" class="space-y-4">
+                <form action="" method="POST" class="space-y-5">
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                    <input type="email"
-                           name="email"
-                           required
-                           autocomplete="email"
-                           class="w-full border border-gray-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all">
-                </div>
-                
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-bold text-slate-700">Password</label>
-                        <a href="#" class="text-xs text-orange-500 hover:underline">Forgot password?</a>
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <input type="email"
+                                   name="email"
+                                   required
+                                   autocomplete="email"
+                                   placeholder="you@example.com"
+                                   class="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-sm text-gray-700 bg-gray-50/50 focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 focus:bg-white transition-all">
+                        </div>
                     </div>
 
-                    <input type="password"
-                           name="password"
-                           required
-                           autocomplete="current-password"
-                           class="w-full border border-gray-200 rounded-lg p-2.5 text-sm text-slate-700 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+                            <a href="#" class="text-xs text-brandOrange hover:text-orange-600 font-medium transition-colors">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <input type="password"
+                                   name="password"
+                                   required
+                                   autocomplete="current-password"
+                                   placeholder="Enter your password"
+                                   class="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-sm text-gray-700 bg-gray-50/50 focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="remember" type="checkbox" class="w-4 h-4 text-brandOrange border-gray-300 rounded focus:ring-brandOrange">
+                        <label for="remember" class="ml-2 text-sm text-gray-600">Remember me</label>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-brandOrange to-orange-500 hover:from-orange-500 hover:to-brandOrange text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-orange-200/50 hover:shadow-xl hover:shadow-orange-200/60 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-7 pt-5 border-t border-gray-100">
+                    <p class="text-sm text-gray-500">
+                        Don't have an account yet?
+                        <a href="register.php" class="text-brandOrange font-semibold hover:text-orange-600 transition-colors ml-1">
+                            Create Account
+                        </a>
+                    </p>
                 </div>
 
-                <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Login As</label>
-                <select name="role" class="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-brandOrange">
-                    <option value="user">Student</option>
-                    <option value="admin">Administrator</option>
-                </select>
-                </div>
-
-                <button type="submit"
-                    class="w-full bg-[#FF8A00] hover:bg-[#E07A00] text-white font-bold py-2.5 rounded-xl text-sm shadow-sm transition-all mt-2">
-                    Sign In
-                </button>
-
-            </form>
-
-            <div class="text-center mt-6 pt-4 border-t border-gray-100 text-xs font-medium text-slate-500">
-                Don't have an account yet?
-                <a href="register.php" class="text-orange-500 font-bold hover:underline ml-0.5">
-                    Create Account
-                </a>
             </div>
-
         </div>
     </div>
+</div>
 
 </body>
 </html>

@@ -24,7 +24,10 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
-                    }
+                    },
+                    animation: {
+                        spin: 'spin 2s linear infinite',
+                    },
                 }
             }
         }
@@ -42,24 +45,22 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                 </span>
             </div>
 
-            <nav class="hidden md:flex items-center space-x-8 font-medium text-brandTextGray">
+            <nav class="hidden md:flex items-center space-x-12 font-medium text-brandTextGray">
 
-    <a href="../users/index.php"
-       class="relative hover:text-brandOchre transition duration-300 hover:border-b-2 hover:border-brandOrange pb-1">
+    <a href="../users/index.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Home
+        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
     </a>
 
     <div class="relative group">
-        <a href="../users/courses.php"
-           class="relative flex items-center hover:text-brandOchre transition duration-300 hover:border-b-2 hover:border-brandOrange pb-1">
+        <a href="../users/courses.php" class="relative flex items-center py-2 hover:text-brandOchre transition-colors duration-300">
             Courses
             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 9l-7 7-7-7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
+            <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
         </a>
 
-        <!-- Dropdown -->
         <div class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
             <a href="../users/courses.php?filter=All" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">All Courses</a>
             <a href="../users/courses.php?filter=Cambridge" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">Cambridge</a>
@@ -70,31 +71,46 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         </div>
     </div>
 
-    <a href="../users/about.php"
-       class="relative hover:text-brandOchre transition duration-300 hover:border-b-2 hover:border-brandOrange pb-1">
+    <a href="../users/about.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         About
+        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
     </a>
 
-    <a href="../users/contact.php"
-       class="relative hover:text-brandOchre transition duration-300 hover:border-b-2 hover:border-brandOrange pb-1">
+    <a href="../users/contact.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Contact
+        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
     </a>
 
 </nav>
-            <div class="relative hidden lg:block">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </span>
-                    <input type="text" placeholder="Search courses..." class="w-56 pl-9 pr-4 py-1.5 bg-[#F1F3F5] rounded-full text-sm text-slate-700 border border-brandOrange placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brandOchre">
-            </div>
+            <div class="group flex items-center rounded-full bg-[#F1F3F5] border border-brandOrange transition-all duration-300">
+    
+    <input 
+        type="text" 
+        placeholder="Search courses..." 
+        class="w-0 bg-transparent py-1.5 px-0 text-sm text-slate-700 outline-none transition-all duration-300 group-hover:w-56 group-hover:pl-4"
+    >
+
+    <a href="#" class="flex h-8 w-8 items-center justify-center rounded-full bg-brandOrange text-white transition-colors duration-300">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+    </a>
+</div>
 
             <div class="flex items-center space-x-4">
                <div class="hidden lg:block">
-                    <button onclick="window.location.href='../auth/register.php'"
-                        class="px-6 py-2 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition duration-300 shadow-md">
-                        Get Started
-                    </button>
-                </div>
+    <button
+        onclick="window.location.href='../auth/register.php'"
+        class="group relative overflow-hidden rounded-full border-2 border-brandOrange bg-white px-6 py-2 font-semibold text-brandOrange transition-all duration-300 hover:shadow-lg">
+        <span
+            class="absolute left-[calc(-100%-1.2rem)] top-0 h-full w-[calc(100%+1.2rem)] bg-brandOrange transition-transform duration-300 [clip-path:polygon(0_0,calc(100%-1.2rem)_0,100%_50%,calc(100%-1.2rem)_100%,0_100%)] group-hover:translate-x-full">
+        </span>
+
+        <span class="relative z-10 transition-colors duration-300 group-hover:text-white">
+            Get Started
+        </span>
+    </button>
+</div>
                 <?php 
                 $header_profile_img = null;
                 if (isset($_SESSION['user_id'])) {
@@ -155,9 +171,14 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     </div>
 
                         <?php else: ?>
-                    <a href="../auth/login.php" class="px-6 py-1.5 border border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
-                        Login
-                    </a>
+                    <div class="relative inline-block p-[2px] rounded-full overflow-hidden">
+    
+    <div class="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#00f7ff_0%,#7c3aed_50%,#ec4899_100%)]"></div>
+
+    <a href="../auth/login.php" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
+        Login
+    </a>
+</div>
                 <?php endif; ?>
             </div>
 
