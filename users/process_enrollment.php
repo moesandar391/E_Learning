@@ -25,6 +25,25 @@ if (!$module_id) {
     exit();
 }
 
+// 1. Handle File Upload
+if (!isset($_FILES['receipt']) || $_FILES['receipt']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'Please upload a valid receipt image.']);
+    exit();
+}
+
+$uploadDir = '../uploads/receipts/';
+if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+$fileExtension = pathinfo($_FILES['receipt']['name'], PATHINFO_EXTENSION);
+$fileName = 'receipt_' . $user_id . '_' . $module_id . '_' . time() . '.' . $fileExtension;
+$targetPath = $uploadDir . $fileName;
+
+if (!move_uploaded_file($_FILES['receipt']['tmp_name'], $targetPath)) {
+    echo json_encode(['success' => false, 'message' => 'Failed to save receipt file.']);
+    exit();
+}
+
+// 2. Fetch Module Details
 $mod = $conn->prepare("SELECT m.id, m.name, m.price, m.course_id, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id WHERE m.id = ?");
 $mod->bind_param("i", $module_id);
 $mod->execute();
@@ -35,6 +54,7 @@ if (!$module) {
     exit();
 }
 
+// 3. Prevent Duplicate Enrollment
 $check = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ?");
 $check->bind_param("ii", $user_id, $module_id);
 $check->execute();
@@ -43,12 +63,13 @@ if ($check->get_result()->num_rows > 0) {
     exit();
 }
 
+// 4. Insert into Database (Added 'receipt' column)
 $enroll_date = date('Y-m-d');
-$stmt = $conn->prepare("INSERT INTO enrollments (user_id, module_id, payment_method_id, enroll_date, status) VALUES (?, ?, ?, ?, 'pending')");
-$stmt->bind_param("iiis", $user_id, $module_id, $payment_method_id, $enroll_date);
+$stmt = $conn->prepare("INSERT INTO enrollments (user_id, module_id, payment_method_id, receipt, enroll_date, status) VALUES (?, ?, ?, ?, ?, 'pending')");
+$stmt->bind_param("iiiss", $user_id, $module_id, $payment_method_id, $targetPath, $enroll_date);
 $stmt->execute();
-$enroll_id = $conn->insert_id;
 
+// 5. Notifications (Your original logic)
 create_notification(
     $user_id,
     'Your enrollment in "' . $module['name'] . '" is pending approval',

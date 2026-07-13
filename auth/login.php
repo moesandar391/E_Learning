@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: ../admin/dashboard.php");
                 } else {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                    header("Location: ../users/courses.php");
+                    header("Location: ../users/index.php");
                 }
                 exit();
             }

@@ -8,13 +8,30 @@
  $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
  $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
  $result = $conn->query("
-    SELECT e.id, u.name AS student_name, u.email AS student_email, m.name AS module_name, m.price, c.course_name, pm.name AS payment_method, e.enroll_date, e.status, e.created_at
+    SELECT e.id,
+           u.name AS student_name,
+           u.email AS student_email,
+           m.name AS module_name,
+           m.price,
+           c.course_name,
+           pm.name AS payment_method,
+           e.enroll_date,
+           e.status,
+           e.created_at
     FROM enrollments e
     JOIN users u ON e.user_id = u.id
     JOIN modules m ON e.module_id = m.id
     JOIN courses c ON m.course_id = c.id
     LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
-    ORDER BY e.created_at DESC
+    ORDER BY
+        CASE
+            WHEN LOWER(e.status) = 'pending' THEN 1
+            WHEN LOWER(e.status) = 'confirmed' THEN 2
+            WHEN LOWER(e.status) = 'completed' THEN 2
+            WHEN LOWER(e.status) = 'rejected' THEN 3
+            ELSE 4
+        END,
+        e.created_at DESC
 ");
 ?>
 
@@ -26,9 +43,10 @@
         </div>
         <div class="flex items-center gap-4">
             <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+            <?php require_once 'includes/admin_notif_icon.php'; ?>
+            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition">
                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
-            </div>
+            </a>
         </div>
     </header>
 
@@ -87,9 +105,25 @@
                     <h3 class="font-semibold text-gray-800">All Enrollments</h3>
                     <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full"><?= $total_enrollments ?> total</span>
                 </div>
-                <div class="relative">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" id="searchInput" placeholder="Search..." class="pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent w-60">
+                <div class="flex items-center gap-3">
+                    <!-- Status Filter -->
+                    <select id="statusFilter"
+                        class="px-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <!-- Search -->
+                    <div class="relative">
+                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="searchInput"
+                        placeholder="Search..."
+                        class="pl-9 pr-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent w-60">
+                    </div>
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -109,7 +143,9 @@
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
                             <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr class="hover:bg-gray-50 transition-colors payment-row" data-id="<?= $row['id'] ?>">
+                            <tr class="hover:bg-gray-50 transition-colors payment-row"
+                                data-id="<?= $row['id'] ?>"
+                                data-status="<?= strtolower($row['status']) == 'completed' ? 'confirmed' : strtolower($row['status']) ?>">
                                 <td class="px-4 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-2">
@@ -127,14 +163,32 @@
                                     <p class="text-xs text-gray-400"><?= htmlspecialchars($row['module_name']) ?></p>
                                 </td>
                                 <td class="px-4 py-4">
-                                    <?php if ($row['payment_method']): ?>
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                                            <?= htmlspecialchars($row['payment_method']) ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="text-xs text-gray-400">—</span>
-                                    <?php endif; ?>
-                                </td>
+    <?php 
+    // Use strtolower to make matching case-insensitive
+    $method = trim($row['payment_method'] ?? '');
+    $methodLower = strtolower($method);
+    
+    // Define brand-specific colors
+    $colors = [
+        'k pay'    => 'bg-blue-100 text-blue-700 border-blue-200',
+        'kbzpay'  => 'bg-blue-100 text-blue-700 border-blue-200',
+        'wavepay' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        'aya pay'  => 'bg-red-100 text-red-700 border-red-200',
+        'cb pay'   => 'bg-teal-100 text-teal-700 border-teal-200'
+    ];
+
+    // Get style based on lowercase match, default to gray if unknown
+    $style = $colors[$methodLower] ?? 'bg-gray-50 text-gray-600 border-gray-200';
+    ?>
+
+    <?php if ($method): ?>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border <?= $style ?>">
+            <?= htmlspecialchars($method) ?>
+        </span>
+    <?php else: ?>
+        <span class="text-xs text-gray-400">—</span>
+    <?php endif; ?>
+</td>
                                 <td class="px-4 py-4 text-sm font-semibold text-gray-700 whitespace-nowrap">
                                     <?php if ($row['price'] > 0): ?>
                                         <?= number_format($row['price']); ?> MMK
@@ -194,16 +248,30 @@
 </div>
 
 <script>
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    var q = this.value.trim();
-    if (!q) { document.querySelectorAll('.payment-row').forEach(function(r) { r.style.display = ''; }); return; }
-    var words = q.toLowerCase().split(/\s+/);
-    document.querySelectorAll('.payment-row').forEach(function(r) {
-        var name = r.querySelector('td:nth-child(4)').textContent.toLowerCase();
-        var match = words.some(function(w) { return name.split(/\s+/).some(function(n) { return n.startsWith(w); }); });
-        r.style.display = match ? '' : 'none';
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+
+function filterTable() {
+
+    const keyword = searchInput.value.toLowerCase().trim();
+    const status = statusFilter.value;
+
+    document.querySelectorAll('.payment-row').forEach(function(row){
+
+        const text = row.innerText.toLowerCase();
+        const rowStatus = row.dataset.status;
+
+        const matchSearch = text.includes(keyword);
+        const matchStatus = status === 'all' || rowStatus === status;
+
+        row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+
     });
-});
+
+}
+
+searchInput.addEventListener('keyup', filterTable);
+statusFilter.addEventListener('change', filterTable);
 
 document.querySelectorAll('.confirm-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {

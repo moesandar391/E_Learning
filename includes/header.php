@@ -62,12 +62,12 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         </a>
 
         <div class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-            <a href="../users/courses.php?filter=All" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">All Courses</a>
-            <a href="../users/courses.php?filter=Cambridge" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">Cambridge</a>
-            <a href="../users/courses.php?filter=English%20Grammar" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">English Grammar</a>
-            <a href="../users/courses.php?filter=Writing%20Course" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">Writing Course</a>
-            <a href="../users/courses.php?filter=General%20English" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">General English</a>
-            <a href="../users/courses.php?filter=English%20for%20Kids" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">English for Kids</a>
+            <a href="../users/viewAllCourses.php?filter=All" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">All Courses</a>
+            <a href="../users/viewAllCourses.php?filter=Cambridge" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">Cambridge</a>
+            <a href="../users/viewAllCourses.php?filter=English%20Grammar" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">English Grammar</a>
+            <a href="../users/viewAllCourses.php?filter=Writing%20Course" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">Writing Course</a>
+            <a href="../users/viewAllCourses.php?filter=General%20English" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">General English</a>
+            <a href="../users/viewAllCourses.php?filter=English%20for%20Kids" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">English for Kids</a>
         </div>
     </div>
 

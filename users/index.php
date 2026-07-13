@@ -291,6 +291,9 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
     </script>
 </body>
 </html>
-<?php 
-include_once('../includes/footer.php');
-?>
+
+// include_once('../users/about.php');
+// include_once('../users/contact.php');
+
+
+<?php include_once('../includes/footer.php');?>

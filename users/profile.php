@@ -110,7 +110,7 @@ if ($resultEnrolled) {
                 </div>
             </div>
 
-            <div class="p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
+            <div class="p-8 text-center">
     <h3 class="text-xl font-bold text-brandOrange mb-6">My Certificates</h3>
     
     <?php if (!empty($certificates)): ?>

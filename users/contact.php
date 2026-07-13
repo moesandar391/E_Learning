@@ -1,5 +1,46 @@
 <?php 
 include_once('../includes/header.php');
+
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/admin_notification_helper.php';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    
+    $firstName = trim($_POST['first-name'] ?? '');
+    $lastName = trim($_POST['last-name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+    
+    $errors = [];
+    if (empty($firstName)) $errors[] = 'First name is required.';
+    if (empty($email)) $errors[] = 'Email is required.';
+    if (empty($subject)) $errors[] = 'Subject is required.';
+    if (empty($message)) $errors[] = 'Message is required.';
+    
+    if (!empty($errors)) {
+        echo json_encode(['success' => false, 'message' => implode(' ', $errors)]);
+        exit;
+    }
+    
+    $stmt = $conn->prepare("INSERT INTO contacts (first_name, last_name, email, phone, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("ssssss", $firstName, $lastName, $email, $phone, $subject, $message);
+    
+    if ($stmt->execute()) {
+        create_admin_notification(
+            "New contact message from $firstName $lastName ($subject)",
+            "../admin/contacts.php",
+            'contact'
+        );
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error. Please try again.']);
+    }
+    exit;
+}
 ?>
 
 <!-- <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen pt-20"> -->
@@ -13,7 +54,7 @@ include_once('../includes/header.php');
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-7 bg-white rounded-3xl p-10 border border-gray-100 shadow-sm">
-                <form action="#" method="POST" class="space-y-8">
+                <form action="" method="POST" class="space-y-8">
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
@@ -179,57 +220,40 @@ include_once('../includes/header.php');
     </div>
     
     <script>
-        // Form submission handler
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form data
             const formData = new FormData(this);
-            const data = Object.fromEntries(formData);
-            
-            // Here you would typically send the data to your backend
-            console.log('Form submitted:', data);
-            
-            // Show success message
             const submitButton = this.querySelector('button[type="submit"]');
             const originalText = submitButton.innerHTML;
             
-            submitButton.innerHTML = '
-                <span>Sending...</span>
-                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 0110 10h2a8 8 0 00-16 0A10 10 0 0112 2zm0 18a8 8 0 01-8-8 8 8 0 018-8v2a6 6 0 100 12 6 6 0 000-12V4z"></path>
-                </svg>
-            ';
+            submitButton.innerHTML = '<span>Sending...</span>';
             submitButton.disabled = true;
             
-            // Simulate API call
-            setTimeout(() => {
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
                 submitButton.innerHTML = originalText;
                 submitButton.disabled = false;
                 
-                // Show success message
-                const successMessage = document.createElement('div');
-                successMessage.className = 'fixed top-4 right-4 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg shadow-lg z-50';
-                successMessage.innerHTML = '
-                    <div class="flex items-center gap-3">
-                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <p class="font-semibold">Message Sent!</p>
-                            <p class="text-sm">Thank you for contacting us. We\'ll get back to you soon.</p>
-                        </div>
-                    </div>
-                ';
-                document.body.appendChild(successMessage);
-                
-                setTimeout(() => {
-                    successMessage.remove();
-                }, 5000);
-                
-                // Reset form
-                this.reset();
-            }, 2000);
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg border ' + (data.success ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700');
+                if (data.success) {
+                    msg.innerHTML = '<div class="flex items-center gap-3"><svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><div><p class="font-semibold">Message Sent!</p><p class="text-sm">Thank you for contacting us.</p></div></div>';
+                    this.reset();
+                } else {
+                    msg.innerHTML = '<div class="flex items-center gap-3"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><div><p class="font-semibold">Error</p><p class="text-sm">' + (data.message || 'Try again.') + '</p></div></div>';
+                }
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 5000);
+            })
+            .catch(function() {
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            });
         });
         
         // Input focus effects

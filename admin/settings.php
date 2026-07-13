@@ -64,9 +64,10 @@ $admin = $stmt->get_result()->fetch_assoc();
         </div>
         <div class="flex items-center gap-4">
             <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+            <?php require_once 'includes/admin_notif_icon.php'; ?>
+            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition">
                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
-            </div>
+            </a>
         </div>
     </header>
 

@@ -22,9 +22,10 @@
         </div>
         <div class="flex items-center gap-4">
             <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+            <?php require_once 'includes/admin_notif_icon.php'; ?>
+            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition">
                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
-            </div>
+            </a>
         </div>
     </header>
 
@@ -37,14 +38,14 @@
                 </div>
                 <div class="relative">
                     <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" id="searchInput" placeholder="Search enrollments..." class="pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent w-60">
+                    <input type="text" id="searchInput" placeholder="Search enrollments..." class="pl-9 pr-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent w-60">
                 </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full" id="enrollmentsTable">
-                    <thead>
-                        <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            <th class="px-6 py-4">#</th>
+                    <thead class="bg-orange-100/50">
+                        <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <!-- <th class="px-6 py-4">#</th> -->
                             <th class="px-6 py-4">Student</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>
@@ -55,7 +56,7 @@
                         <?php if ($result && $result->num_rows > 0): ?>
                             <?php while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors enrollment-row">
-                                <td class="px-6 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td>
+                                <!-- <td class="px-6 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td> -->
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold">
@@ -92,13 +93,15 @@
 
 <script>
 document.getElementById('searchInput').addEventListener('keyup', function() {
-    var q = this.value.trim();
-    if (!q) { document.querySelectorAll('.enrollment-row').forEach(function(r) { r.style.display = ''; }); return; }
-    var words = q.toLowerCase().split(/\s+/);
-    document.querySelectorAll('.enrollment-row').forEach(function(r) {
-        var name = r.querySelector('td:nth-child(4)').textContent.toLowerCase();
-        var match = words.some(function(w) { return name.split(/\s+/).some(function(n) { return n.startsWith(w); }); });
-        r.style.display = match ? '' : 'none';
+    var q = this.value.toLowerCase().trim();
+    var rows = document.querySelectorAll('.enrollment-row');
+    
+    rows.forEach(function(r) {
+        // Target only the second column (Course)
+        var course = r.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        
+        // Show row if it includes the query, otherwise hide it
+        r.style.display = course.includes(q) ? '' : 'none';
     });
 });
 </script>

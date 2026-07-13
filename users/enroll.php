@@ -222,30 +222,21 @@ document.addEventListener('keydown', function(e) {
 //         display.textContent = `${mins.toString().padStart(2, '0')} minutes : ${secs.toString().padStart(2, '0')} seconds`;
 //     }
 // }
-
 function processPurchase(event) {
     if (!selectedMethod) {
-        Swal.fire({
-            title: 'Select Payment Method',
-            text: 'Please select a payment method first.',
-            icon: 'warning',
-            confirmButtonColor: '#ea580c'
-        });
+        Swal.fire({ title: 'Select Payment Method', text: 'Please select a payment method first.', icon: 'warning', confirmButtonColor: '#ea580c' });
         return;
     }
 
     const receiptInput = document.querySelector('input[name="receipt"]');
     
-    if (!receiptInput.files || receiptInput.files.length === 0) {
-        Swal.fire({
-            title: 'Receipt Required',
-            text: 'Please upload your payment receipt.',
-            icon: 'warning',
-            confirmButtonColor: '#ea580c'
-        });
+    // Check if input exists and has a file
+    if (!receiptInput || receiptInput.files.length === 0) {
+        Swal.fire({ title: 'Receipt Required', text: 'Please upload your payment receipt.', icon: 'warning', confirmButtonColor: '#ea580c' });
         return;
     }
 
+    const file = receiptInput.files[0];
     const button = event.target;
     button.innerText = "Processing...";
     button.disabled = true;
@@ -253,47 +244,33 @@ function processPurchase(event) {
     const formData = new FormData();
     formData.append('module_id', '<?php echo $module_id; ?>');
     formData.append('payment_method_id', selectedMethodId);
-    formData.append('receipt', receiptInput.files[0]);
+    formData.append('receipt', file); // Sending the file object
+
+    // Debugging: Log what is being sent to the console
+    console.log("Sending file:", file.name, "Size:", file.size);
 
     fetch('process_enrollment.php', {
         method: 'POST',
-        body: formData
+        body: formData 
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.success) {
-            Swal.fire({
-                title: 'Payment Successful!',
-                text: data.message,
-                icon: 'success',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
-            }).then(function() {
-                window.location.href = data.redirect;
-            });
+            Swal.fire({ title: 'Payment Successful!', text: data.message, icon: 'success', showConfirmButton: false, timer: 2000, timerProgressBar: true })
+                .then(function() { window.location.href = data.redirect; });
         } else {
-            Swal.fire({
-                title: 'Error',
-                text: data.message,
-                icon: 'error',
-                confirmButtonColor: '#ea580c'
-            });
+            console.error("Server Error:", data.message); // Check console if purchase fails
+            Swal.fire({ title: 'Error', text: data.message, icon: 'error', confirmButtonColor: '#ea580c' });
             button.innerText = "Purchase Now - <?php echo number_format($price); ?> MMK";
             button.disabled = false;
         }
     })
-    .catch(function() {
-        Swal.fire({
-            title: 'Error',
-            text: 'Something went wrong. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#ea580c'
-        });
+    .catch(function(err) {
+        console.error("Fetch Error:", err);
+        Swal.fire({ title: 'Error', text: 'Something went wrong. Please check console.', icon: 'error', confirmButtonColor: '#ea580c' });
         button.innerText = "Purchase Now - <?php echo number_format($price); ?> MMK";
         button.disabled = false;
     });
-
 }
 </script>
 

@@ -146,7 +146,7 @@ $isCompleted = $activeLesson && in_array($activeLesson['id'], $completedIds);
         </main>
 
         <aside class="lg:col-span-4">
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm sticky top-6">
+            <div class="bg-white p-6 rounded-xl border border-orange-200 shadow-sm">
                 <h3 class="font-bold text-lg text-gray-800 mb-4 border-b border-gray-100 pb-3">Course Outline</h3>
 
                 <div class="space-y-1 max-h-[60vh] overflow-y-auto pr-1">
@@ -200,6 +200,37 @@ $isCompleted = $activeLesson && in_array($activeLesson['id'], $completedIds);
                     <?php endif; ?>
                 </div>
             </div>
+            <?php
+$progress = $totalLessons > 0 ? round(($completedCount / $totalLessons) * 100) : 0;
+?>
+
+<div class="mt-3 rounded-xl border border-orange-200 bg-orange-50 p-4">
+    <div class="flex justify-between items-center mb-2">
+        <h4 class="font-semibold text-gray-800">Lesson Progress</h4>
+        <span class="text-sm font-bold text-brandOrange">
+            <?= $completedCount ?>/<?= $totalLessons ?>
+        </span>
+    </div>
+
+    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div class="h-full bg-brandOrange rounded-full"
+             style="width: <?= $progress ?>%"></div>
+    </div>
+
+    <div class="mt-2 flex justify-between text-xs">
+        <span class="text-gray-500"><?= $progress ?>% Completed</span>
+
+        <?php if($progress==100): ?>
+            <span class="font-semibold text-green-600">
+                ✔ Completed
+            </span>
+        <?php else: ?>
+            <span class="font-semibold text-yellow-600">
+                In Progress
+            </span>
+        <?php endif; ?>
+    </div>
+</div>
         </aside>
 
     </div>

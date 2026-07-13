@@ -33,7 +33,12 @@ CREATE TABLE IF NOT EXISTS modules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
+    image VARCHAR(255) DEFAULT NULL,
     price DECIMAL(10,2) DEFAULT 0.00,
+    description TEXT,
+    requirements TEXT,
+    what_includes TEXT,
+    who_is_for TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -183,6 +188,18 @@ CREATE TABLE IF NOT EXISTS admin_notifications (
     type VARCHAR(50) DEFAULT 'general',
     message VARCHAR(255) NOT NULL,
     link VARCHAR(255) DEFAULT '',
+    is_read TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS contacts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) DEFAULT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    subject VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
     is_read TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
