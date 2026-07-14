@@ -162,7 +162,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
             <div class="space-y-6">
 
                 <!-- Price Card -->
-                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm sticky top-28">
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
                     <div class="text-center mb-6">
                         <?php if (!empty($module['price']) && $module['price'] > 0): ?>
                             <p class="text-4xl font-bold text-brandOrange"><?php echo number_format($module['price']); ?> <span class="text-lg text-gray-400 font-normal">MMK</span></p>

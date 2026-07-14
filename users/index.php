@@ -147,6 +147,65 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
         </div>
     </section>
 
+        <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ── HOW IT WORK SECTION (Project Colors Applied) ── -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="w-full bg-white py-16 px-6 font-sans">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
+                <div>
+                    <span class="text-sm font-medium text-brandTextGray tracking-wide">Over 1,235+ Course</span>
+                    <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-900 tracking-tight mt-2">
+                        How It Work? <span class="inline-block w-16 h-1 bg-brandOrange align-middle ml-2 rounded-full"></span>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center relative">
+                
+                <!-- Arrow 1 (Changed to brandOrange) -->
+                <div class="hidden md:flex absolute left-[33%] top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 text-brandOrange">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+                
+                <!-- Arrow 2 (Changed to brandOrange) -->
+                <div class="hidden md:flex absolute left-[66%] top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 text-brandOrange">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+
+                <!-- Step 1 (Changed to Orange theme) -->
+                <div class="bg-orange-50 rounded-2xl p-10 text-center relative z-[1] border border-orange-100 hover:shadow-lg transition-all duration-300">
+                    <div class="w-16 h-16 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-sm text-brandOrange">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Find Your Course</h3>
+                    <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                </div>
+
+                <!-- Step 2 (Changed to Orange theme) -->
+                <div class="bg-orange-50 rounded-2xl p-10 text-center relative z-[1] border border-orange-100 hover:shadow-lg transition-all duration-300">
+                    <div class="w-16 h-16 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-sm text-brandOrange">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Book A Seat</h3>
+                    <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                </div>
+
+                <!-- Step 3 (Changed to Orange theme) -->
+                <div class="bg-orange-50 rounded-2xl p-10 text-center relative z-[1] border border-orange-100 hover:shadow-lg transition-all duration-300">
+                    <div class="w-16 h-16 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-sm text-brandOrange">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                    </div>
+                    <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Get Certificate</h3>
+                    <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- ═══════════════════════════════════════════════════════ -->
+
     <section class="w-full bg-[#F8F9FA] py-16 px-6 font-sans">
     <div class="max-w-7xl mx-auto">
 
@@ -240,16 +299,16 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
     </div>
 </section>
 
-<section class="w-full bg-white py-12 px-6 font-sans">
+<section class="w-full bg-[#F8F9FA] py-12 px-6 font-sans">
     <div class="max-w-6xl mx-auto">
         
-        <div class="w-full bg-[#4A607A] rounded-[32px] px-8 py-10 md:px-12 md:py-12 shadow-md flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div class="w-full bg-white/90 rounded-[32px] px-8 py-10 md:px-12 md:py-12 shadow-lg flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             
             <div class="space-y-3 max-w-xl">
-                <h2 class="font-serif italic font-bold text-3xl md:text-4xl text-white tracking-tight">
+                <h2 class="font-serif italic font-bold text-3xl md:text-4xl text-brandOchre tracking-tight">
                     Start your journey today.
                 </h2>
-                <p class="text-sm md:text-base text-slate-200/90 font-medium leading-relaxed">
+                <p class="text-sm md:text-base text-slate-400/90 font-medium leading-relaxed">
                     Join 50,000+ learners mastering English. New courses added every month.
                 </p>
             </div>
@@ -292,8 +351,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
 </body>
 </html>
 
-// include_once('../users/about.php');
-// include_once('../users/contact.php');
-
+<!-- include_once('../users/about.php');
+include_once('../users/contact.php'); -->
 
 <?php include_once('../includes/footer.php');?>
