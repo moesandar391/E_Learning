@@ -172,8 +172,8 @@ $subjectLabels = [
     $isMsgRead = $msg['is_read'] == 1;
 ?>
 <dialog id="view-modal-<?php echo $msg['id']; ?>" class="p-0 rounded-3xl shadow-2xl border-0 max-w-lg w-full backdrop:bg-black/40">
-    <div style="padding:2rem;background:white;border-radius:1.5rem">
-        <h2 style="font-size:1.25rem;font-weight:700;color:#1f2937;margin-bottom:1.5rem">Message Details</h2>
+    <div class="dialog-content" style="padding:2rem;background:white;border-radius:1.5rem">
+        <h2 class="dialog-title" style="font-size:1.25rem;font-weight:700;color:#1f2937;margin-bottom:1.5rem">Message Details</h2>
         <table style="width:100%">
             <tr><td style="padding-bottom:1rem;width:50%"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">First Name</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#374151"><?php echo htmlspecialchars($msg['first_name']); ?></p></td>
                 <td style="padding-bottom:1rem;width:50%"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Last Name</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#374151"><?php echo htmlspecialchars($msg['last_name'] ?: 'N/A'); ?></p></td></tr>

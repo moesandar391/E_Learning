@@ -99,7 +99,7 @@
                                             </svg>
                                         </button>
 
-                                        <button onclick="deleteCourse(<?= $row['id'] ?>)" 
+                                        <button onclick="deleteModule(<?= $row['id'] ?>)" 
                                             class="p-2 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition" 
                                             title="Delete">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -94,9 +94,10 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     </div>
                 </div>
 
+                <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> -->
                 <!-- About This Module -->
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <h2 class="font-serif font-bold text-2xl text-gray-900 mb-4">About This Module</h2>
+                    <h2 class="font-serif font-bold text-2xl text-gray-500 mb-4">About This Module</h2>
                     <p class="text-gray-600 leading-relaxed">
                         <?php echo nl2br(htmlspecialchars($module['description'] ?? 'No description available.')); ?>
                     </p>
@@ -104,7 +105,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
                 <!-- What This Module Includes -->
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <h2 class="font-serif font-bold text-2xl text-gray-900 mb-4">What This Module Includes</h2>
+                    <h2 class="font-serif font-bold text-2xl text-gray-500 mb-4">What This Module Includes</h2>
                     <?php if (!empty($module['what_includes'])): ?>
                         <ul class="space-y-3">
                             <?php foreach (explode("\n", $module['what_includes']) as $item): ?>
@@ -122,7 +123,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
                 <!-- Requirements -->
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <h2 class="font-serif font-bold text-2xl text-gray-900 mb-4">Requirements</h2>
+                    <h2 class="font-serif font-bold text-2xl text-gray-500 mb-4">Requirements</h2>
                     <?php if (!empty($module['requirements'])): ?>
                         <ul class="space-y-3">
                             <?php foreach (explode("\n", $module['requirements']) as $item): ?>
@@ -140,7 +141,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
                 <!-- Who This Module Is For -->
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <h2 class="font-serif font-bold text-2xl text-gray-900 mb-4">Who This Module Is For</h2>
+                    <h2 class="font-serif font-bold text-2xl text-gray-500 mb-4">Who This Module Is For</h2>
                     <?php if (!empty($module['who_is_for'])): ?>
                         <ul class="space-y-3">
                             <?php foreach (explode("\n", $module['who_is_for']) as $item): ?>
@@ -155,7 +156,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                         <p class="text-gray-400">Open to all learners.</p>
                     <?php endif; ?>
                 </div>
-
+                <!-- </div> -->
             </div>
 
             <!-- Sidebar -->
@@ -199,7 +200,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 <!-- Related Modules -->
                 <?php if (!empty($relatedModules)): ?>
                 <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <h3 class="font-serif font-bold text-xl text-gray-900 mb-6">Related Modules</h3>
+                    <h3 class="font-serif font-bold text-xl text-gray-500 mb-6">Related Modules</h3>
                     <div class="space-y-4">
                         <?php foreach ($relatedModules as $rel): ?>
                             <a href="details.php?module_id=<?php echo $rel['module_id']; ?>" class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group">

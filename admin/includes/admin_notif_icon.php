@@ -1,3 +1,16 @@
+<button id="darkModeToggle"
+class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer text-gray-400 hover:text-brandOrange"
+title="Toggle dark mode">
+    <svg id="darkModeIcon"
+         xmlns="http://www.w3.org/2000/svg"
+         class="w-5 h-5"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+    </svg>
+</button>
+
 <div class="relative" id="adminNotifWrapper">
     <button id="adminNotifBtn" class="relative text-gray-400 hover:text-brandOrange transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
@@ -126,4 +139,25 @@
     fetchAdminNotifs();
     setInterval(fetchAdminNotifs, 15000);
 })();
+
+// Dark mode toggle
+const darkModeBtn = document.getElementById('darkModeToggle');
+const darkModePath = document.querySelector('#darkModeIcon path');
+if (darkModeBtn && darkModePath) {
+    darkModeBtn.addEventListener('click', function() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
+        updateDarkModeIcon(isDark);
+    });
+    function updateDarkModeIcon(isDark) {
+        if (isDark) {
+            darkModePath.setAttribute('d', 'M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z');
+            darkModeBtn.classList.add('text-brandOrange');
+        } else {
+            darkModePath.setAttribute('d', 'M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z');
+            darkModeBtn.classList.remove('text-brandOrange');
+        }
+    }
+    updateDarkModeIcon(document.documentElement.classList.contains('dark'));
+}
 </script>
