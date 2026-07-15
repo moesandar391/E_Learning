@@ -83,7 +83,7 @@ $payment_methods = $result_methods->fetch_all(MYSQLI_ASSOC);
             <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="email" readonly value="<?php echo htmlspecialchars($userData['email']); ?>" class="bg-white border p-3 rounded-lg w-full">
                 <input type="text" readonly value="<?php echo htmlspecialchars($userData['name']); ?>" class="bg-white border p-3 rounded-lg w-full">
-                <input type="password" placeholder="New Password" class="bg-white border p-3 rounded-lg w-full">
+                <!-- <input type="password" placeholder="New Password" class="bg-white border p-3 rounded-lg w-full"> -->
                 <input type="text" readonly value="<?php echo htmlspecialchars($userData['phone']); ?>" class="bg-white border p-3 rounded-lg w-full">
             </form>
             
@@ -109,7 +109,7 @@ $payment_methods = $result_methods->fetch_all(MYSQLI_ASSOC);
     </div>
 </div>
             <div class="w-full">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Upload Receipt</label>
+                <label class="block text-[15px] font-bold text-gray-400 uppercase mb-1">Upload Receipt</label>
                 <input type="file" name="receipt" id="receiptInput" class="w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" required>
             </div>
             <button onclick="processPurchase(event)" class="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg">
@@ -197,31 +197,6 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeQR();
 });
 
-// Timer Logic
-// function startTimer(duration) {
-//     let timer = duration;
-//     const display = document.getElementById('timer');
-    
-//     // Initial display immediately so it doesn't wait 1 second to show
-//     updateDisplay();
-
-//     const interval = setInterval(() => {
-//         timer--;
-//         updateDisplay();
-        
-//         if (timer < 0) {
-//             clearInterval(interval);
-//             display.textContent = "00 minutes : 00 seconds";
-//             closeQR(); // Auto close when expired
-//         }
-//     }, 1000);
-
-//     function updateDisplay() {
-//         let mins = parseInt(timer / 60, 10);
-//         let secs = parseInt(timer % 60, 10);
-//         display.textContent = `${mins.toString().padStart(2, '0')} minutes : ${secs.toString().padStart(2, '0')} seconds`;
-//     }
-// }
 function processPurchase(event) {
     if (!selectedMethod) {
         Swal.fire({ title: 'Select Payment Method', text: 'Please select a payment method first.', icon: 'warning', confirmButtonColor: '#ea580c' });

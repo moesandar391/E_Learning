@@ -2,14 +2,168 @@
     /* Only 3 lines of CSS needed for the toggle animation */
     #sidebar {
         transition: width 0.3s ease-in-out;
-        overflow: hidden;
+        /* Changed to 'visible' so tooltips can escape the sidebar in BOTH open and closed states */
+        overflow: visible; 
+        position: relative;
     }
     #sidebar.collapsed {
         width: 80px !important;
     }
+    
+    /* Base rule to hide texts when collapsed */
     #sidebar.collapsed .nav-text,
     #sidebar.collapsed .sidebar-header-text {
         display: none;
+    }
+
+    /* ── Center logo when collapsed ── */
+    #sidebar.collapsed > div:first-child {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center !important;
+        position: relative;
+    }
+
+    /* ── Logo Hover State (Disappears) ── */
+    #sidebar.collapsed > div:first-child > div:first-child {
+        margin-right: 0 !important;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+        transition: opacity 0.2s ease;
+        opacity: 1;
+    }
+    #sidebar.collapsed > div:first-child:hover > div:first-child {
+        opacity: 0 !important;
+    }
+
+    /* ── Toggle Icon Hover State (Appears over logo) ── */
+    #sidebar.collapsed > div:first-child > div:last-child {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 8px;
+        z-index: 20;
+        opacity: 0; 
+        pointer-events: none; 
+        transition: opacity 0.2s ease;
+    }
+    #sidebar.collapsed > div:first-child:hover > div:last-child {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════ */
+    /* ── "Open/Close sidebar" Tooltip on Toggle Button ── */
+    /* ══════════════════════════════════════════════════════════ */
+    #sidebarToggle {
+        position: relative; 
+    }
+
+    #sidebarToggle::after {
+        content: "Close sidebar"; 
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 50%;
+        transform: translateY(-50%) translateX(8px);
+        
+        /* Updated background and text colors */
+        background-color: #EA580C; 
+        color: #ffffff; 
+        
+        font-size: 13px;
+        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #EA580C; /* Added border match */
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none; 
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        z-index: 1000;
+    }
+
+    #sidebar.collapsed #sidebarToggle::after {
+        content: "Open sidebar";
+    }
+
+    #sidebarToggle:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+    }
+
+    /* Dark mode support */
+    .dark #sidebarToggle::after {
+        background-color: #1f2937;
+        /* Keeping white text for contrast in dark mode */
+        color: #f9fafb; 
+        border-color: #374151;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════ */
+    /* ── Floating Tooltips for Collapsed Nav Icons ── */
+    /* ══════════════════════════════════════════════════════════ */
+
+    /* Override the nav's scroll behavior when collapsed so tooltips don't get clipped */
+    #sidebar.collapsed nav,
+    #sidebar.collapsed > div:last-child {
+        overflow: visible !important;
+    }
+
+    #sidebar.collapsed p.nav-text {
+        display: none !important;
+    }
+
+    #sidebar.collapsed nav a,
+    #sidebar.collapsed > div:last-child a {
+        position: relative;
+        justify-content: center !important;
+    }
+
+    #sidebar.collapsed nav a .nav-text,
+    #sidebar.collapsed > div:last-child a .nav-text {
+        display: block !important;
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 50%;
+        transform: translateY(-50%) translateX(8px);
+        background-color: #EA580C; 
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f3f4f6;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none; 
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        z-index: 1000;
+    }
+
+    #sidebar.collapsed nav a:hover .nav-text,
+    #sidebar.collapsed > div:last-child a:hover .nav-text {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+    }
+
+    /* Dark mode support for nav tooltips */
+    .dark #sidebar.collapsed nav a .nav-text,
+    .dark #sidebar.collapsed > div:last-child a .nav-text {
+        background-color: #1f2937;
+        color: #f9fafb;
+        border-color: #374151;
     }
 </style>
 
@@ -106,11 +260,8 @@
 <script>
 const sidebar = document.getElementById("sidebar");
 const btn = document.getElementById("sidebarToggle");
-const icon = document.getElementById("toggleIcon");
 
 btn.addEventListener("click", function() {
     sidebar.classList.toggle("collapsed");
 });
-
-
 </script>

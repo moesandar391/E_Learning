@@ -11,6 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_lesson']) &&
     $stmt = $conn->prepare("INSERT INTO lesson_progress (user_id, lesson_id, completed, completed_at) VALUES (?, ?, 1, NOW()) ON DUPLICATE KEY UPDATE completed = 1, completed_at = NOW()");
     $stmt->bind_param("ii", $user_id, $complete_lesson_id);
     $stmt->execute();
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        echo json_encode(['success' => true]);
+        exit;
+    }
     header("Location: lesson.php?module_id=$module_id&lesson_id=$complete_lesson_id");
     exit;
 }
@@ -76,7 +80,7 @@ $isCompleted = $activeLesson && in_array($activeLesson['id'], $completedIds);
                 <?php endif; ?>
 
                 <div class="aspect-video bg-gray-200 rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                    <video class="w-full h-full" controls preload="metadata">
+                    <video id="lessonVideo" class="w-full h-full" controls preload="metadata" <?= $user_id && !$isCompleted ? 'onended="autoComplete(' . $activeLesson['id'] . ')"' : '' ?>>
                         <source src="../admin/<?php echo htmlspecialchars($activeLesson['video']); ?>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -99,13 +103,10 @@ $isCompleted = $activeLesson && in_array($activeLesson['id'], $completedIds);
                                 Completed
                             </span>
                         <?php elseif (isUnlocked($currentIndex, $allLessons, $completedIds)): ?>
-                            <form method="POST">
-                                <input type="hidden" name="complete_lesson_id" value="<?php echo $activeLesson['id']; ?>">
-                                <button type="submit" name="complete_lesson" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-brandOrange hover:bg-brandOrangeHover transition shadow-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                    Mark as Complete
-                                </button>
-                            </form>
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold bg-gray-50 text-gray-500 border border-gray-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                                Watching...
+                            </span>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
@@ -213,7 +214,7 @@ $progress = $totalLessons > 0 ? round(($completedCount / $totalLessons) * 100) :
     </div>
 
     <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div class="h-full bg-brandOrange rounded-full"
+        <div class="h-full bg-green-500 rounded-full"
              style="width: <?= $progress ?>%"></div>
     </div>
 
@@ -305,5 +306,21 @@ function fetchCertificate(moduleId, btn) {
     };
     xhr.send();
 }
+
+function autoComplete(lessonId) {
+    var formData = new FormData();
+    formData.append('complete_lesson', '1');
+    formData.append('complete_lesson_id', lessonId);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '', true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            location.reload();
+        }
+    };
+    xhr.send(formData);
+}
+
 </script>
 <?php include_once('../includes/footer.php'); ?>

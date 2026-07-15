@@ -215,15 +215,11 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
             <div class="flex items-center space-x-3">
                 
-                <button id="userDarkModeToggle"
-                class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer text-slate-600 hover:text-brandOchre"
-                title="Toggle dark mode">
+               <button id="userDarkModeToggle"
+                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-orange-200 bg-orange-50 hover:bg-orange-100 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer text-slate-600 hover:text-brandOchre"
+                    title="Toggle dark mode">
                     <svg id="userDarkModeIcon"
-                         xmlns="http://www.w3.org/2000/svg"
-                         class="w-5 h-5"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
+                        xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                     </svg>
                 </button>
@@ -245,9 +241,13 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     $initial = strtoupper(substr($_SESSION['username'], 0, 1));
                 ?>                    
                     <div class="relative" id="notifWrapper">
-                        <button id="notifBtn" class="relative text-slate-600 hover:text-brandOchre transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                            <span id="notifBadge" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 <?php echo $notif_count > 0 ? '' : 'hidden'; ?>"><?php echo $notif_count; ?></span>
+                        <button id="notifBtn" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Notifications">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span id="notifBadge" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 <?php echo $notif_count > 0 ? '' : 'hidden'; ?>">
+                                <?php echo $notif_count; ?>
+                            </span>
                         </button>
 
                         <div id="notifDropdown" class="hidden absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-[100] origin-top-right">
@@ -271,16 +271,21 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                             <?php endif; ?>
                         </button>
 
-                        <div id="profileMenu" class="hidden absolute right-0 top-full mt-2 w-44 bg-[#0B1120] rounded-xl shadow-xl border border-gray-700 py-1.5 z-[100]">
+                        <div id="profileMenu" class="hidden absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-200 py-1.5 z-[100]">
                             
-                            <a href="profile.php" class="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-[#161e33] transition">
+                            <a href="profile.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
                                 <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 My Profile
                             </a>
 
-                            <hr class="border-gray-700 my-2">
+                            <a href="my_learning.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                My Learning
+                            </a>
 
-                            <a href="../auth/logout.php" class="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-[#161e33] transition">
+                            <hr class="border-gray-100 my-2">
+
+                            <a href="../auth/logout.php" class="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-orange-50 transition">
                                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                                 Logout
                             </a>

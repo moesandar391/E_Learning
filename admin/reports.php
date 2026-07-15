@@ -5,7 +5,6 @@
 if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     require_once '../config/db.php';
 
-    // Re-apply current filters
     $start_date = $_GET['start_date'] ?? date('Y-m-01');
     $end_date = $_GET['end_date'] ?? date('Y-m-d');
     $course_filter = $_GET['course_id'] ?? '';
@@ -21,7 +20,6 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     $join_modules = "JOIN modules m ON e.module_id = m.id";
     $join_courses = "LEFT JOIN courses c ON m.course_id = c.id";
 
-    // Fetch data (high limit for full report)
     $report_data = $conn->query("
         SELECT u.name AS student, c.course_name, m.name AS module_name, pm.name AS payment_method, m.price, e.enroll_date, e.created_at
         FROM enrollments e 
@@ -33,19 +31,15 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
         ORDER BY e.created_at DESC LIMIT 5000
     ");
 
-    // Force browser to download file
     header("Content-Type: application/vnd.ms-excel; charset=utf-8");
     header("Content-Disposition: attachment; filename=Transaction_Report_" . date('Y-m-d_His') . ".xls");
     header("Pragma: no-cache");
     header("Expires: 0");
 
-    // Output native Excel XML formatting for perfect styling
     echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
     echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Transactions</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
     echo '<body>';
     echo '<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">';
-    
-    // Styled Header Row matching the dashboard UI
     echo '<tr style="background-color: #FF8A00; color: #ffffff; font-weight: bold;">
             <td>#</td><td>Student</td><td>Course</td><td>Module</td><td>Payment Method</td><td>Amount (MMK)</td><td>Enroll Date</td><td>System Date</td>
           </tr>';
@@ -56,8 +50,6 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
             $price = $row['price'] > 0 ? number_format($row['price']) : 'Free';
             $method = $row['payment_method'] ?? 'Free';
             $enroll_date = $row['enroll_date'] ?? '-';
-            
-            // FIXED: Separated $counter++ from the string to prevent parse error
             echo "<tr>
                     <td>" . $counter++ . "</td>
                     <td>{$row['student']}</td>
@@ -72,9 +64,8 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
     } else {
         echo '<tr><td colspan="8" align="center">No transactions found for this period.</td></tr>';
     }
-    
     echo '</table></body></html>';
-    exit; // Stop executing so the HTML dashboard doesn't load
+    exit;
 }
 // ═══════════════════════════════════════════════════════════════
 ?>
@@ -82,6 +73,175 @@ if (isset($_GET['export']) && $_GET['export'] == 'excel') {
 <?php require_once 'includes/header.php'; ?>
 <?php require_once 'includes/sidebar.php'; ?>
 <?php require_once '../config/db.php'; ?>
+
+<!-- ── Print-Specific Styles ── -->
+<style>
+    @media print {
+        /* ── 1. HIDE EVERYTHING FIRST ── */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+        }
+        body * {
+            visibility: hidden !important;
+        }
+
+        /* ── 2. SHOW ONLY PRINT AREA ── */
+        #printArea {
+            visibility: visible !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            padding: 15mm !important;
+            margin: 0 !important;
+            background: #fff !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+        }
+        #printArea * {
+            visibility: visible !important;
+        }
+
+        /* ── 3. FORCE HIDE no-print ELEMENTS (even inside #printArea) ── */
+        .no-print,
+        #printArea .no-print {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        /* ── 4. HIDE SIDEBAR / HEADER / FOOTER BY COMMON CLASSES ── */
+        header, nav, aside, footer,
+        .sidebar, .main-header, .admin-header, .admin-footer,
+        [class*="sidebar"], [class*="header"]:not(#printArea *),
+        [class*="footer"]:not(#printArea *) {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* ── 5. REMOVE ALL EFFECTS ── */
+        #printArea * {
+            transition: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
+
+        /* ── 6. PRINT HEADER ── */
+        #printArea .print-header {
+            display: block !important;
+            visibility: visible !important;
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #FF8A00;
+        }
+        #printArea .print-header h2 {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            color: #000 !important;
+            margin: 0 0 4px 0 !important;
+        }
+        #printArea .print-header p {
+            font-size: 11px !important;
+            color: #555 !important;
+            margin: 2px 0 !important;
+        }
+
+        /* ── 7. PRINT SUMMARY ── */
+        #printArea .print-summary {
+            display: flex !important;
+            visibility: visible !important;
+            justify-content: space-around;
+            margin-bottom: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        #printArea .print-summary-item {
+            text-align: center;
+        }
+        #printArea .print-summary-item .val {
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            color: #000 !important;
+        }
+        #printArea .print-summary-item .lbl {
+            font-size: 9px !important;
+            color: #666 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── 8. TABLE STYLING ── */
+        #printArea table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+        #printArea thead {
+            display: table-header-group !important;
+        }
+        #printArea th {
+            border: 1px solid #333 !important;
+            padding: 8px 10px !important;
+            font-size: 10px !important;
+            color: #fff !important;
+            background: #FF8A00 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+        }
+        #printArea td {
+            border: 1px solid #999 !important;
+            padding: 6px 10px !important;
+            font-size: 10px !important;
+            color: #000 !important;
+            background: transparent !important;
+        }
+        #printArea tbody tr:nth-child(even) td {
+            background: #f5f5f5 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* ── 9. HIDE AVATAR CIRCLES ── */
+        #printArea .print-hide {
+            display: none !important;
+        }
+
+        /* ── 10. FLATTEN BADGES TO PLAIN TEXT ── */
+        #printArea span[class*="bg-"] {
+            background: transparent !important;
+            color: #000 !important;
+            padding: 0 !important;
+            font-weight: 600 !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        /* ── 11. PAGE MARGIN = 0 REMOVES SPACE FOR BROWSER HEADER/FOOTER ── */
+        @page {
+            size: landscape;
+            margin: 0;
+        }
+    }
+
+    /* Screen-only: hide print header/summary */
+    .print-header,
+    .print-summary {
+        display: none;
+    }
+</style>
 
 <?php
 // ── Filter Defaults ──
@@ -102,7 +262,7 @@ if (!empty($course_filter)) $where[] = "c.id = " . (int)$course_filter;
 if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment_filter;
  $whereSql = implode(" AND ", $where);
 
-// ── Common JOINs to prevent missing column errors ──
+// ── Common JOINs ──
  $join_modules = "JOIN modules m ON e.module_id = m.id";
  $join_courses = "LEFT JOIN courses c ON m.course_id = c.id";
 
@@ -112,7 +272,7 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
  $total_students = $conn->query("SELECT COUNT(DISTINCT e.user_id) FROM enrollments e $join_modules $join_courses WHERE $whereSql")->fetch_row()[0] ?? 0;
  $avg_value = $total_enrollments > 0 ? $total_revenue / $total_enrollments : 0;
 
-// ── Badge Map for Table ──
+// ── Badge Map ──
  $badge_map = [
     'k pay' => 'bg-blue-50 text-blue-700', 'kbzpay' => 'bg-blue-50 text-blue-700', 'kbz pay' => 'bg-blue-50 text-blue-700',
     'wavepay' => 'bg-yellow-50 text-yellow-700', 'wave pay' => 'bg-yellow-50 text-yellow-700',
@@ -132,12 +292,24 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
     ORDER BY e.created_at DESC LIMIT 500
 ");
 
-// Smart URL builder for export (preserves applied filters)
  $export_url = htmlspecialchars($_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['export' => 'excel'])));
+
+// ── Filter description for print ──
+ $filter_parts = [];
+ $filter_parts[] = date('M d, Y', strtotime($start_date)) . ' — ' . date('M d, Y', strtotime($end_date));
+if (!empty($course_filter)) {
+    $cname = $conn->query("SELECT course_name FROM courses WHERE id = " . (int)$course_filter)->fetch_row()[0] ?? '';
+    if ($cname) $filter_parts[] = $cname;
+}
+if (!empty($payment_filter)) {
+    $pname = $conn->query("SELECT name FROM payment_method WHERE id = " . (int)$payment_filter)->fetch_row()[0] ?? '';
+    if ($pname) $filter_parts[] = $pname;
+}
+ $filter_description = implode(' · ', $filter_parts);
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0 no-print">
         <div>
             <h1 class="text-lg font-semibold text-gray-800">Reports & Analytics</h1>
             <p class="text-sm text-gray-500">Generate and view detailed transaction insights</p>
@@ -153,7 +325,7 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
 
     <main class="flex-1 overflow-y-auto p-8">
         <!-- ── Filters ── -->
-        <form method="GET" class="bg-white rounded-xl border border-gray-200 p-6 mb-8 hover:shadow-lg transition-shadow duration-200">
+        <form method="GET" class="bg-white rounded-xl border border-gray-200 p-6 mb-8 hover:shadow-lg transition-shadow duration-200 no-print">
             <div class="grid grid-cols-5 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1.5">Start Date</label>
@@ -189,7 +361,7 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
         </form>
 
         <!-- ── Summary Cards ── -->
-        <div class="grid grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-4 gap-6 mb-8 no-print">
             <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <span class="text-sm font-medium text-gray-500">Filtered Revenue</span>
                 <p class="text-3xl font-bold text-gray-900 mt-2"><?= number_format($total_revenue) ?> <span class="text-base font-medium text-gray-500">MMK</span></p>
@@ -208,19 +380,58 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
             </div>
         </div>
 
-        <!-- ── Detailed Transactions Table Sheet ── -->
-        <div class="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-200">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <!-- ── Detailed Transactions Table ── -->
+        <div id="printArea" class="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-200">
+            
+            <!-- Print-only Header -->
+            <div class="print-header">
+                <h2>Transaction Report</h2>
+                <p><?= htmlspecialchars($filter_description) ?></p>
+                <p style="font-size: 10px; color: #999; margin-top: 4px;">Generated on <?= date('Y-m-d H:i:s') ?></p>
+            </div>
+
+            <!-- Print-only Summary -->
+            <div class="print-summary">
+                <div class="print-summary-item">
+                    <div class="val"><?= number_format($total_revenue) ?> MMK</div>
+                    <div class="lbl">Revenue</div>
+                </div>
+                <div class="print-summary-item">
+                    <div class="val"><?= number_format($total_enrollments) ?></div>
+                    <div class="lbl">Enrollments</div>
+                </div>
+                <div class="print-summary-item">
+                    <div class="val"><?= number_format($total_students) ?></div>
+                    <div class="lbl">Students</div>
+                </div>
+                <div class="print-summary-item">
+                    <div class="val"><?= number_format($avg_value, 0) ?> MMK</div>
+                    <div class="lbl">Avg. Value</div>
+                </div>
+            </div>
+
+            <!-- Toolbar with buttons (hidden in print via no-print class) -->
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between no-print">
                 <h3 class="font-semibold text-gray-800">Detailed Transactions</h3>
-                <!-- ── MOVED: Print Button placed here ── -->
-                <div class="flex items-center gap-4">
-                    <span class="text-xs text-gray-400 font-medium">Showing up to 500 records</span>
-                    <a href="<?= $export_url ?>" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <div class="flex items-center gap-3">
+                    <!-- Print Button -->
+                    <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brandOrange rounded-lg hover:bg-orange-600 transition shadow-sm cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
                         Print
+                    </button>
+                    <!-- Excel Export Button -->
+                    <a href="<?= $export_url ?>" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Excel
                     </a>
                 </div>
             </div>
+
+            <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="bg-gray-50 border-b border-gray-200">
@@ -247,7 +458,7 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
                                 <td class="px-6 py-4 text-sm text-gray-400 font-mono"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <span class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-xs font-bold flex-shrink-0"><?= strtoupper(substr($row['student'], 0, 1)) ?></span>
+                                        <span class="print-hide w-8 h-8 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-xs font-bold flex-shrink-0"><?= strtoupper(substr($row['student'], 0, 1)) ?></span>
                                         <span class="text-sm font-medium text-gray-800"><?= htmlspecialchars($row['student']) ?></span>
                                     </div>
                                 </td>

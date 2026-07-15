@@ -5,13 +5,17 @@
 <?php
  $total = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
  $result = $conn->query("
-    SELECT e.id, u.name AS student_name, u.email AS student_email, m.name AS module_name, c.course_name, e.enroll_date
+    SELECT e.id, u.name AS student_name, u.email AS student_email, u.phone AS student_phone,
+           m.name AS module_name, c.course_name, e.enroll_date, e.status, e.receipt,
+           pm.name AS payment_method, m.price
     FROM enrollments e
     JOIN users u ON e.user_id = u.id
     JOIN modules m ON e.module_id = m.id
     JOIN courses c ON m.course_id = c.id
+    LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
     ORDER BY e.created_at DESC
 ");
+ $enrollments = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -50,11 +54,12 @@
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>
                             <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                        <?php if (count($enrollments) > 0): ?>
+                            <?php foreach ($enrollments as $row): ?>
                             <tr class="hover:bg-gray-50 transition-colors enrollment-row">
                                 <!-- <td class="px-6 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td> -->
                                 <td class="px-6 py-4">
@@ -73,11 +78,21 @@
                                     <span class="text-sm text-gray-600"><?= htmlspecialchars($row['module_name']) ?></span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500"><?= htmlspecialchars($row['enroll_date']) ?></td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <a href="enrollment_details.php?id=<?= $row['id'] ?>" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
+                                            View
+                                        </a>
+                                        <button onclick="deleteEnrollment(<?= $row['id'] ?>)" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center">
+                                <td colspan="6" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     <p class="text-sm text-gray-400 mb-1">No enrollments yet</p>
                                     <p class="text-xs text-gray-300">Enrollments will appear once students purchase a module.</p>
@@ -92,15 +107,28 @@
 </div>
 
 <script>
+function deleteEnrollment(id) {
+    if (!confirm('Delete this enrollment? This cannot be undone.')) return;
+    var formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('id', id);
+    fetch('enrollments_ajax.php', { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+}
+
 document.getElementById('searchInput').addEventListener('keyup', function() {
     var q = this.value.toLowerCase().trim();
     var rows = document.querySelectorAll('.enrollment-row');
     
     rows.forEach(function(r) {
-        // Target only the second column (Course)
         var course = r.querySelector('td:nth-child(2)').textContent.toLowerCase();
-        
-        // Show row if it includes the query, otherwise hide it
         r.style.display = course.includes(q) ? '' : 'none';
     });
 });

@@ -65,14 +65,21 @@ CREATE TABLE IF NOT EXISTS lessons (
 CREATE TABLE IF NOT EXISTS enrollments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    course_id INT NOT NULL,
-    payment_method_id INT, 
+    module_id INT,
+    payment_method_id INT NOT NULL,
     enroll_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    receipt VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'Pending',
+    certificate_downloaded_at DATETIME,
 
     CONSTRAINT fk_enrollments_user
         FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE,
+
+    CONSTRAINT fk_enrollments_module
+        FOREIGN KEY (module_id) REFERENCES modules(id)
+        ON DELETE SET NULL,
 
     CONSTRAINT fk_enrollments_payment
         FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)
@@ -123,55 +130,6 @@ CREATE TABLE IF NOT EXISTS certificates (
         ON DELETE CASCADE
 );
 
-
-
--- above enroll
-CREATE TABLE IF NOT EXISTS quizzes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    module_id INT NOT NULL,
-    quiz_title VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT fk_quizzes_module
-        FOREIGN KEY (module_id)
-        REFERENCES modules(id)
-        ON DELETE CASCADE
-);
-CREATE TABLE IF NOT EXISTS questions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    quiz_id INT NOT NULL,
-    question_text TEXT NOT NULL,
-    option_a VARCHAR(50),
-    option_b VARCHAR(50),
-    option_c VARCHAR(50),
-    option_d VARCHAR(50),
-    correct_answer ENUM('A','B','C','D') NOT NULL,
-    marks INT DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_questions_quiz
-        FOREIGN KEY (quiz_id)
-        REFERENCES quizzes(id)
-        ON DELETE CASCADE
-);
--- above certi
-CREATE TABLE IF NOT EXISTS quiz_results (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    quiz_id INT NOT NULL,
-    user_id INT NOT NULL,
-    score INT NOT NULL,
-    attempt_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_quiz_results_quiz
-        FOREIGN KEY (quiz_id)
-        REFERENCES quizzes(id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_quiz_results_user
-        FOREIGN KEY (user_id)
-        REFERENCES users(id)
-        ON DELETE CASCADE
-);
 CREATE TABLE IF NOT EXISTS notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

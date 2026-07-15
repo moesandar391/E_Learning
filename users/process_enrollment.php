@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 
 header('Content-Type: application/json; charset=utf-8');
 require_once '../config/db.php';
-require_once '../includes/notification_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
@@ -54,8 +53,8 @@ if (!$module) {
     exit();
 }
 
-// 3. Prevent Duplicate Enrollment
-$check = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ?");
+// 3. Prevent Duplicate Enrollment (allow re-enrollment if previous was rejected)
+$check = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ? AND LOWER(status) != 'rejected'");
 $check->bind_param("ii", $user_id, $module_id);
 $check->execute();
 if ($check->get_result()->num_rows > 0) {
@@ -67,16 +66,12 @@ if ($check->get_result()->num_rows > 0) {
 $enroll_date = date('Y-m-d');
 $stmt = $conn->prepare("INSERT INTO enrollments (user_id, module_id, payment_method_id, receipt, enroll_date, status) VALUES (?, ?, ?, ?, ?, 'pending')");
 $stmt->bind_param("iiiss", $user_id, $module_id, $payment_method_id, $targetPath, $enroll_date);
-$stmt->execute();
+if (!$stmt->execute()) {
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
+    exit();
+}
 
-// 5. Notifications (Your original logic)
-create_notification(
-    $user_id,
-    'Your enrollment in "' . $module['name'] . '" is pending approval',
-    'enroll.php',
-    'enrollment'
-);
-
+// 5. Notify admin only (user should not get notification for their own action)
 require_once __DIR__ . '/../includes/admin_notification_helper.php';
 $uname = $conn->query("SELECT name FROM users WHERE id = $user_id")->fetch_row()[0] ?? 'A student';
 create_admin_notification(

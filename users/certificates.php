@@ -64,6 +64,16 @@ if ($certRow) {
     $certId = 'CERT-' . strtoupper(substr(md5($user_id . $module_id), 0, 8));
 }
 
+if ($certRow) {
+    if (isset($_GET['validate'])) {
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => false, 'error' => 'Certificate already downloaded. You can only download it once.']);
+        exit;
+    }
+    http_response_code(403);
+    die('Certificate already downloaded. You can only download it once.');
+}
+
 if (isset($_GET['validate'])) {
     header('Content-Type: application/json');
     echo json_encode(['ok' => true]);
