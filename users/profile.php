@@ -15,21 +15,43 @@ include_once('../includes/header.php');
  $stmt->execute();
  $user = $stmt->get_result()->fetch_assoc();
 
+// ── Check if lesson_progress table exists (moved UP) ──
+ $hasProgressTable = false;
+ $checkTable = $conn->query("SHOW TABLES LIKE 'lesson_progress'");
+if ($checkTable && $checkTable->num_rows > 0) {
+    $hasProgressTable = true;
+}
+
+// ── Courses Learning (confirmed enrollments) ──
  $stmtLearning = $conn->prepare("SELECT COUNT(*) AS total FROM enrollments WHERE user_id = ? AND status = 'confirmed'");
  $stmtLearning->bind_param("i", $userId);
  $stmtLearning->execute();
  $learningCount = $stmtLearning->get_result()->fetch_assoc()['total'] ?? 0;
 
- $stmtCompleted = $conn->prepare("SELECT COUNT(*) AS total FROM enrollments WHERE user_id = ? AND LCASE(status) = 'completed'");
- $stmtCompleted->bind_param("i", $userId);
- $stmtCompleted->execute();
- $completedCount = $stmtCompleted->get_result()->fetch_assoc()['total'] ?? 0;
+// ── FIXED: Courses Completed (based on actual lesson progress) ──
+ $completedCount = 0;
+if ($hasProgressTable) {
+    $stmtCompleted = $conn->prepare("
+        SELECT COUNT(*) AS total FROM (
+            SELECT m.id
+            FROM enrollments e 
+            JOIN modules m ON e.module_id = m.id 
+            LEFT JOIN lessons l ON m.id = l.module_id
+            LEFT JOIN lesson_progress lp ON l.id = lp.lesson_id AND lp.user_id = ?
+            WHERE e.user_id = ? AND e.status = 'confirmed'
+            GROUP BY m.id
+            HAVING COUNT(l.id) > 0 AND COUNT(lp.id) = COUNT(l.id)
+        ) AS fully_completed
+    ");
+    $stmtCompleted->bind_param("ii", $userId, $userId);
+    $stmtCompleted->execute();
+    $completedCount = $stmtCompleted->get_result()->fetch_assoc()['total'] ?? 0;
+}
 
  $certificates = [];
  $enrolledCourses = [];
 
-// ── FIXED: Fetch Certificates (Case-Insensitive + Fallback) ──
-// First, try to find strictly 'completed' (case-insensitive)
+// ── Fetch Certificates ──
  $stmtCert = $conn->prepare("SELECT DISTINCT c.course_name, m.id AS module_id FROM enrollments e 
                            JOIN modules m ON e.module_id = m.id 
                            JOIN courses c ON m.course_id = c.id 
@@ -38,11 +60,9 @@ include_once('../includes/header.php');
  $stmtCert->execute();
  $resultCert = $stmtCert->get_result();
 
-// If no 'completed' status exists, fallback to 'confirmed' courses so cards still appear
 if ($resultCert && $resultCert->num_rows > 0) {
     $certificates = $resultCert->fetch_all(MYSQLI_ASSOC);
 } else {
-    // Fallback: Show certificates for actively enrolled courses
     $stmtCertFallback = $conn->prepare("SELECT DISTINCT c.course_name, m.id AS module_id FROM enrollments e 
                                JOIN modules m ON e.module_id = m.id 
                                JOIN courses c ON m.course_id = c.id 
@@ -53,13 +73,6 @@ if ($resultCert && $resultCert->num_rows > 0) {
     if ($resultFallback) {
         $certificates = $resultFallback->fetch_all(MYSQLI_ASSOC);
     }
-}
-
-// ── Check if lesson_progress table exists ──
- $hasProgressTable = false;
- $checkTable = $conn->query("SHOW TABLES LIKE 'lesson_progress'");
-if ($checkTable && $checkTable->num_rows > 0) {
-    $hasProgressTable = true;
 }
 
 // ── Fetch Enrolled Courses with Progress ──
@@ -177,10 +190,10 @@ if ($resultEnrolled) {
                                 <p class="text-sm font-bold text-gray-800 uppercase tracking-wide leading-tight"><?php echo htmlspecialchars($cert['course_name']); ?></p>
                                 <p class="text-[10px] text-gray-500 mt-2">Certified Student</p>
                                 
-                                <a href="view_certificate.php?course=<?php echo urlencode($cert['course_name']); ?>" 
+                                <!-- <a href="view_certificate.php?course=<?php echo urlencode($cert['course_name']); ?>" 
                                    class="mt-5 block text-xs bg-brandOrange text-white py-2.5 rounded-lg font-bold hover:bg-orange-600 transition w-full">
                                    View Certificate
-                                </a>
+                                </a> -->
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -217,7 +230,7 @@ if ($resultEnrolled) {
                                 $textColor = 'text-green-600';
                             }
                         ?>
-                        <a href="lessons.php?module_id=<?= $course['module_id'] ?>" 
+                        <a href="lesson.php?module_id=<?= $course['module_id'] ?>" 
                            class="block p-5 border border-gray-100 rounded-2xl hover:shadow-lg hover:border-brandOrange/30 transition-all duration-200 group bg-gray-50/50">
                             
                             <div class="flex items-start justify-between mb-4">
