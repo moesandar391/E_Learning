@@ -44,6 +44,18 @@ if (!empty($params)) {
 }
 $stmt->execute();
 $modules = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$enrolledModuleIds = [];
+if ($userId) {
+    $enrollCheck = $conn->prepare("SELECT module_id FROM enrollments WHERE user_id = ? AND status = 'confirmed'");
+    $enrollCheck->bind_param("i", $userId);
+    $enrollCheck->execute();
+    $enrollResult = $enrollCheck->get_result();
+    while ($row = $enrollResult->fetch_assoc()) {
+        $enrolledModuleIds[] = $row['module_id'];
+    }
+}
 ?>
 
 <section class="px-10 py-12 min-h-screen bg-gray-50">
@@ -134,12 +146,12 @@ $modules = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
    View Details
 </a>
 
-    <a href="<?php echo isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
+    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>"
        class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
               border border-orange-600 text-orange-600
               hover:bg-orange-600 hover:text-white
               hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-       Enroll Now
+       <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
     </a>
 </div>
                     </div>

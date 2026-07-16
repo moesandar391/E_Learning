@@ -16,6 +16,18 @@ $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS mod
                  LIMIT 6";
 $popularResult = $conn->query($popularQuery);
 $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
+
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$enrolledModuleIds = [];
+if ($userId) {
+    $enrollCheck = $conn->prepare("SELECT module_id FROM enrollments WHERE user_id = ? AND status = 'confirmed'");
+    $enrollCheck->bind_param("i", $userId);
+    $enrollCheck->execute();
+    $enrollResult = $enrollCheck->get_result();
+    while ($row = $enrollResult->fetch_assoc()) {
+        $enrolledModuleIds[] = $row['module_id'];
+    }
+}
 ?>
 
 <section class="w-full bg-[#F8F9FA] py-12 px-6 font-sans">
@@ -100,13 +112,19 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
    View Details
 </a>
 
-    <a href="<?php echo isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
-       class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
-              border border-orange-600 text-orange-600
-              hover:bg-orange-600 hover:text-white
-              hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-       Enroll Now
-    </a>
+    <a href="<?php 
+    echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) 
+        ? 'my_learning.php' 
+        : (isset($_SESSION['user_id']) 
+            ? 'enroll.php?module_id=' . urlencode($module['module_id']) 
+            : '../auth/login.php');
+?>" 
+   class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
+          border border-orange-600 text-orange-600
+          hover:bg-orange-600 hover:text-white
+          hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
+   <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
+</a>
 </div>
                     </div>
                 </div>

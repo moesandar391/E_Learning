@@ -13,9 +13,22 @@ $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS mod
                  LEFT JOIN lessons l ON m.id = l.module_id
                  GROUP BY m.id, m.name, m.image, m.price, c.course_name, c.level, c.instructor_name
                  ORDER BY m.id DESC
-                 LIMIT 3";
+                 LIMIT 6";
 $popularResult = $conn->query($popularQuery);
 $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
+
+$heroEnrolled = false;
+$enrolledModuleIds = [];
+if (isset($_SESSION['user_id'])) {
+    $enrollCheck = $conn->prepare("SELECT module_id FROM enrollments WHERE user_id = ? AND status = 'confirmed'");
+    $enrollCheck->bind_param("i", $_SESSION['user_id']);
+    $enrollCheck->execute();
+    $enrollResult = $enrollCheck->get_result();
+    while ($row = $enrollResult->fetch_assoc()) {
+        $enrolledModuleIds[] = $row['module_id'];
+    }
+    $heroEnrolled = count($enrolledModuleIds) > 0;
+}
 ?>
     <main class="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
         
@@ -34,12 +47,12 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
             </p>
 
             <div class="pt-4 flex flex-wrap gap-4">
-    <a href="<?php echo isset($_SESSION['user_id']) ? '../users/enroll.php' : '../auth/login.php'; ?>" 
+    <a href="<?php echo $heroEnrolled ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>" 
        class="group relative px-7 py-3.5 font-semibold text-white rounded-xl transition-all shadow-md overflow-hidden border-2 border-brandOrange">
         
         <span class="absolute inset-0 bg-brandOrange -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
         
-        <span class="relative z-10 transition-colors duration-500 text-brandOrange hover:text-white">Enroll Now</span>
+        <span class="relative z-10 transition-colors duration-500 text-brandOrange hover:text-white"><?php echo $heroEnrolled ? 'Learn Now' : 'Enroll Now'; ?></span>
     </a>
 
     <a href="../users/courses.php" 
@@ -150,7 +163,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
     <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ── HOW IT WORK SECTION (Project Colors Applied) ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
-<section class="w-full bg-white py-16 px-6 font-sans">
+<section class="w-full bg-[#F8F9FA] py-16 px-6 font-sans">
     <div class="max-w-6xl mx-auto">
         
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
@@ -162,7 +175,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
             </div>
         </div>
 
-        <!-- ✅ CHANGED: grid → flex, arrows are now real flex children -->
+        <!-- CHANGED: grid → flex, arrows are now real flex children -->
         <div class="flex flex-col md:flex-row items-center justify-center gap-0">
             
             <!-- Step 1 -->
@@ -174,7 +187,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
                 <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
             </div>
 
-            <!-- ✅ Arrow 1: real flex child, no absolute positioning -->
+            <!-- Arrow 1: real flex child, no absolute positioning -->
             <div class="hidden md:flex items-center justify-center w-14 flex-shrink-0 text-brandOrange">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </div>
@@ -205,9 +218,82 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ── IMPORTANT FOR ENGLISH LEARNING ── -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-sm font-medium text-brandTextGray tracking-wide">Why Learn English?</span>
+            <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 tracking-tight mt-2 mb-4">
+                Important for English Learning
+            </h2>
+            <p class="text-sm text-brandTextGray leading-relaxed">
+                English is more than a language — it's a bridge to opportunities, connections, and personal growth that shapes your future.
+            </p>
+        </div>
+
+        <!-- Row 1: Image Left + Text Right -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-10 lg:mb-20">
+            
+            <div class="relative">
+                <div class="rounded-3xl overflow-hidden shadow-xl border border-gray-100">
+                    <img src="../assets/English.png" alt="English Learning Classroom" 
+                         class="w-full h-80 lg:h-[420px] object-cover">
+                </div>
+                <!-- Floating stat badge -->
+                <div class="absolute -bottom-5 -right-3 lg:-right-6 bg-brandOrange text-white rounded-2xl px-6 py-4 shadow-lg shadow-orange-200">
+                    <p class="text-2xl font-bold leading-none">1.5B+</p>
+                    <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Global Speakers</p>
+                </div>
+                <!-- Floating tag on image -->
+                <div class="absolute top-5 left-5 bg-white/90 backdrop-blur-sm text-brandOrange text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border border-orange-200 shadow-sm">
+                    <span class="inline-block w-2 h-2 bg-brandOrange rounded-full mr-1.5 animate-pulse"></span>
+                    Live Classes
+                </div>
+            </div>
+
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 bg-orange-50 text-brandOrange text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Global Communication
+                </div>
+                <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 leading-tight">
+                    Connect With the World
+                </h3>
+                <p class="text-sm text-brandTextGray leading-relaxed">
+                    English is the most widely spoken second language in the world. Whether you're traveling, networking, or making friends online, English breaks down barriers and brings people together across 100+ countries.
+                </p>
+                <p class="text-sm text-brandTextGray leading-relaxed">
+                    Our interactive classroom environment helps you practice real conversations — just like the ones you'll have in the real world. From group discussions to presentations, every session builds your confidence.
+                </p>
+                <div class="flex items-center gap-6 pt-2">
+                    <div>
+                        <p class="text-xl font-bold text-slate-800">100+</p>
+                        <p class="text-[11px] text-brandTextGray font-medium">Countries</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div>
+                        <p class="text-xl font-bold text-slate-800">60%</p>
+                        <p class="text-[11px] text-brandTextGray font-medium">Web Content</p>
+                    </div>
+                    <div class="w-px h-10 bg-gray-200"></div>
+                    <div>
+                        <p class="text-xl font-bold text-slate-800">#1</p>
+                        <p class="text-[11px] text-brandTextGray font-medium">Lingua Franca</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ═══════════════════════════════════════════════════════ -->
 
-    <section class="w-full bg-[#F8F9FA] py-16 px-6 font-sans">
+    <section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
     <div class="max-w-7xl mx-auto">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
@@ -250,7 +336,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
 
                 <div class="p-7 flex-1 flex flex-col justify-between relative z-20">
                     <div>
-                        <h3 class="font-serif font-bold text-[#0F172A] text-xl leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
+                        <h3 class="font-serif font-bold text-[#0F172A] text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
 
@@ -282,12 +368,12 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
    View Details
 </a>
 
-    <a href="<?php echo isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
+    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>"
        class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
               border border-orange-600 text-orange-600
               hover:bg-orange-600 hover:text-white
               hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-       Enroll Now
+       <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
     </a>
 </div>
                     </div>
@@ -299,38 +385,48 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </section>
-
-<section class="w-full bg-[#F8F9FA] py-12 px-6 font-sans">
-    <div class="max-w-6xl mx-auto">
-        
-        <div class="w-full bg-white/90 rounded-[32px] px-8 py-10 md:px-12 md:py-12 shadow-lg flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+<section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
+    <div class="max-w-7xl mx-auto">
+<!-- Row 2: Text Left + Image Right (Gradient Fallback) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16 lg:mb-24">
             
-            <div class="space-y-3 max-w-xl">
-                <h2 class="font-serif italic font-bold text-3xl md:text-4xl text-brandOchre tracking-tight">
-                    Start your journey today.
-                </h2>
-                <p class="text-sm md:text-base text-slate-400/90 font-medium leading-relaxed">
-                    Join 50,000+ learners mastering English. New courses added every month.
+            <div class="space-y-5 order-2 lg:order-1">
+                <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Career Growth
+                </div>
+                <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 leading-tight">
+                    Unlock Better Opportunities
+                </h3>
+                <p class="text-sm text-brandTextGray leading-relaxed">
+                    In today's competitive job market, English proficiency is often the deciding factor between candidates. Multinational companies across Myanmar and beyond actively seek employees who can communicate in English.
                 </p>
+                <p class="text-sm text-brandTextGray leading-relaxed">
+                    Studies show that bilingual professionals earn up to 20% more than their peers. From client meetings to email writing, English fluency directly impacts your career trajectory and earning potential.
+                </p>
+                <!-- Highlight quote -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border-l-4 border-blue-500">
+                    <p class="text-sm font-medium text-slate-700 italic leading-relaxed">"English is not just a skill — it's an investment that pays for itself throughout your career."</p>
+                </div>
             </div>
 
-            <div class="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <div class="relative min-w-[260px] sm:w-80">
-                    <input type="email" name="cta_email" placeholder="Enter your email" 
-                        class="w-full bg-[#5C728D] text-white placeholder-slate-300/80 text-sm border-0 rounded-xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200">
+            <div class="relative order-1 lg:order-2">
+                <div class="rounded-3xl overflow-hidden shadow-xl border border-gray-100">
+                    <div class="relative order-1 lg:order-2">
+        <img src="../assets/career.png" alt="Career Growth Illustration" class="w-full h-auto rounded-3xl shadow-xl border border-gray-100">
+    </div>
+                </div>
+            
+                <!-- Floating stat badge -->
+                <div class="absolute -bottom-5 -left-3 lg:-left-6 bg-blue-600 text-white rounded-2xl px-6 py-4 shadow-lg shadow-blue-200">
+                    <p class="text-2xl font-bold leading-none">+20%</p>
+                    <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Higher Income</p>
                 </div>
                 
-                <button type="submit" 
-                    class="bg-[#FF8A00] hover:bg-[#E07A00] text-white text-sm font-bold px-6 py-3.5 rounded-xl whitespace-nowrap shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all duration-200 active:scale-[0.98]">
-                    Get Free Lesson
-                </button>
             </div>
-
         </div>
-
     </div>
 </section>
-
     <script>
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -352,7 +448,7 @@ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
 </body>
 </html>
 
-<!-- include_once('../users/about.php');
-include_once('../users/contact.php'); -->
+<?php include_once('../users/about.php');?>
+<!--include_once('../users/contact.php'); -->
 
 <?php include_once('../includes/footer.php');?>

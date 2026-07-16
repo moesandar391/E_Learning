@@ -42,6 +42,14 @@ $relatedStmt->execute();
 $relatedModules = $relatedStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $isLoggedIn = isset($_SESSION['user_id']);
+$isEnrolled = false;
+if ($isLoggedIn) {
+    $userId = $_SESSION['user_id'];
+    $enrollCheck = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ? AND status = 'confirmed'");
+    $enrollCheck->bind_param("ii", $userId, $module_id);
+    $enrollCheck->execute();
+    $isEnrolled = $enrollCheck->get_result()->num_rows > 0;
+}
 ?>
 
 <section class="min-h-screen bg-gray-50 pt-10 pb-16">
@@ -191,9 +199,9 @@ $isLoggedIn = isset($_SESSION['user_id']);
                         </li>
                     </ul>
 
-                    <a href="<?php echo $isLoggedIn ? 'enroll.php?module_id=' . $module['module_id'] : '../auth/login.php'; ?>"
+                    <a href="<?php echo $isEnrolled ? 'my_learning.php' : ($isLoggedIn ? 'enroll.php' : '../auth/login.php'); ?>"
                        class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-brandOrange hover:bg-brandOrangeHover transition-all shadow-[0_4px_12px_rgba(255,138,0,0.3)]">
-                        <?php echo $isLoggedIn ? 'Enroll Now' : 'Login to Enroll'; ?>
+                        <?php echo $isEnrolled ? 'Learn Now' : ($isLoggedIn ? 'Enroll Now' : 'Login to Enroll'); ?>
                     </a>
                 </div>
 

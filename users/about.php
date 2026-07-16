@@ -1,5 +1,15 @@
 <?php 
+require_once '../config/db.php';
 include_once('../includes/header.php');
+
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$hasEnrollment = false;
+if ($userId) {
+    $enrollCheck = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND status = 'confirmed' LIMIT 1");
+    $enrollCheck->bind_param("i", $userId);
+    $enrollCheck->execute();
+    $hasEnrollment = $enrollCheck->get_result()->num_rows > 0;
+}
 ?>
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
@@ -128,8 +138,8 @@ include_once('../includes/header.php');
                         Join 50,000+ learners who have mastered English and unlocked new opportunities in their personal and professional lives.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="enroll.php" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">
-                            Enroll Now
+                        <a href="<?php echo $hasEnrollment ? 'my_learning.php' : 'enroll.php'; ?>" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">
+                            <?php echo $hasEnrollment ? 'Learn Now' : 'Enroll Now'; ?>
                         </a>
                         <a href="contact.php" class="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl border border-white/20 transition-all duration-200">
                             Contact Us
