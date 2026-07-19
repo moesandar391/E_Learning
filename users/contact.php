@@ -81,8 +81,8 @@ if ($userId && isset($_GET['enrollment_id'])) {
 <!-- <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen pt-20"> -->
     <div class="max-w-6xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-4xl md:text-5xl text-[#0F172A] mb-4">Contact Us</h1>
-            <p class="text-base text-[#566473] max-w-2xl mx-auto">
+            <h1 class="font-serif font-bold text-4xl md:text-5xl text-[#0F172A] dark:text-slate-100 mb-4">Contact Us</h1>
+            <p class="text-base text-[#566473] dark:text-slate-300 max-w-2xl mx-auto">
                 Have questions? We're here to help you on your learning journey. Our support team is ready to assist you with any inquiries about our courses, enrollment, or anything else you need to know.
             </p>
             <?php if (isset($_GET['sent'])): ?>
@@ -178,53 +178,53 @@ if ($userId && isset($_GET['enrollment_id'])) {
             
             <div class="lg:col-span-5 lg:pl-8 space-y-8">
                 <div>
-                    <h2 class="text-xl font-bold text-[#0F172A] mb-6">Get in Touch</h2>
+                    <h2 class="text-xl font-bold text-[#0F172A] dark:text-slate-100 mb-6">Get in Touch</h2>
                     <div class="space-y-6">
                         <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034]">
+                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034] dark:text-amber-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] mb-1">Email Us</h3>
-                                <p class="text-sm text-[#566473] font-medium">support@accessedu.com</p>
+                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Email Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">support@accessedu.com</p>
                                 <p class="text-xs text-gray-400 mt-1">We typically respond within 24 hours</p>
                             </div>
                         </div>
                         
                         <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034]">
+                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034] dark:text-amber-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] mb-1">Call Us</h3>
-                                <p class="text-sm text-[#566473] font-medium">+1 (555) 000-0000</p>
+                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Call Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">+1 (555) 000-0000</p>
                                 <p class="text-xs text-gray-400 mt-1">Mon-Fri 9am-5pm EST</p>
                             </div>
                         </div>
                         
                         <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034]">
+                            <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034] dark:text-amber-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] mb-1">Visit Us</h3>
-                                <p class="text-sm text-[#566473] font-medium">123 Learning Way, EdTech City</p>
+                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Visit Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">123 Learning Way, EdTech City</p>
                                 <p class="text-xs text-gray-400 mt-1">Building A, Suite 200</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-[#F8F9FA] rounded-2xl p-6 border border-gray-100">
-                    <h3 class="font-bold text-[#0F172A] mb-4">Why Contact Us?</h3>
-                    <ul class="space-y-3 text-sm text-[#566473]">
+                <div class="bg-[#F8F9FA] dark:bg-gray-700 rounded-2xl p-6 border border-gray-100 dark:border-gray-600">
+                    <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-4">Why Contact Us?</h3>
+                    <ul class="space-y-3 text-sm text-[#566473] dark:text-slate-300">
                         <li class="flex items-start gap-2">
                             <svg class="w-5 h-5 text-brandOrange mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -260,8 +260,8 @@ if ($userId && isset($_GET['enrollment_id'])) {
                             </svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-[#0F172A] mb-1">Quick Response Guaranteed</h3>
-                            <p class="text-sm text-[#566473]">We prioritize responding to all inquiries within 24 hours.</p>
+                            <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Quick Response Guaranteed</h3>
+                            <p class="text-sm text-[#566473] dark:text-slate-300">We prioritize responding to all inquiries within 24 hours.</p>
                         </div>
                     </div>
                 </div>

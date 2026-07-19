@@ -80,24 +80,24 @@ if ($userId) {
 
                 <div class="p-7 flex-1 flex flex-col justify-between relative z-20">
                     <div>
-                        <h3 class="font-serif font-bold text-[#0F172A] text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
+                        <h3 class="font-serif font-bold text-[#0F172A] dark:text-slate-100 text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
 
                         <div class="flex items-center justify-between mb-4">
                             <?php if (!empty($module['price']) && $module['price'] > 0): ?>
-                                <div class="text-sm font-bold text-[#A87034]"><?php echo number_format($module['price']); ?> MMK</div>
+                                <div class="text-sm font-bold text-[#A87034] dark:text-amber-300"><?php echo number_format($module['price']); ?> MMK</div>
                             <?php else: ?>
                                 <div class="text-sm font-bold text-green-600">Free</div>
                             <?php endif; ?>
-                            <div class="flex items-center gap-1 text-xs text-brandTextGray">
+                            <div class="flex items-center gap-1 text-xs text-brandTextGray dark:text-slate-200">
                                 <span class="text-slate-400">📋</span> <?php echo (int)$module['total_lessons']; ?> Lessons
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between text-xs font-medium text-[#566473]">
+                        <div class="flex items-center justify-between text-xs font-medium text-[#566473] dark:text-slate-300">
                             <span class="flex items-center gap-1">
                                 <span class="text-slate-400">👤</span> <?php echo htmlspecialchars($module['instructor_name']); ?>
                             </span>

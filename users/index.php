@@ -99,7 +99,7 @@ $reviews = $conn->query("
                 </div>
                 
                 <h4 class="font-bold text-slate-900 text-base tracking-tight">Improve Your Future</h4>
-                <p class="text-xs font-medium text-brandTextGray mt-1">Start Learning Today!</p>
+                <p class="text-xs font-medium text-brandTextGray dark:text-slate-200 mt-1">Start Learning Today!</p>
             </div>
         </div>
 
@@ -243,7 +243,7 @@ $reviews = $conn->query("
             <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 dark:text-slate-200 tracking-tight mt-2 mb-4">
                 Important for English Learning
             </h2>
-            <p class="text-sm text-brandTextGray leading-relaxed">
+            <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
                 English is more than a language — it's a bridge to opportunities, connections, and personal growth that shapes your future.
             </p>
         </div>
@@ -276,26 +276,26 @@ $reviews = $conn->query("
                 <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 leading-tight">
                     Connect With the World
                 </h3>
-                <p class="text-sm text-brandTextGray leading-relaxed">
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
                     English is the most widely spoken second language in the world. Whether you're traveling, networking, or making friends online, English breaks down barriers and brings people together across 100+ countries.
                 </p>
-                <p class="text-sm text-brandTextGray leading-relaxed">
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
                     Our interactive classroom environment helps you practice real conversations — just like the ones you'll have in the real world. From group discussions to presentations, every session builds your confidence.
                 </p>
                 <div class="flex items-center gap-6 pt-2">
                     <div>
                         <p class="text-xl font-bold text-slate-800">100+</p>
-                        <p class="text-[11px] text-brandTextGray font-medium">Countries</p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Countries</p>
                     </div>
                     <div class="w-px h-10 bg-gray-200"></div>
                     <div>
                         <p class="text-xl font-bold text-slate-800">60%</p>
-                        <p class="text-[11px] text-brandTextGray font-medium">Web Content</p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Web Content</p>
                     </div>
                     <div class="w-px h-10 bg-gray-200"></div>
                     <div>
                         <p class="text-xl font-bold text-slate-800">#1</p>
-                        <p class="text-[11px] text-brandTextGray font-medium">Lingua Franca</p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Lingua Franca</p>
                     </div>
                 </div>
             </div>
@@ -374,10 +374,10 @@ $reviews = $conn->query("
             <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 dark:text-slate-200 leading-tight">
                 Unlock Better Opportunities
             </h3>
-                <p class="text-sm text-brandTextGray leading-relaxed">
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
                     In today's competitive job market, English proficiency is often the deciding factor between candidates. Multinational companies across Myanmar and beyond actively seek employees who can communicate in English.
                 </p>
-                <p class="text-sm text-brandTextGray leading-relaxed">
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
                     Studies show that bilingual professionals earn up to 20% more than their peers. From client meetings to email writing, English fluency directly impacts your career trajectory and earning potential.
                 </p>
                 <!-- Highlight quote -->
