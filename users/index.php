@@ -29,30 +29,39 @@ if (isset($_SESSION['user_id'])) {
     }
     $heroEnrolled = count($enrolledModuleIds) > 0;
 }
+
+$reviews = $conn->query("
+    SELECT r.rating, r.review, r.created_at, u.name AS user_name, m.name AS module_name
+    FROM reviews r
+    JOIN users u ON r.user_id = u.id
+    JOIN modules m ON r.module_id = m.id
+    ORDER BY r.created_at DESC
+    LIMIT 6
+")->fetch_all(MYSQLI_ASSOC);
 ?>
-    <main class="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+    <main class="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 dark:text-gray-200">
         
         <div class="lg:col-span-5 space-y-6">
             <div class="inline-block bg-brandOrange text-white text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg shadow-sm">
                 EMPOWERING GLOBAL COMMUNICATORS
             </div>
 
-            <h1 class="text-4xl sm:text-5xl font-serif font-bold text-slate-500 leading-tight">
+            <h1 class="text-4xl sm:text-5xl font-serif font-bold text-slate-500 dark:text-slate-200 leading-tight">
                 Master English for the <br>
                 <span class="text-brandOchre italic font-bold">Global Stage</span>
             </h1>
 
-            <p class="text-base text-brandTextGray leading-relaxed max-w-lg">
+            <p class="text-base text-brandTextGray dark:text-slate-200 leading-relaxed max-w-lg">
                 Unlock international opportunities with structured, professional English courses designed for ambitious learners. From business mastery to academic excellence.
             </p>
 
             <div class="pt-4 flex flex-wrap gap-4">
-    <a href="<?php echo $heroEnrolled ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>" 
-       class="group relative px-7 py-3.5 font-semibold text-white rounded-xl transition-all shadow-md overflow-hidden border-2 border-brandOrange">
+    <a href="<?php echo $heroEnrolled ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php?redirect=' . urlencode('../users/enroll.php')); ?>" 
+       class="group relative px-7 py-3.5 font-semibold text-slate-700 rounded-xl transition-all shadow-md overflow-hidden border-2 border-brandOrange hover:text-white">
         
         <span class="absolute inset-0 bg-brandOrange -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
         
-        <span class="relative z-10 transition-colors duration-500 text-brandOrange hover:text-white"><?php echo $heroEnrolled ? 'Learn Now' : 'Enroll Now'; ?></span>
+        <span class="relative z-10 transition-colors duration-500"><?php echo $heroEnrolled ? 'Learn Now' : 'Enroll Now'; ?></span>
     </a>
 
     <a href="../users/courses.php" 
@@ -96,15 +105,15 @@ if (isset($_SESSION['user_id'])) {
 
     </main>
 
-    <section class="w-full bg-[#F8F9FA] py-16 px-6 font-sans">
-        <div class="max-w-7xl mx-auto">
+    <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
+        <div class="max-w-7xl mx-auto px-6">
             
             <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
                 <div>
                     <h2 class="font-serif font-bold text-[30px] text-brandOchre leading-tight tracking-tight">
                         Explore Categories
                     </h2>
-                    <p class="text-sm text-[#566473] mt-2 font-medium">
+                    <p class="text-sm text-[#566473] dark:text-slate-200 mt-2 font-medium">
                         Find the right path for your learning goals
                     </p>
                 </div>
@@ -136,25 +145,28 @@ if (isset($_SESSION['user_id'])) {
                     'M4 3a3 3 0 000 6v10a3 3 0 003 3h10a3 3 0 003-3V9a3 3 0 000-6H4zm0 2h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm4 3a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H9a1 1 0 01-1-1V8zm0 5a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H9a1 1 0 01-1-1v-2z',
                     'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11H3m2 0a2 2 0 012 2v6a2 2 0 01-2 2m0-8h4m4 0h4'
                 ];
-                
+    
                 $iconIndex = 0;
                 ?>
                 <?php foreach ($categories as $cat): ?>
-                <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center group transform hover:-translate-y-2 hover:shadow-lg hover:border-gray-200 transition-all duration-300 ease-out cursor-pointer">
+                    <!-- Wrap the card in an anchor tag -->
+                   <a href="../users/viewAllCourses.php?filter=<?php echo urlencode($cat['course_name']); ?>" 
+                    class="block bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col items-center text-center group transform hover:-translate-y-2 hover:shadow-lg hover:border-gray-200 transition-all duration-300 ease-out cursor-pointer">
+
                     <div class="w-14 h-14 rounded-full bg-[#DCE9FF] flex items-center justify-center <?php echo $iconClasses[$iconIndex % count($iconClasses)]; ?> mb-5">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $iconPaths[$iconIndex % count($iconPaths)]; ?>"></path>
                         </svg>
                     </div>
 
-                    <h3 class="font-serif font-bold text-[#020617] text-xl mb-2 transition-colors duration-200 group-hover:text-brandOrange">
+                    <h3 class="font-serif font-bold text-[#020617] dark:text-slate-200 text-xl mb-2 transition-colors duration-200 group-hover:text-brandOrange">
                         <?php echo htmlspecialchars($cat['course_name']); ?>
                     </h3>
-                    
-                    <p class="text-xs text-[#566473] line-clamp-2 leading-relaxed font-medium">
+            
+                    <p class="text-xs text-[#566473] dark:text-slate-200 line-clamp-2 leading-relaxed font-medium">
                         <?php echo htmlspecialchars($cat['description']); ?>
                     </p>
-                </div>
+                    </a>
                 <?php $iconIndex++; endforeach; ?>
             </div>
         </div>
@@ -163,13 +175,13 @@ if (isset($_SESSION['user_id'])) {
     <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ── HOW IT WORK SECTION (Project Colors Applied) ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
-<section class="w-full bg-[#F8F9FA] py-16 px-6 font-sans">
-    <div class="max-w-6xl mx-auto">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
+    <div class="max-w-7xl mx-auto px-6">
         
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
             <div>
-                <span class="text-sm font-medium text-brandTextGray tracking-wide">Over 1,235+ Course</span>
-                <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 tracking-tight mt-2">
+                <span class="text-sm font-medium text-brandTextGray dark:text-gray-200 tracking-wide">Over 1,235+ Course</span>
+                <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 dark:text-slate-200 tracking-tight mt-2">
                     How It Work? <span class="inline-block w-16 h-1 bg-brandOrange align-middle ml-2 rounded-full"></span>
                 </h2>
             </div>
@@ -184,7 +196,7 @@ if (isset($_SESSION['user_id'])) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Find Your Course</h3>
-                <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
             </div>
 
             <!-- Arrow 1: real flex child, no absolute positioning -->
@@ -198,7 +210,7 @@ if (isset($_SESSION['user_id'])) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Book A Course</h3>
-                <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
             </div>
 
             <!-- ✅ Arrow 2: real flex child, no absolute positioning -->
@@ -212,7 +224,7 @@ if (isset($_SESSION['user_id'])) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Get Certificate</h3>
-                <p class="text-sm text-brandTextGray leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
             </div>
 
         </div>
@@ -222,13 +234,13 @@ if (isset($_SESSION['user_id'])) {
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ── IMPORTANT FOR ENGLISH LEARNING ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
-<section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+    <div class="max-w-7xl mx-auto px-6">
         
         <!-- Section Header -->
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <span class="text-sm font-medium text-brandTextGray tracking-wide">Why Learn English?</span>
-            <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 tracking-tight mt-2 mb-4">
+            <span class="text-sm font-medium text-brandTextGray dark:text-gray-400 tracking-wide">Why Learn English?</span>
+            <h2 class="font-serif font-bold text-3xl md:text-4xl text-slate-500 dark:text-slate-200 tracking-tight mt-2 mb-4">
                 Important for English Learning
             </h2>
             <p class="text-sm text-brandTextGray leading-relaxed">
@@ -291,102 +303,66 @@ if (isset($_SESSION['user_id'])) {
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-
-    <section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+    <div class="max-w-7xl mx-auto px-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <h2 class="font-serif font-bold text-3xl text-brandOchre tracking-tight">
                 Popular Courses
             </h2>
-        
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <?php $cardColors = ['orange', 'blue', 'green']; ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php foreach ($popularModules as $index => $module): ?>
-            <?php $color = $cardColors[$index % count($cardColors)]; ?>
-            <div class="group relative bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl">
-                
-                <div class="absolute inset-0 bg-gradient-to-br from-<?php echo $color; ?>-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+            <a href="details.php?module_id=<?php echo $module['module_id']; ?>" 
+               class="group block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-400">
 
-                <div class="relative h-64 w-full overflow-hidden">
+                <!-- Image -->
+                <div class="relative h-56 overflow-hidden">
                     <?php if (!empty($module['module_image'])): ?>
-                        <img src="../uploads/modules/<?php echo htmlspecialchars($module['module_image']); ?>" alt="<?php echo htmlspecialchars($module['module_name']); ?>" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110">
+                        <img src="../uploads/modules/<?php echo htmlspecialchars($module['module_image']); ?>" 
+                             alt="<?php echo htmlspecialchars($module['module_name']); ?>" 
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy">
                     <?php else: ?>
-                        <div class="w-full h-full bg-gradient-to-br from-<?php echo $color; ?>-50 to-amber-50 flex items-center justify-center">
-                            <svg class="w-16 h-16 text-<?php echo $color; ?>-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </div>
                     <?php endif; ?>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                    <div class="absolute top-4 left-4 z-20">
-                        <span class="bg-white/90 backdrop-blur-sm text-<?php echo $color; ?>-600 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border border-<?php echo $color; ?>-200">
+
+                    <!-- Badges -->
+                    <div class="absolute top-3 left-3">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50">
                             <?php echo htmlspecialchars($module['course_name']); ?>
                         </span>
                     </div>
-                    <div class="absolute top-4 right-4 z-20">
-                        <div class="bg-white/90 backdrop-blur-sm text-xs font-medium px-3 py-1 rounded-full border border-gray-200 text-gray-600">
+                    <div class="absolute top-3 right-3">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-500 dark:text-gray-400 border border-gray-200/50 dark:border-gray-600/50">
                             <?php echo htmlspecialchars($module['level'] ?? 'Beginner'); ?>
-                        </div>
+                        </span>
                     </div>
+
+                    <!-- Bottom gradient -->
+                    <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
 
-                <div class="p-7 flex-1 flex flex-col justify-between relative z-20">
-                    <div>
-                        <h3 class="font-serif font-bold text-[#0F172A] text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
-                            <?php echo htmlspecialchars($module['module_name']); ?>
-                        </h3>
-
-                        <div class="flex items-center justify-between mb-4">
-                            <?php if (!empty($module['price']) && $module['price'] > 0): ?>
-                                <div class="text-sm font-bold text-[#A87034]"><?php echo number_format($module['price']); ?> MMK</div>
-                            <?php else: ?>
-                                <div class="text-sm font-bold text-green-600">Free</div>
-                            <?php endif; ?>
-                            <div class="flex items-center gap-1 text-xs text-brandTextGray">
-                                <span class="text-slate-400">📋</span> <?php echo (int)$module['total_lessons']; ?> Lessons
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between text-xs font-medium text-[#566473]">
-                            <span class="flex items-center gap-1">
-                                <span class="text-slate-400">👤</span> <?php echo htmlspecialchars($module['instructor_name']); ?>
-                            </span>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-    <a href="details.php?module_id=<?php echo $module['module_id']; ?>"
-   class="flex-1 text-center text-xs font-medium py-3 rounded-xl transition-all duration-300
-          border border-gray-400 text-gray-500
-          hover:bg-gray-500 hover:text-white hover:border-gray-500
-          hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
-   View Details
-</a>
-
-    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>"
-       class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
-              border border-orange-600 text-orange-600
-              hover:bg-orange-600 hover:text-white
-              hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-       <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
-    </a>
-</div>
-                    </div>
+                <!-- Title -->
+                <div class="p-5">
+                    <h3 class="font-serif font-bold text-[15px] leading-snug text-gray-900 dark:text-white line-clamp-2 group-hover:text-brandOchre transition-colors duration-300">
+                        <?php echo htmlspecialchars($module['module_name']); ?>
+                    </h3>
                 </div>
 
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-<?php echo $color; ?>-400 to-<?php echo $color; ?>-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-            </div>
+            </a>
             <?php endforeach; ?>
         </div>
+
     </div>
 </section>
-<section class="w-full bg-[#F8F9FA] py-10 px-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+    <div class="max-w-7xl mx-auto px-6">
 <!-- Row 2: Text Left + Image Right (Gradient Fallback) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16 lg:mb-24">
             
@@ -395,9 +371,9 @@ if (isset($_SESSION['user_id'])) {
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     Career Growth
                 </div>
-                <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 leading-tight">
-                    Unlock Better Opportunities
-                </h3>
+            <h3 class="font-serif font-bold text-2xl lg:text-3xl text-slate-500 dark:text-slate-200 leading-tight">
+                Unlock Better Opportunities
+            </h3>
                 <p class="text-sm text-brandTextGray leading-relaxed">
                     In today's competitive job market, English proficiency is often the deciding factor between candidates. Multinational companies across Myanmar and beyond actively seek employees who can communicate in English.
                 </p>
@@ -427,6 +403,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 </section>
+
     <script>
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');

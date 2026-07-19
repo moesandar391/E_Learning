@@ -33,7 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: ../admin/dashboard.php");
                 } else {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                    header("Location: ../users/index.php");
+                    $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '../users/index.php';
+                    header("Location: $redirect");
                 }
                 exit();
             }

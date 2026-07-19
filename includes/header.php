@@ -54,18 +54,20 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         html.dark .text-gray-800,
         html.dark .text-\[#0F172A\],
         html.dark .text-\[#020617\],
-        html.dark .text-slate-900 { color: #f1f5f9 !important; }
+        html.dark .text-slate-900 { color: #ffffff !important; }
         html.dark .text-gray-700,
         html.dark .text-slate-800,
-        html.dark .text-slate-700 { color: #e2e8f0 !important; }
-        html.dark .text-gray-600 { color: #cbd5e1 !important; }
+        html.dark .text-slate-700 { color: #ffffff !important; }
+        html.dark .text-gray-600 { color: #f8fafc !important; }
         html.dark .text-gray-500,
-        html.dark .text-slate-600 { color: #94a3b8 !important; }
+        html.dark .text-slate-600 { color: #f1f5f9 !important; }
         html.dark .text-gray-400,
-        html.dark .text-slate-400 { color: #64748b !important; }
-        html.dark .text-gray-200 { color: #e2e8f0 !important; }
+        html.dark .text-slate-400 { color: #e2e8f0 !important; }
+        html.dark .text-gray-200 { color: #ffffff !important; }
         html.dark .text-\[#566473\],
-        html.dark .text-brandTextGray { color: #94a3b8 !important; }
+        html.dark .text-brandTextGray { color: #f1f5f9 !important; }
+        html.dark .text-slate-500 { color: #ffffff !important; }
+        html.dark .text-slate-300 { color: #f1f5f9 !important; }
         html.dark .text-\[#A87034\],
         html.dark .text-brandOchre { color: #d48d4b !important; }
         html.dark .text-brandOrange { color: #FF8A00 !important; }
@@ -76,6 +78,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         html.dark .text-green-500 { color: #6ee7b7 !important; }
         html.dark .text-green-600,
         html.dark .text-green-700 { color: #6ee7b7 !important; }
+        html.dark .text-red-500,
         html.dark .text-red-700 { color: #fca5a5 !important; }
 
         html.dark .border-gray-100,
@@ -140,6 +143,24 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         html.dark .text-cyan-600 { color: #67e8f9 !important; }
         html.dark .text-fuchsia-600 { color: #f0abfc !important; }
         html.dark .text-teal-600 { color: #5eead4 !important; }
+        html.dark .text-slate-500 { color: #ffffff !important; }
+        html.dark .text-blue-600 { color: #93c5fd !important; }
+        html.dark .text-yellow-400 { color: #fbbf24 !important; }
+        html.dark .text-gray-300 { color: #e2e8f0 !important; }
+        html.dark .text-orange-200 { color: #fdba74 !important; }
+        html.dark .text-blue-200 { color: #bfdbfe !important; }
+        html.dark .text-green-200 { color: #bbf7d0 !important; }
+
+        html.dark .bg-blue-50 { background-color: rgba(37, 99, 235, 0.15) !important; }
+        html.dark .bg-blue-600 { background-color: #2563eb !important; }
+
+        html.dark .from-blue-50 { --tw-gradient-from: #1e3a5f !important; }
+        html.dark .from-green-50 { --tw-gradient-from: #1a3a2a !important; }
+        html.dark .to-indigo-50 { --tw-gradient-to: #2e1a47 !important; }
+
+        html.dark .border-blue-500 { border-color: #3b82f6 !important; }
+
+        html.dark .hover\:text-\[#FF8A00\]:hover { color: #FF8A00 !important; }
 
         html.dark .placeholder-gray-400::placeholder,
         html.dark .placeholder-slate-300\/80::placeholder { color: #64748b !important; }
@@ -157,7 +178,16 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                 </span>
             </div>
 
-            <nav class="hidden md:flex items-center space-x-12 font-medium text-brandTextGray">
+            <button id="mobileMenuBtn" class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Menu">
+                <svg id="menuOpenIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+                <svg id="menuCloseIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <nav class="hidden md:flex items-center space-x-12 font-medium text-brandTextGray-50 dark:text-slate-200">
 
     <a href="../users/index.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Home
@@ -182,7 +212,10 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             <a href="../users/viewAllCourses.php?filter=English%20for%20Kids" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-brandOchre">English for Kids</a>
         </div>
     </div>
-
+    <a href="../users/reviews.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
+        Review
+        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+    </a>
     <a href="../users/about.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         About
         <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
@@ -280,9 +313,13 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
                             <a href="my_learning.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
                                 <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                My Learning
+                                My Dashboard
                             </a>
-
+                            
+                            <a href="my_review.php" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                                My Reviews
+                            </a>
                             <hr class="border-gray-100 my-2">
 
                             <a href="../auth/logout.php" class="flex items-center px-4 py-2 text-sm text-red-500 hover:bg-orange-50 transition">
@@ -316,7 +353,80 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                 </div>
                 <?php endif; ?>
             </div>
-            
+
+            <!-- Mobile Menu Overlay -->
+            <div id="mobileMenu" class="fixed inset-0 z-40 hidden lg:hidden">
+                <div id="mobileMenuBackdrop" class="absolute inset-0 bg-black/50"></div>
+                <div class="absolute left-0 top-0 h-full w-72 max-w-[85vw] bg-white shadow-xl pt-20 overflow-y-auto">
+                    <div class="px-4 py-4 space-y-1">
+                        <a href="../users/index.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            Home
+                        </a>
+
+                        <div>
+                            <button onclick="toggleMobileCourses()" class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                                <span class="flex items-center">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    Courses
+                                </span>
+                                <svg id="mobileCoursesArrow" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="mobileCoursesSub" class="hidden pl-4 space-y-1 pb-1">
+                                <a href="../users/viewAllCourses.php?filter=All" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">All Courses</a>
+                                <a href="../users/viewAllCourses.php?filter=Cambridge" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">Cambridge</a>
+                                <a href="../users/viewAllCourses.php?filter=English%20Grammar" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">English Grammar</a>
+                                <a href="../users/viewAllCourses.php?filter=Writing%20Course" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">Writing Course</a>
+                                <a href="../users/viewAllCourses.php?filter=General%20English" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">General English</a>
+                                <a href="../users/viewAllCourses.php?filter=English%20for%20Kids" class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-orange-50 hover:text-brandOchre rounded-lg transition">English for Kids</a>
+                            </div>
+                        </div>
+
+                        <a href="../users/reviews.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            Review
+                        </a>
+
+                        <a href="../users/about.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            About
+                        </a>
+
+                        <a href="../users/contact.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Contact
+                        </a>
+                    </div>
+
+                    <div class="border-t border-gray-100 px-6 py-4 space-y-2">
+                        <?php if (isset($_SESSION['username'])): ?>
+                            <a href="profile.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                My Profile
+                            </a>
+                            <a href="my_learning.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                My Dashboard
+                            </a>
+                            <a href="my_review.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                                My Reviews
+                            </a>
+                            <hr class="border-gray-100 my-2">
+                            <a href="../auth/logout.php" class="flex items-center px-4 py-3 rounded-lg text-red-500 hover:bg-orange-50 font-medium transition">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Logout
+                            </a>
+                        <?php else: ?>
+                            <a href="../auth/login.php" class="flex items-center justify-center px-6 py-3 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition text-sm">Login</a>
+                            <a href="../auth/register.php" class="flex items-center justify-center px-6 py-3 border-2 border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">Get Started</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </header>
 
@@ -586,6 +696,61 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         }
     });
 })();
+</script>
+
+<script>
+(function() {
+    var menuBtn = document.getElementById('mobileMenuBtn');
+    var menu = document.getElementById('mobileMenu');
+    var backdrop = document.getElementById('mobileMenuBackdrop');
+    var openIcon = document.getElementById('menuOpenIcon');
+    var closeIcon = document.getElementById('menuCloseIcon');
+
+    if (!menuBtn || !menu) return;
+
+    function toggleMenu() {
+        menu.classList.toggle('hidden');
+        if (openIcon && closeIcon) {
+            openIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+    }
+
+    menuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
+    });
+
+    if (backdrop) {
+        backdrop.addEventListener('click', function() {
+            toggleMenu();
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) {
+            toggleMenu();
+        }
+    });
+
+    var profileBtn = document.getElementById('profileBtn');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', function() {
+            if (menu && !menu.classList.contains('hidden')) {
+                toggleMenu();
+            }
+        });
+    }
+})();
+
+function toggleMobileCourses() {
+    var sub = document.getElementById('mobileCoursesSub');
+    var arrow = document.getElementById('mobileCoursesArrow');
+    if (sub && arrow) {
+        sub.classList.toggle('hidden');
+        arrow.classList.toggle('rotate-180');
+    }
+}
 </script>
 
 </body>

@@ -43,32 +43,36 @@ $certs = $conn->query("
 ");
 $certificates = $certs ? $certs->fetch_all(MYSQLI_ASSOC) : [];
 
-// Enrolled Courses with progress
+// Enrolled Courses with progress and existing reviews
 if ($hasProgress) {
     $stmt = $conn->prepare("
         SELECT m.id AS module_id, c.course_name, m.name AS module_name, m.image, m.price,
                COUNT(l.id) AS total_lessons,
-               COUNT(lp.id) AS completed_lessons
+               COUNT(lp.id) AS completed_lessons,
+               r.rating AS existing_rating, r.review AS existing_review
         FROM enrollments e
         JOIN modules m ON e.module_id = m.id
         JOIN courses c ON m.course_id = c.id
         LEFT JOIN lessons l ON m.id = l.module_id
         LEFT JOIN lesson_progress lp ON l.id = lp.lesson_id AND lp.user_id = ?
+        LEFT JOIN reviews r ON r.user_id = e.user_id AND r.module_id = m.id
         WHERE e.user_id = ? AND e.status = 'confirmed'
-        GROUP BY m.id, c.course_name, m.name, m.image, m.price
+        GROUP BY m.id, c.course_name, m.name, m.image, m.price, r.rating, r.review
         ORDER BY e.created_at DESC
     ");
     $stmt->bind_param("ii", $user_id, $user_id);
 } else {
     $stmt = $conn->prepare("
         SELECT m.id AS module_id, c.course_name, m.name AS module_name, m.image, m.price,
-               COUNT(l.id) AS total_lessons, 0 AS completed_lessons
+               COUNT(l.id) AS total_lessons, 0 AS completed_lessons,
+               r.rating AS existing_rating, r.review AS existing_review
         FROM enrollments e
         JOIN modules m ON e.module_id = m.id
         JOIN courses c ON m.course_id = c.id
         LEFT JOIN lessons l ON m.id = l.module_id
+        LEFT JOIN reviews r ON r.user_id = e.user_id AND r.module_id = m.id
         WHERE e.user_id = ? AND e.status = 'confirmed'
-        GROUP BY m.id, c.course_name, m.name, m.image, m.price
+        GROUP BY m.id, c.course_name, m.name, m.image, m.price, r.rating, r.review
         ORDER BY e.created_at DESC
     ");
     $stmt->bind_param("i", $user_id);
@@ -94,11 +98,23 @@ $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         </div>
 
         <!-- My Certificates -->
+         <?php 
+// Filter to get only unique certificates by course name
+$uniqueCertificates = [];
+$seenCourses = [];
+
+foreach ($certificates as $cert) {
+    if (!in_array($cert['course_name'], $seenCourses)) {
+        $uniqueCertificates[] = $cert;
+        $seenCourses[] = $cert['course_name'];
+    }
+}
+?>
         <div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8">
             <h3 class="text-xl font-bold text-brandOrange mb-6">My Certificates</h3>
             <?php if (!empty($certificates)): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <?php foreach ($certificates as $cert): ?>
+    <?php foreach ($uniqueCertificates as $cert): ?>
                         <div class="relative overflow-hidden p-6 border-2 border-orange-100 rounded-2xl bg-gradient-to-br from-orange-50 to-white text-center shadow-sm hover:shadow-md transition-shadow">
                             <span class="text-5xl mb-4 block">🎓</span>
                             <p class="text-sm font-bold text-gray-800 uppercase tracking-wide leading-tight"><?= htmlspecialchars($cert['course_name']) ?></p>
@@ -135,39 +151,43 @@ $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             $barColor = 'bg-green-500';
                             $textColor = 'text-green-600';
                         }
+                        $hasReview = !is_null($course['existing_rating']);
                     ?>
-                    <a href="lesson.php?module_id=<?= $course['module_id'] ?>"
-                       class="block p-5 border border-gray-100 rounded-2xl hover:shadow-lg hover:border-brandOrange/30 transition-all duration-200 group bg-gray-50/50">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="pr-4">
-                                <h4 class="font-bold text-gray-800 group-hover:text-brandOrange transition-colors leading-snug">
-                                    <?= htmlspecialchars($course['module_name']) ?>
-                                </h4>
-                                <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($course['course_name']) ?></p>
+                    <div class="p-5 border border-gray-100 rounded-2xl hover:shadow-lg hover:border-brandOrange/30 transition-all duration-200 bg-gray-50/50">
+                        <a href="lesson.php?module_id=<?= $course['module_id'] ?>"
+                           class="block group">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="pr-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brandOrange transition-colors leading-snug">
+                                        <?= htmlspecialchars($course['module_name']) ?>
+                                    </h4>
+                                    <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($course['course_name']) ?></p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">Active</span>
                             </div>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">Active</span>
-                        </div>
-                        <?php if ($hasProgress): ?>
-                        <div class="space-y-2 mt-auto">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-500">Progress</span>
-                                <span class="font-bold <?= $textColor ?>"><?= $course['completed_lessons'] ?>/<?= $course['total_lessons'] ?> Lessons</span>
+                            <?php if ($hasProgress): ?>
+                            <div class="space-y-2 mt-auto">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-500">Progress</span>
+                                    <span class="font-bold <?= $textColor ?>"><?= $course['completed_lessons'] ?>/<?= $course['total_lessons'] ?> Lessons</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div class="h-full <?= $barColor ?> rounded-full transition-all duration-700 ease-out" style="width: <?= $progress ?>%;"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="h-full <?= $barColor ?> rounded-full transition-all duration-700 ease-out" style="width: <?= $progress ?>%;"></div>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        <div class="mt-4 flex items-center justify-between">
-                            <span class="text-xs text-brandOrange font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                Continue Learning
-                            </span>
-                            <?php if ($progress == 100): ?>
-                                <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Completed</span>
                             <?php endif; ?>
-                        </div>
-                    </a>
+                            <div class="mt-4 flex items-center justify-between">
+                                <span class="text-xs text-brandOrange font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    Continue Learning
+                                </span>
+                                <?php if ($progress == 100): ?>
+                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Completed</span>
+                                <?php endif; ?>
+                            </div>
+                        </a>
+
+                    </div>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
@@ -180,5 +200,6 @@ $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </div>
+
 
 <?php include_once('../includes/footer.php'); ?>

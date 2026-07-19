@@ -35,20 +35,45 @@ $notifications = get_user_notifications($user_id, $limit);
         </div>
     <?php else: ?>
         <div class="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
-            <?php foreach ($notifications as $n): ?>
-                <a href="<?php echo htmlspecialchars($n['link'] ?: '#'); ?>" class="flex items-start gap-4 px-6 py-4 hover:bg-gray-50 transition notif-page-item <?php echo $n['is_read'] ? '' : 'bg-orange-50'; ?>" data-id="<?php echo $n['id']; ?>">
+                        <?php foreach ($notifications as $n):
+                // ▼▼▼ ADD THIS BLOCK RIGHT HERE ▼▼▼
+                $is_rejection = (strpos($n['message'], 'was rejected') !== false);
+                $reason = '';
+                $base_message = $n['message'];
+
+                if ($is_rejection) {
+                    if (preg_match('/^(.+was rejected):\s*(.+?)\.\s*Please contact support\./', $n['message'], $m)) {
+                        $base_message = $m[1] . '.';
+                        $reason = trim($m[2]);
+                    }
+                }
+                // ▲▲▲ END OF ADDED BLOCK ▲▲▲
+            ?>
+                <a href="<?php echo htmlspecialchars($n['link'] ?: '#'); ?>" class="flex items-start gap-4 px-6 py-4 hover:bg-gray-50 transition notif-page-item <?php echo $n['is_read'] ? '' : ($is_rejection ? 'bg-red-50' : 'bg-orange-50'); ?>" data-id="<?php echo $n['id']; ?>">
                     <span class="text-xl flex-shrink-0 mt-0.5">
-                        <?php
-                        $icons = ['enrollment' => '📋', 'lesson' => '📖', 'quiz' => '📝', 'certificate' => '🎓', 'payment' => '💰'];
-                        echo $icons[$n['type']] ?? '🔔';
-                        ?>
+                        <?php if ($is_rejection): ?>
+                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-100 text-base">✕</span>
+                        <?php else: ?>
+                            <?php
+                            $icons = ['enrollment' => '📋', 'lesson' => '📖', 'quiz' => '📝', 'certificate' => '🎓', 'payment' => '💰'];
+                            echo $icons[$n['type']] ?? '🔔';
+                            ?>
+                        <?php endif; ?>
                     </span>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm text-gray-700"><?php echo htmlspecialchars($n['message']); ?></p>
+                        <!-- ▼▼▼ CHANGED: use $base_message instead of $n['message'] ▼▼▼ -->
+                        <p class="text-sm <?php echo $is_rejection ? 'text-red-700' : 'text-gray-700'; ?>"><?php echo htmlspecialchars($base_message); ?></p>
+                        <!-- ▼▼▼ ADDED: show reason box if exists ▼▼▼ -->
+                        <?php if ($reason): ?>
+                            <div class="mt-2 bg-red-100 border border-red-200 rounded-lg px-3 py-2">
+                                <p class="text-xs font-semibold text-red-500 uppercase tracking-wider mb-0.5">Reason</p>
+                                <p class="text-sm text-red-700">"<?php echo htmlspecialchars($reason); ?>"</p>
+                            </div>
+                        <?php endif; ?>
                         <p class="text-xs text-gray-400 mt-1"><?php echo $n['time_ago']; ?></p>
                     </div>
                     <?php if (!$n['is_read']): ?>
-                        <span class="w-2.5 h-2.5 rounded-full bg-brandOrange flex-shrink-0 mt-2"></span>
+                        <span class="w-2.5 h-2.5 rounded-full <?php echo $is_rejection ? 'bg-red-500' : 'bg-brandOrange'; ?> flex-shrink-0 mt-2"></span>
                     <?php endif; ?>
                 </a>
             <?php endforeach; ?>

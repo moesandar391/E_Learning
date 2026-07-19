@@ -54,16 +54,29 @@ if ($pending_result) {
     }
 }
 
+function getTypeLink($type) {
+    $map = [
+        'enrollment' => 'enrollments.php',
+        'review'     => 'reviews.php',
+        'payment'    => 'payments.php',
+        'student'    => 'students.php',
+        'course'     => 'courses.php',
+        'contact'    => 'contacts.php',
+    ];
+    return $map[$type] ?? '';
+}
+
 // Fetch from admin_notifications table
 $notif_list = [];
 $notif_result = $conn->query("SELECT id, type, message, link, is_read, created_at FROM admin_notifications ORDER BY created_at DESC LIMIT 20");
 if ($notif_result) {
     while ($row = $notif_result->fetch_assoc()) {
+        $typeLink = getTypeLink($row['type']);
         $notif_list[] = [
             'id' => $row['id'],
             'type' => $row['type'],
             'message' => $row['message'],
-            'link' => $row['link'],
+            'link' => $typeLink ?: $row['link'],
             'time_ago' => getTimeAgo($row['created_at']),
             'is_read' => (int)$row['is_read'],
             'created_at' => $row['created_at']

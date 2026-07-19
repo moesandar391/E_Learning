@@ -112,6 +112,7 @@ title="Toggle dark mode">
 
     function getIcon(type) {
         switch(type) {
+            case 'review': return '\u2b50';
             case 'enrollment': return '\ud83d\udccb';
             case 'payment': return '\ud83d\udcb0';
             case 'student': return '\ud83d\udc64';

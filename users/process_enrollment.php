@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/admin_notification_helper.php';
 $uname = $conn->query("SELECT name FROM users WHERE id = $user_id")->fetch_row()[0] ?? 'A student';
 create_admin_notification(
     $uname . ' enrolled in ' . $module['course_name'] . ' - ' . $module['name'],
-    'enroll.php',
+    'enrollments.php',
     'enrollment'
 );
 

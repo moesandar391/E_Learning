@@ -136,7 +136,7 @@ try {
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
+    <!-- <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
         <div>
             <h1 class="text-lg font-semibold text-gray-800">Dashboard</h1>
             <p class="text-sm text-gray-500">Welcome back, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
@@ -149,7 +149,7 @@ try {
                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
             </a>
         </div>
-    </header>
+    </header> -->
 
     <main class="flex-1 overflow-y-auto p-8">
         <div class="grid grid-cols-4 gap-6 mb-8">

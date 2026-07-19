@@ -65,7 +65,7 @@ $nextUnlocked = $nextIndex !== null ? isUnlocked($nextIndex, $allLessons, $compl
 $isCompleted = $activeLesson && in_array($activeLesson['id'], $completedIds);
 ?>
 
-<div class="max-w-7xl mx-auto p-6 bg-gray-50 text-gray-900 text-left min-h-screen">
+<div class="max-w-7xl mx-auto px-6 py-6 bg-gray-50 text-gray-900 text-left min-h-screen">
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 

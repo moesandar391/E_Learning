@@ -30,3 +30,17 @@ if ($action === 'delete') {
 }
 
 echo json_encode(['success' => false, 'message' => 'Unknown action.']);
+// Inside enrollments_ajax.php
+if ($_POST['action'] == 'reject') {
+    $id = $_POST['id'];
+    $reason = $conn->real_escape_string($_POST['reason']);
+    
+    // Update the status to 'Rejected' and save the reason
+    $sql = "UPDATE enrollments SET status = 'Rejected', rejection_reason = '$reason' WHERE id = '$id'";
+    
+    if ($conn->query($sql)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error']);
+    }
+}

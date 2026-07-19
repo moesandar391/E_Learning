@@ -11,7 +11,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-$action = $_POST['action'] ?? '';
+ $action = $_POST['action'] ?? '';
 
 if ($action === 'confirm' || $action === 'reject') {
     $enroll_id = intval($_POST['id'] ?? 0);
@@ -38,16 +38,24 @@ if ($action === 'confirm' || $action === 'reject') {
         create_notification(
             $enroll['user_id'],
             'Enrollment Successful! You can now access "' . $enroll['module_name'] . '" lessons.',
-            'lesson.php?module_id=' . $mod_id,
+            'my_learning.php',
             'enrollment'
         );
         echo json_encode(['success' => true, 'message' => 'Enrollment confirmed.']);
     } else {
+        $reason = trim($_POST['reason'] ?? '');
         $conn->query("UPDATE enrollments SET status = 'rejected' WHERE id = $enroll_id");
+
+        if ($reason) {
+            $message = 'Your enrollment in "' . $enroll['module_name'] . '" was rejected: ' . $reason . '. Please contact support.';
+        } else {
+            $message = 'Your enrollment in "' . $enroll['module_name'] . '" was rejected. Please contact support.';
+        }
+
         create_notification(
             $enroll['user_id'],
-            'Your enrollment in "' . $enroll['module_name'] . '" was rejected. Please contact support.',
-            'contact.php',
+            $message,
+            'contact.php?enrollment_id=' . $enroll_id,
             'enrollment'
         );
         echo json_encode(['success' => true, 'message' => 'Enrollment rejected.']);

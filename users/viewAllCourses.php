@@ -58,7 +58,8 @@ if ($userId) {
 }
 ?>
 
-<section class="px-10 py-12 min-h-screen bg-gray-50">
+<section class="py-12 min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
     <h1 class="text-brandOchre text-center italic font-bold text-4xl mb-2">OUR ENGLISH COURSES</h1>
     <p class="text-gray-600 text-center mb-8">Comprehensive pathways to master the English language.</p>
     
@@ -120,7 +121,7 @@ if ($userId) {
                         <span class="text-orange-500 text-[10px] font-bold uppercase tracking-wider">
                             <?php echo htmlspecialchars($module['course_name']); ?>
                         </span>
-                        <h3 class="text-xl font-bold text-gray-900 mt-1 mb-2">
+                        <h3 class="text-md font-bold text-gray-900 mt-1 mb-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
                         <p class="text-gray-500 text-sm mb-1">
@@ -146,7 +147,7 @@ if ($userId) {
    View Details
 </a>
 
-    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php'); ?>"
+    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . urlencode($module['module_id']) : '../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module['module_id'])); ?>"
        class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
               border border-orange-600 text-orange-600
               hover:bg-orange-600 hover:text-white
@@ -160,6 +161,7 @@ if ($userId) {
         <?php else: ?>
             <p class="text-gray-500 col-span-full text-center py-10">No modules found for this category.</p>
         <?php endif; ?>
+    </div>
     </div>
 </section>
 <?php 

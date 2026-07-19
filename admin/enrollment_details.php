@@ -115,7 +115,7 @@ $badge = match($s) {
                 <?php endif; ?>
             </div>
 
-            <!-- Actions -->
+                        <!-- Actions -->
             <?php if ($s === 'pending'): ?>
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Actions</h3>
@@ -123,7 +123,7 @@ $badge = match($s) {
                     <button onclick="updateStatus(<?= $row['id'] ?>, 'confirm')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition">
                         Confirm Enrollment
                     </button>
-                    <button onclick="updateStatus(<?= $row['id'] ?>, 'reject')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
+                    <button onclick="openRejectModal(<?= $row['id'] ?>)" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
                         Reject Enrollment
                     </button>
                 </div>
@@ -133,12 +133,53 @@ $badge = match($s) {
     </main>
 </div>
 
+<!-- Modal OUTSIDE the flex container and main -->
+<div id="rejectModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
+        <h3 class="font-bold text-lg mb-4">Reject Enrollment</h3>
+        <input type="hidden" id="rejectEnrollmentId">
+        <textarea id="rejectReason" class="w-full border rounded-lg p-2 mb-4" rows="3" placeholder="Enter reason for rejection..."></textarea>
+        <div class="flex justify-end gap-2">
+            <button onclick="document.getElementById('rejectModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
+            <button onclick="submitRejection()" class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg">Confirm Rejection</button>
+        </div>
+    </div>
+</div>
+
 <script>
 function updateStatus(id, action) {
     if (!confirm('Are you sure you want to ' + action + ' this enrollment?')) return;
     var formData = new FormData();
     formData.append('action', action);
     formData.append('id', id);
+    fetch('payments_ajax.php', { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+}
+
+function openRejectModal(id) {
+    document.getElementById('rejectEnrollmentId').value = id;
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectModal').classList.remove('hidden');
+}
+
+function submitRejection() {
+    var id = document.getElementById('rejectEnrollmentId').value;
+    var reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+        alert('Please enter a reason for rejection.');
+        return;
+    }
+    var formData = new FormData();
+    formData.append('action', 'reject');
+    formData.append('id', id);
+    formData.append('reason', reason);
     fetch('payments_ajax.php', { method: 'POST', body: formData })
         .then(function(r) { return r.json(); })
         .then(function(data) {

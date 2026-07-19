@@ -3,11 +3,10 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
- $message = '';
- $error = '';
- $upload_dir = '../uploads/admin_profile/';
+$message = '';
+$error = '';
+$upload_dir = '../uploads/admin_profile/';
 
-// Make sure upload directory exists
 if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0777, true);
 }
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     $email = trim($_POST['email'] ?? '');
     
     if ($name && $email) {
-        // ── Handle Image Upload ──
         if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == 0) {
             $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
             $file_name = $_FILES['profile_image']['name'];
@@ -28,12 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
                 $new_image_name = 'admin_' . $_SESSION['user_id'] . '_' . time() . '.' . $file_ext;
                 $destination = $upload_dir . $new_image_name;
 
-                // Delete old image if it exists
                 $stmt_old = $conn->prepare("SELECT profile_image FROM admin WHERE id = ?");
                 $stmt_old->bind_param("i", $_SESSION['user_id']);
                 $stmt_old->execute();
                 $old_img = $stmt_old->get_result()->fetch_assoc();
-                if ($old_img['profile_image'] && file_exists($upload_dir . $old_img['profile_image'])) {
+                if ($old_img && !empty($old_img['profile_image']) && file_exists($upload_dir . $old_img['profile_image'])) {
                     unlink($upload_dir . $old_img['profile_image']);
                 }
 
@@ -49,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             }
         }
 
-        // ── Update Name and Email ──
         $stmt = $conn->prepare("UPDATE admin SET name = ?, email = ? WHERE id = ?");
         $stmt->bind_param("ssi", $name, $email, $_SESSION['user_id']);
         if ($stmt->execute()) {
@@ -92,34 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     }
 }
 
-// Fetch admin data including profile image
- $stmt = $conn->prepare("SELECT name, email, profile_image FROM admin WHERE id = ?");
- $stmt->bind_param("i", $_SESSION['user_id']);
- $stmt->execute();
- $admin = $stmt->get_result()->fetch_assoc();
+$stmt = $conn->prepare("SELECT name, email, profile_image FROM admin WHERE id = ?");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$admin = $stmt->get_result()->fetch_assoc();
 
- $image_path = $admin['profile_image'] ? $upload_dir . $admin['profile_image'] : null;
+$image_path = ($admin && !empty($admin['profile_image'])) ? $upload_dir . $admin['profile_image'] : null;
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
-        <div>
-            <h1 class="text-lg font-semibold text-gray-800">Profiles</h1>
-            <p class="text-sm text-gray-500">Manage your account profiles</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
-            <?php require_once 'includes/admin_notif_icon.php'; ?>
-            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition overflow-hidden">
-                <?php if($image_path && file_exists($image_path)): ?>
-                    <img src="<?= $image_path ?>" class="w-full h-full object-cover">
-                <?php else: ?>
-                    <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
-                <?php endif; ?>
-            </a>
-        </div>
-    </header>
-
     <main class="flex-1 overflow-y-auto p-8">
 
         <?php if ($message): ?>
@@ -138,13 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            <!-- ── Profile Settings Card ── -->
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                    <!-- Hidden File Input -->
                     <input type="file" name="profile_image" id="profile_image" class="hidden" accept="image/png, image/jpeg, image/gif" onchange="previewImage(this)">
                     
-                    <!-- Avatar with Camera Icon -->
                     <div class="flex items-center gap-5">
                         <div class="relative flex-shrink-0">
                             <div id="preview-container" 
@@ -156,7 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                                     <span class="text-3xl font-bold text-brandOrange"><?= strtoupper(substr($admin['name'] ?? 'A', 0, 1)) ?></span>
                                 <?php endif; ?>
                             </div>
-                            <!-- Camera Icon Button -->
                             <button type="button" 
                                     onclick="event.stopPropagation(); document.getElementById('profile_image').click();" 
                                     class="absolute -bottom-1 -right-1 w-7 h-7 bg-brandOrange text-white rounded-full flex items-center justify-center shadow-md hover:bg-orange-600 transition border-2 border-white focus:outline-none">
@@ -189,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                 </form>
             </div>
 
-            <!-- ── Change Password Card ── -->
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -226,14 +198,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     </main>
 </div>
 
-<!-- Javascript to preview image before saving -->
 <script>
 function previewImage(input) {
     const container = document.getElementById('preview-container');
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            // Replace the inner content of the avatar with the new image
             container.innerHTML = '<img src="'+e.target.result+'" class="w-full h-full object-cover">';
         }
         reader.readAsDataURL(input.files[0]);

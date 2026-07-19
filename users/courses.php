@@ -30,11 +30,11 @@ if ($userId) {
 }
 ?>
 
-<section class="w-full bg-[#F8F9FA] py-12 px-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-12 font-sans">
+    <div class="max-w-7xl mx-auto px-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-[#0F172A] tracking-tight">
+            <h2 class="font-serif font-bold text-3xl text-[#0F172A] dark:text-gray-100 tracking-tight">
                 Popular Courses
             </h2>
             <div>
@@ -80,7 +80,7 @@ if ($userId) {
 
                 <div class="p-7 flex-1 flex flex-col justify-between relative z-20">
                     <div>
-                        <h3 class="font-serif font-bold text-[#0F172A] text-xl leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
+                        <h3 class="font-serif font-bold text-[#0F172A] text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
 
@@ -114,16 +114,16 @@ if ($userId) {
 
     <a href="<?php 
     echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) 
-        ? 'my_learning.php' 
+        ? 'lesson.php?module_id=' . urlencode($module['module_id']) 
         : (isset($_SESSION['user_id']) 
             ? 'enroll.php?module_id=' . urlencode($module['module_id']) 
-            : '../auth/login.php');
+            : '../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module['module_id']));
 ?>" 
    class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
           border border-orange-600 text-orange-600
           hover:bg-orange-600 hover:text-white
           hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-   <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
+    <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
 </a>
 </div>
                     </div>
