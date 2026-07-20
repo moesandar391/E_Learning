@@ -79,7 +79,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
 ?>
 
 <!-- <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen pt-20"> -->
-    <div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
             <h1 class="font-serif font-bold text-4xl md:text-5xl text-[#0F172A] dark:text-slate-100 mb-4">Contact Us</h1>
             <p class="text-base text-[#566473] dark:text-slate-300 max-w-2xl mx-auto">

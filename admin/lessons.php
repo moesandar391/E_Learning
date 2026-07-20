@@ -3,13 +3,19 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
- $total = $conn->query("SELECT COUNT(*) FROM lessons")->fetch_row()[0] ?? 0;
- $result = $conn->query("
+$limit = 10;
+$page = max(1, intval($_GET['page'] ?? 1));
+$offset = ($page - 1) * $limit;
+
+$total = $conn->query("SELECT COUNT(*) FROM lessons")->fetch_row()[0] ?? 0;
+$totalPages = max(1, ceil($total / $limit));
+$result = $conn->query("
     SELECT l.id, l.title, l.description, l.video, m.name AS module_name, c.course_name, l.created_at
     FROM lessons l
     JOIN modules m ON l.module_id = m.id
     JOIN courses c ON m.course_id = c.id
     ORDER BY l.created_at DESC
+    LIMIT $offset, $limit
 ");
  $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_name ASC");
 ?>
@@ -125,6 +131,18 @@
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
+                    <?php endfor; ?>
+                    <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 </div>

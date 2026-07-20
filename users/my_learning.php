@@ -82,8 +82,8 @@ $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-500 mb-8">My Learning</h1>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-500 mb-8 px-8">My Learning</h1>
 
         <!-- Stats Cards -->
         <div class="flex gap-4 items-center justify-center mb-8">
@@ -177,7 +177,7 @@ foreach ($certificates as $cert) {
                             </div>
                             <?php endif; ?>
                             <div class="mt-4 flex items-center justify-between">
-                                <span class="text-xs text-brandOrange font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                <span class="text-xs text-brandOrange font-semibold flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                     Continue Learning
                                 </span>

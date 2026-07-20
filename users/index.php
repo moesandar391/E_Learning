@@ -303,61 +303,82 @@ $reviews = $conn->query("
     </div>
 </section>
 
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
-    <div class="max-w-7xl mx-auto px-6">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 px-6 font-sans">
+    <div class="max-w-7xl mx-auto">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-brandOchre tracking-tight">
+            <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-orange-400 tracking-tight">
                 Popular Courses
             </h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <?php $cardColors = ['orange', 'blue', 'green']; ?>
             <?php foreach ($popularModules as $index => $module): ?>
-            <a href="details.php?module_id=<?php echo $module['module_id']; ?>" 
-               class="group block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-400">
+            <?php $color = $cardColors[$index % count($cardColors)]; ?>
+            <div class="group relative bg-white dark:bg-gray-800 rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-500 hover:shadow-2xl">
+                
+                <div class="absolute inset-0 bg-gradient-to-br from-<?php echo $color; ?>-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
 
-                <!-- Image -->
-                <div class="relative h-56 overflow-hidden">
+                <div class="relative h-64 w-full overflow-hidden">
                     <?php if (!empty($module['module_image'])): ?>
-                        <img src="../uploads/modules/<?php echo htmlspecialchars($module['module_image']); ?>" 
-                             alt="<?php echo htmlspecialchars($module['module_name']); ?>" 
-                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy">
+                        <img src="../uploads/modules/<?php echo htmlspecialchars($module['module_image']); ?>" alt="<?php echo htmlspecialchars($module['module_name']); ?>" class="w-full h-full object-cover transition-all duration-700 group-hover:scale-110">
                     <?php else: ?>
-                        <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                            <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        <div class="w-full h-full bg-gradient-to-br from-<?php echo $color; ?>-50 to-amber-50 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                            <svg class="w-16 h-16 text-<?php echo $color; ?>-200 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                         </div>
                     <?php endif; ?>
-
-                    <!-- Badges -->
-                    <div class="absolute top-3 left-3">
-                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-600 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    <div class="absolute top-4 left-4 z-20">
+                        <span class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-<?php echo $color; ?>-600 dark:text-<?php echo $color; ?>-400 text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border border-<?php echo $color; ?>-200 dark:border-<?php echo $color; ?>-800">
                             <?php echo htmlspecialchars($module['course_name']); ?>
                         </span>
                     </div>
-                    <div class="absolute top-3 right-3">
-                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-500 dark:text-gray-400 border border-gray-200/50 dark:border-gray-600/50">
+                    <div class="absolute top-4 right-4 z-20">
+                        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-xs font-medium px-3 py-1 rounded-full border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300">
                             <?php echo htmlspecialchars($module['level'] ?? 'Beginner'); ?>
-                        </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-7 flex flex-col justify-between relative z-20">
+                    <div class="flex-1">
+                        <h3 class="font-serif font-bold text-[#0F172A] dark:text-white text-md leading-snug mb-6 group-hover:text-[#FF8A00] dark:group-hover:text-orange-400 transition-colors duration-300 line-clamp-2">
+                            <?php echo htmlspecialchars($module['module_name']); ?>
+                        </h3>
                     </div>
 
-                    <!-- Bottom gradient -->
-                    <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent"></div>
+                    <div class="flex items-center gap-2">
+                        <a href="details.php?module_id=<?php echo $module['module_id']; ?>"
+                           class="flex-1 text-center text-xs font-medium py-3 rounded-xl transition-all duration-300
+                                  border border-gray-400 dark:border-gray-500 text-gray-500 dark:text-gray-300
+                                  hover:bg-gray-500 hover:text-white hover:border-gray-500
+                                  hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
+                           <span class="inline-flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                View Details
+                           </span>
+                        </a>
+
+                        <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . urlencode($module['module_id']) : '../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module['module_id'])); ?>"
+                               class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
+                                      border border-orange-600 text-orange-600
+                                      hover:bg-orange-600 hover:text-white
+                                      hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
+                            <span class="inline-flex items-center justify-center gap-2">
+                                <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                            </span>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Title -->
-                <div class="p-5">
-                    <h3 class="font-serif font-bold text-[15px] leading-snug text-gray-900 dark:text-white line-clamp-2 group-hover:text-brandOchre transition-colors duration-300">
-                        <?php echo htmlspecialchars($module['module_name']); ?>
-                    </h3>
-                </div>
-
-            </a>
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-<?php echo $color; ?>-400 to-<?php echo $color; ?>-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+            </div>
             <?php endforeach; ?>
         </div>
-
     </div>
 </section>
 
@@ -425,6 +446,7 @@ $reviews = $conn->query("
 </body>
 </html>
 
+<?php include_once('../users/reviews.php');?>
 <?php include_once('../users/about.php');?>
 <!--include_once('../users/contact.php'); -->
 

@@ -3,11 +3,16 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
- $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
- $total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
- $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
- $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
- $result = $conn->query("
+$limit = 10;
+$page = max(1, intval($_GET['page'] ?? 1));
+$offset = ($page - 1) * $limit;
+
+$total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+$total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
+$total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
+$total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
+$totalPages = max(1, ceil($total_enrollments / $limit));
+$result = $conn->query("
     SELECT e.id,
            u.name AS student_name,
            u.email AS student_email,
@@ -33,6 +38,7 @@
             ELSE 4
         END,
         e.created_at DESC
+    LIMIT $offset, $limit
 ");
 ?>
 
@@ -263,8 +269,32 @@
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total_enrollments ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
+                    <?php endfor; ?>
+                    <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
+</div>
+
+<div id="rejectModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
+        <h3 class="font-bold text-lg mb-4">Reject Enrollment</h3>
+        <input type="hidden" id="rejectEnrollmentId">
+        <textarea id="rejectReason" class="w-full border rounded-lg p-2 mb-4" rows="3" placeholder="Enter reason for rejection..."></textarea>
+        <div class="flex justify-end gap-2">
+            <button onclick="document.getElementById('rejectModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
+            <button onclick="submitRejection()" class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg">Confirm Rejection</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -318,24 +348,38 @@ document.querySelectorAll('.confirm-btn').forEach(function(btn) {
 document.querySelectorAll('.reject-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var id = this.getAttribute('data-id');
-        var row = this.closest('tr');
-        if (confirm('Reject this enrollment?')) {
-            var formData = new FormData();
-            formData.append('action', 'reject');
-            formData.append('id', id);
-            fetch('payments_ajax.php', { method: 'POST', body: formData })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.success) {
-                        var statusCell = row.querySelector('td:nth-child(8)');
-                        statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Rejected</span>';
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
+        document.getElementById('rejectEnrollmentId').value = id;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').classList.remove('hidden');
     });
 });
+
+function submitRejection() {
+    var id = document.getElementById('rejectEnrollmentId').value;
+    var reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+        alert('Please enter a reason for rejection.');
+        return;
+    }
+    var row = document.querySelector('.payment-row[data-id="' + id + '"]');
+    var formData = new FormData();
+    formData.append('action', 'reject');
+    formData.append('id', id);
+    formData.append('reason', reason);
+    fetch('payments_ajax.php', { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                if (row) {
+                    var statusCell = row.querySelector('td:nth-child(8)');
+                    statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Rejected</span>';
+                }
+                document.getElementById('rejectModal').classList.add('hidden');
+            } else {
+                alert(data.message);
+            }
+        });
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

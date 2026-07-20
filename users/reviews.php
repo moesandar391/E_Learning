@@ -1,8 +1,4 @@
 <?php
-session_start();
-require_once '../config/db.php';
-include_once('../includes/header.php');
-
 $reviews = [];
 $result = $conn->query("
     SELECT r.rating, r.review, u.name AS user_name, m.name AS module_name
@@ -17,7 +13,7 @@ if ($result) {
 ?>
 
 <?php if (!empty($reviews)): ?>
-<section class="w-full bg-white dark:bg-gray-800 py-16 px-6 font-sans" id="testimonials">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 px-6 font-sans" id="testimonials">
     <div class="max-w-3xl mx-auto">
         
         <!-- Header -->
@@ -146,5 +142,3 @@ if ($result) {
     }
 })();
 </script>
-
-<?php include_once('../includes/footer.php'); ?>

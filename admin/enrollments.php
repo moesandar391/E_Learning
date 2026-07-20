@@ -3,8 +3,13 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
- $total = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
- $result = $conn->query("
+$limit = 10;
+$page = max(1, intval($_GET['page'] ?? 1));
+$offset = ($page - 1) * $limit;
+
+$total = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+$totalPages = max(1, ceil($total / $limit));
+$result = $conn->query("
     SELECT e.id, u.name AS student_name, u.email AS student_email, u.phone AS student_phone,
            m.name AS module_name, c.course_name, e.enroll_date, e.status, e.receipt,
            pm.name AS payment_method, m.price
@@ -14,6 +19,7 @@
     JOIN courses c ON m.course_id = c.id
     LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
     ORDER BY e.created_at DESC
+    LIMIT $offset, $limit
 ");
  $enrollments = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 ?>
@@ -102,6 +108,18 @@
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
+                    <?php endfor; ?>
+                    <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 </div>
