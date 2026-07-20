@@ -3,14 +3,20 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
- $total = $conn->query("SELECT COUNT(*) FROM modules")->fetch_row()[0] ?? 0;
- $result = $conn->query("
+$limit = 10;
+$page = max(1, intval($_GET['page'] ?? 1));
+$offset = ($page - 1) * $limit;
+
+$total = $conn->query("SELECT COUNT(*) FROM modules")->fetch_row()[0] ?? 0;
+$totalPages = max(1, ceil($total / $limit));
+$result = $conn->query("
     SELECT m.id, m.name, m.price, m.image, m.created_at, c.course_name
     FROM modules m
     JOIN courses c ON m.course_id = c.id
     ORDER BY m.created_at DESC
+    LIMIT $offset, $limit
 ");
- $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_name ASC");
+$courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_name ASC");
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -50,6 +56,7 @@
                 <table class="w-full" id="modulesTable">
                     <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Image</th>
                             <th class="px-6 py-4">Module</th>
                             <th class="px-6 py-4">Course</th>
@@ -60,8 +67,9 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php $counter = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors module-row" data-id="<?= $row['id'] ?>">
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0">
                                         <?php if (!empty($row['image'])): ?>
@@ -80,7 +88,6 @@
                                         </span>
                                         <div>
                                             <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($row['name']) ?></p>
-                                            <p class="text-xs text-gray-400">ID: #<?= $row['id'] ?></p>
                                         </div>
                                     </div>
                                 </td>
@@ -112,7 +119,7 @@
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="7" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                     <p class="text-sm text-gray-400 mb-3">No modules yet</p>
                                     <button onclick="openModal()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brandOrange text-white text-sm font-semibold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
@@ -125,6 +132,18 @@
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
+                    <?php endfor; ?>
+                    <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 </div>
@@ -184,11 +203,11 @@
                        placeholder="e.g. 50000">
             </div>
             <div class="flex items-center gap-3 pt-2">
-                <button type="submit" id="submitBtn" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
-                    Save Module
-                </button>
                 <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">
                     Cancel
+                </button>
+                <button type="submit" id="submitBtn" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
+                    Save Module
                 </button>
             </div>
         </form>

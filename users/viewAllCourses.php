@@ -65,7 +65,7 @@ if ($userId) {
     
     <!-- Search and Filter Bar -->
     <form action="courses.php" method="GET" class="flex items-center justify-center gap-4 mb-10">
-    <select name="level" onchange="this.form.submit()" class="bg-white border border-orange-200 rounded-lg p-3 text-sm focus:outline-none focus:border-orange-500 text-gray-700 shadow-sm">
+    <select name="level" onchange="this.form.submit()" class="cursor-pointer bg-white border border-orange-200 rounded-lg p-3 text-sm focus:outline-none focus:border-orange-500 text-gray-700 shadow-sm">
         <option value="">All Levels</option>
         <option value="Beginner" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Beginner') ? 'selected' : ''; ?>>Beginner</option>
         <option value="Intermediate" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Intermediate') ? 'selected' : ''; ?>>Intermediate</option>

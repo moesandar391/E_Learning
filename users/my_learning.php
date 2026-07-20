@@ -83,10 +83,10 @@ $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-500 mb-8 px-8">My Learning</h1>
+        <h1 class="text-3xl font-bold text-brandOchre mb-8 px-8">My Dashboard</h1>
 
         <!-- Stats Cards -->
-        <div class="flex gap-4 items-center justify-center mb-8">
+        <div class="flex gap-4 items-center justify-center mb-8 px-8">
             <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center w-48 shadow-sm">
                 <p class="text-blue-500 text-3xl font-bold"><?= $learningCount ?></p>
                 <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Courses Learning</p>
@@ -110,7 +110,7 @@ foreach ($certificates as $cert) {
     }
 }
 ?>
-        <div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8">
+        <div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8 mx-8">
             <h3 class="text-xl font-bold text-brandOrange mb-6">My Certificates</h3>
             <?php if (!empty($certificates)): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -133,7 +133,7 @@ foreach ($certificates as $cert) {
         </div>
 
         <!-- Enrolled Courses -->
-        <div class="bg-white p-8 rounded-2xl border border-gray-200">
+        <div class="bg-white p-8 rounded-2xl border border-gray-200 mx-8">
             <h3 class="text-xl font-bold text-brandOrange mb-6">Enrolled Courses</h3>
             <?php if (count($enrolledCourses) > 0): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

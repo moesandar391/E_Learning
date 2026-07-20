@@ -1,4 +1,6 @@
 <?php
+require_once '../config/db.php';
+include_once('../includes/header.php');
 $reviews = [];
 $result = $conn->query("
     SELECT r.rating, r.review, u.name AS user_name, m.name AS module_name
@@ -19,7 +21,7 @@ if ($result) {
         <!-- Header -->
         <div class="text-center mb-12">
             <span class="inline-block text-[10px] font-bold text-brandOrange uppercase tracking-[0.2em] mb-3">Testimonials</span>
-            <h2 class="text-3xl lg:text-4xl font-serif font-bold text-slate-500 dark:text-slate-200">What Our Students Say</h2>
+            <h2 class="text-3xl lg:text-4xl font-serif font-bold text-brandOchre dark:text-slate-200">What Our Students Say</h2>
             <p class="text-sm text-brandTextGray dark:text-slate-200 mt-3 max-w-lg mx-auto">Real feedback from our learners</p>
         </div>
 
@@ -142,3 +144,6 @@ if ($result) {
     }
 })();
 </script>
+<?php 
+include_once('../includes/footer.php');
+?>

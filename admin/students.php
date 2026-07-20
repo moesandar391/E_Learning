@@ -141,6 +141,7 @@ if (!empty($students)) {
                 <table class="w-full" id="studentsTable">
                     <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Student</th>
                             <th class="px-6 py-4">Email</th>
                             <th class="px-6 py-4">Phone</th>
@@ -153,14 +154,14 @@ if (!empty($students)) {
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($studentCount > 0): ?>
-                            <?php foreach ($students as $row): ?>
+                            <?php $counter = $offset + 1; foreach ($students as $row): ?>
                             <tr class="hover:bg-gray-50 transition-colors student-row">
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold"><?= strtoupper(substr($row['name'], 0, 1)) ?></span>
                                         <div>
                                             <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($row['name']) ?></p>
-                                            <p class="text-xs text-gray-400">ID: #<?= $row['id'] ?></p>
                                         </div>
                                     </div>
                                 </td>
@@ -217,7 +218,7 @@ if (!empty($students)) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" class="px-6 py-12 text-center">
+                                <td colspan="9" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
                                     <p class="text-sm text-gray-400">No students found</p>
                                 </td>

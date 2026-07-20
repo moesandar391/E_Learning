@@ -13,7 +13,7 @@ if ($userId) {
 ?>
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-5xl md:text-6xl text-[#0F172A] dark:text-slate-100 mb-6">About Access Edu</h1>
+            <h1 class="font-serif font-bold text-5xl md:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
             <p class="text-lg text-[#566473] dark:text-slate-300 max-w-3xl mx-auto">
                 We empower global communicators through immersive English language learning. Our mission is to bridge cultures and unlock international opportunities for learners worldwide.
             </p>
@@ -22,7 +22,7 @@ if ($userId) {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
             <div class="lg:col-span-5 space-y-8">
                 <div class="space-y-6">
-                    <h2 class="font-serif font-bold text-3xl text-[#0F172A] dark:text-slate-100">Our Story</h2>
+                    <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-slate-100">Our Story</h2>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
                         Founded in 2020, Access Edu began as a small tutoring center in Singapore with a vision to make quality English education accessible to everyone. Over the years, we've grown into a global platform serving learners in over 50 countries.
                     </p>
@@ -88,7 +88,7 @@ if ($userId) {
         
         <section class="bg-white rounded-[32px] p-12 shadow-sm border border-gray-100">
             <div class="max-w-4xl mx-auto">
-                <h2 class="font-serif font-bold text-3xl text-[#0F172A] dark:text-slate-100 mb-8 text-center">Our Mission & Values</h2>
+                <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-slate-100 mb-8 text-center">Our Mission & Values</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="text-center space-y-4">
@@ -97,7 +97,7 @@ if ($userId) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
-                        <h3 class="font-bold text-lg text-[#0F172A] dark:text-slate-100">Excellence</h3>
+                        <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Excellence</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
                             We strive for teaching excellence through continuous improvement and proven methodologies that deliver real results for our learners.
                         </p>
@@ -109,7 +109,7 @@ if ($userId) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
-                        <h3 class="font-bold text-lg text-[#0F172A] dark:text-slate-100">Community</h3>
+                        <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Community</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
                             We believe in the power of community learning, where students support each other and grow together towards their goals.
                         </p>
@@ -121,7 +121,7 @@ if ($userId) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.004 5.004 0 006.323 0M15 6l3-1M15 6l-3 9a5.004 5.004 0 006.323 0M9 12l3 6m0 0l3-6m-6 0V4m12 4v8m-4-4h8"></path>
                             </svg>
                         </div>
-                        <h3 class="font-bold text-lg text-[#0F172A] dark:text-slate-100">Innovation</h3>
+                        <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Innovation</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
                             We innovate continuously, leveraging technology to create personalized learning experiences that adapt to each student's unique needs.
                         </p>

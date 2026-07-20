@@ -73,7 +73,7 @@ include_once('../includes/header.php');
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-2xl font-bold text-gray-700">Edit Profile</h1>
+                <h1 class="text-2xl font-bold text-brandOchre">Edit Profile</h1>
                 <p class="text-sm text-gray-400 mt-1">Update your personal information</p>
             </div>
             <a href="profile.php" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brandOrange transition-colors">

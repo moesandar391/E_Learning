@@ -69,9 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-8 px-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-700">My Reviews</h1>
+                <h1 class="text-3xl font-bold text-brandOchre">My Reviews</h1>
                 <p class="text-sm text-gray-400 mt-1">Review your enrolled courses and share your feedback</p>
             </div>
             <a href="courses.php" class="text-sm font-bold text-brandOrange hover:underline flex items-center gap-1">
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
         <?php endif; ?>
 
                 <?php if (count($enrollments) > 0): ?>
-            <div class="space-y-4">
+            <div class="space-y-4 px-6">
                 <?php foreach ($enrollments as $enr):
                     $hasReview = !is_null($enr['existing_rating']);
                 ?>

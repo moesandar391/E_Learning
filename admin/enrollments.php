@@ -55,7 +55,7 @@ $result = $conn->query("
                 <table class="w-full" id="enrollmentsTable">
                     <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            <!-- <th class="px-6 py-4">#</th> -->
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Student</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>
@@ -65,9 +65,9 @@ $result = $conn->query("
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if (count($enrollments) > 0): ?>
-                            <?php foreach ($enrollments as $row): ?>
+                            <?php $counter = $offset + 1; foreach ($enrollments as $row): ?>
                             <tr class="hover:bg-gray-50 transition-colors enrollment-row">
-                                <!-- <td class="px-6 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td> -->
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold">

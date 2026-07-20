@@ -3,16 +3,16 @@
 <?php require_once '../config/db.php'; ?>
 
 <?php
-$limit = 10;
-$page = max(1, intval($_GET['page'] ?? 1));
-$offset = ($page - 1) * $limit;
+ $limit = 10;
+ $page = max(1, intval($_GET['page'] ?? 1));
+ $offset = ($page - 1) * $limit;
 
-$total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
-$total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
-$total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
-$total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
-$totalPages = max(1, ceil($total_enrollments / $limit));
-$result = $conn->query("
+ $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+ $total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
+ $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
+ $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
+ $totalPages = max(1, ceil($total_enrollments / $limit));
+ $result = $conn->query("
     SELECT e.id,
            u.name AS student_name,
            u.email AS student_email,
@@ -20,6 +20,7 @@ $result = $conn->query("
            m.price,
            c.course_name,
            pm.name AS payment_method,
+           pm.image AS payment_image,
            e.enroll_date,
            e.status,
            e.created_at,
@@ -100,8 +101,13 @@ $result = $conn->query("
                         <p class="text-3xl font-bold text-red-600 mt-1"><?= $total_rejected ?></p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </div>
+    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" stroke-width="2"></circle>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 9l6 6M15 9l-6 6">
+        </path>
+    </svg>
+</div>
                 </div>
             </div>
         </div>
@@ -115,7 +121,7 @@ $result = $conn->query("
                 <div class="flex items-center gap-3">
                     <!-- Status Filter -->
                     <select id="statusFilter"
-                        class="px-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
+                        class="cursor-pointer px-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
                         <option value="confirmed">Confirmed</option>
@@ -135,27 +141,27 @@ $result = $conn->query("
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full" id="paymentsTable">
-                    <thead>
+                    <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            <th class="px-4 py-4">#</th>
-                            <th class="px-4 py-4">Student</th>
-                            <th class="px-4 py-4">Course / Module</th>
-                            <th class="px-4 py-4">Method</th>
-                            <th class="px-4 py-4">Receipt</th>
-                            <th class="px-4 py-4">Amount</th>
-                            <th class="px-4 py-4">Date</th>
-                            <th class="px-4 py-4">Status</th>
-                            <th class="px-4 py-4">Action</th>
+                            <th class="px-3 py-3">No.</th>
+                            <th class="px-3 py-3">Student</th>
+                            <th class="px-3 py-3">Course / Module</th>
+                            <th class="px-3 py-3">Method</th>
+                            <th class="px-3 py-3">Receipt</th>
+                            <th class="px-3 py-3">Amount</th>
+                            <th class="px-3 py-3">Date</th>
+                            <th class="px-3 py-3">Status</th>
+                            <th class="px-3 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php $counter = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors payment-row"
                                 data-id="<?= $row['id'] ?>"
                                 data-status="<?= strtolower($row['status']) == 'completed' ? 'confirmed' : strtolower($row['status']) ?>">
-                                <td class="px-4 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td>
-                                <td class="px-4 py-4">
+                                <td class="px-3 py-3 text-sm text-gray-500"><?= $counter++ ?></td>
+                                <td class="px-3 py-3">
                                     <div class="flex items-center gap-2">
                                         <span class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold">
                                             <?php echo strtoupper(substr($row['student_name'], 0, 1)); ?>
@@ -166,64 +172,52 @@ $result = $conn->query("
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4">
+                                <td class="px-3 py-3">
                                     <p class="text-sm text-gray-700"><?= htmlspecialchars($row['course_name']) ?></p>
                                     <p class="text-xs text-gray-400"><?= htmlspecialchars($row['module_name']) ?></p>
                                 </td>
-                                <td class="px-4 py-4">
-    <?php 
-    // Use strtolower to make matching case-insensitive
-    $method = trim($row['payment_method'] ?? '');
-    $methodLower = strtolower($method);
-    
-    // Define brand-specific colors
-    $colors = [
-        'k pay'    => 'bg-blue-100 text-blue-700 border-blue-200',
-        'kbzpay'  => 'bg-blue-100 text-blue-700 border-blue-200',
-        'wavepay' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-        'aya pay'  => 'bg-red-100 text-red-700 border-red-200',
-        'cb pay'   => 'bg-teal-100 text-teal-700 border-teal-200'
-    ];
-
-    // Get style based on lowercase match, default to gray if unknown
-    $style = $colors[$methodLower] ?? 'bg-gray-50 text-gray-600 border-gray-200';
-    ?>
-
-    <?php if ($method): ?>
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border <?= $style ?>">
-            <?= htmlspecialchars($method) ?>
-        </span>
-    <?php else: ?>
-        <span class="text-xs text-gray-400">—</span>
-    <?php endif; ?>
-</td>
-                                <td class="px-4 py-4">
+                                <td class="px-3 py-3">
+                                    <?php
+                                        $method = trim($row['payment_method'] ?? '');
+                                        $img = $row['payment_image'] ?? null;
+                                    ?>
+                                    <?php if ($img): ?>
+                                        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($method) ?>"
+                                        class="h-8 w-auto object-contain">
+                                    <?php elseif ($method): ?>
+                                        <span class="text-sm text-gray-700"><?= htmlspecialchars($method) ?></span>
+                                    <?php else: ?>
+                                        <span class="text-xs text-gray-400">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-3 py-3">
                                     <?php if (!empty($row['receipt'])): ?>
-                                        <a href="#" onclick="event.preventDefault(); document.getElementById('receiptModal<?= $row['id'] ?>').classList.remove('hidden')"
-                                           class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition">
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('receiptModal<?= $row['id'] ?>').classList.remove('hidden'); document.getElementById('receiptModal<?= $row['id'] ?>').classList.add('flex')"
+                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                             View Receipt
                                         </a>
                                         <!-- Modal -->
-                                        <div id="receiptModal<?= $row['id'] ?>" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm" onclick="if(event.target===this) this.classList.add('hidden')">
-                                            <div class="bg-white rounded-2xl p-4 max-w-lg w-full mx-4 shadow-2xl relative">
-                                                <button onclick="document.getElementById('receiptModal<?= $row['id'] ?>').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-                                                <img src="<?= htmlspecialchars($row['receipt']) ?>" alt="Receipt" class="w-full h-auto rounded-lg" onerror="this.parentElement.innerHTML='<p class=\'text-red-500 text-sm p-4\'>Receipt image not found</p>'">
+                                        <div id="receiptModal<?= $row['id'] ?>" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm" onclick="if(event.target===this){this.classList.add('hidden');this.classList.remove('flex')}">
+                                            <div class="bg-white rounded-2xl p-4 max-w-lg w-full mx-4 shadow-2xl relative flex items-center justify-center">
+                                                <button onclick="event.stopPropagation(); document.getElementById('receiptModal<?= $row['id'] ?>').classList.add('hidden');document.getElementById('receiptModal<?= $row['id'] ?>').classList.remove('flex')" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl leading-none z-10">&times;</button>
+                                                <img src="<?= htmlspecialchars($row['receipt']) ?>" alt="Receipt" class="max-w-full h-auto max-h-[80vh] mx-auto block rounded-lg" onerror="this.parentElement.innerHTML='<p class=\'text-red-500 text-sm p-4\'>Receipt image not found</p>'">
                                             </div>
                                         </div>
                                     <?php else: ?>
                                         <span class="text-xs text-gray-400">—</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-4 py-4 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                <td class="px-3 py-3 text-sm font-semibold text-gray-700">
                                     <?php if ($row['price'] > 0): ?>
-                                        <?= number_format($row['price']); ?> MMK
+                                        <span class="block leading-tight"><?= number_format($row['price']); ?></span>
+                                        <span class="block text-[10px] font-normal text-gray-400 leading-tight">MMK</span>
                                     <?php else: ?>
                                         <span class="text-gray-400">Free</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-4 py-4 text-sm text-gray-500"><?= htmlspecialchars($row['enroll_date']) ?></td>
-                                <td class="px-4 py-4">
+                                <td class="px-3 py-3 text-sm text-gray-500"><?= htmlspecialchars($row['enroll_date']) ?></td>
+                                <td class="px-3 py-3">
                                     <?php
                                     $s = strtolower($row['status']);
                                     if ($s === 'completed') $s = 'confirmed';
@@ -245,7 +239,7 @@ $result = $conn->query("
                                         <?= ucfirst($s) ?>
                                     </span>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
+                                <td class="px-3 py-3 whitespace-nowrap">
                                     <div class="flex items-center gap-1.5">
                                         <button class="confirm-btn px-2 py-1 text-xs font-semibold rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition" data-id="<?= $row['id'] ?>">
                                             Confirm

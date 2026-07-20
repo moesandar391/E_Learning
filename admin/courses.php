@@ -44,6 +44,7 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                 <table class="w-full" id="coursesTable">
                     <thead class="bg-orange-100/50"> 
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Instructor</th>
                             <th class="px-6 py-4">Level</th>
@@ -54,8 +55,9 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php $counter = 1; while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors course-row" data-id="<?= $row['id'] ?>">
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-sm font-bold">
@@ -101,7 +103,7 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="7" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                                     <p class="text-sm text-gray-400 mb-3">No courses yet</p>
                                     <button onclick="openModal()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brandOrange text-white text-sm font-semibold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
@@ -157,11 +159,11 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                           placeholder="Brief description of the course"></textarea>
             </div>
             <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
-                    Save Course
-                </button>
                 <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">
                     Cancel
+                </button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
+                    Save Course
                 </button>
             </div>
         </form>
@@ -245,7 +247,7 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
     if (!q) { document.querySelectorAll('.course-row').forEach(r => r.style.display = ''); return; }
     const words = q.toLowerCase().split(/\s+/);
     document.querySelectorAll('.course-row').forEach(r => {
-        const name = r.querySelector('td:first-child').textContent.toLowerCase();
+        const name = r.querySelector('td:nth-child(2)').textContent.toLowerCase();
         const match = words.some(w => name.split(/\s+/).some(n => n.startsWith(w)));
         r.style.display = match ? '' : 'none';
     });

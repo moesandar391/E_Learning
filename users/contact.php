@@ -81,7 +81,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
 <!-- <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen pt-20"> -->
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-4xl md:text-5xl text-[#0F172A] dark:text-slate-100 mb-4">Contact Us</h1>
+            <h1 class="font-serif font-bold text-4xl md:text-5xl text-brandOchre dark:text-slate-100 mb-4">Contact Us</h1>
             <p class="text-base text-[#566473] dark:text-slate-300 max-w-2xl mx-auto">
                 Have questions? We're here to help you on your learning journey. Our support team is ready to assist you with any inquiries about our courses, enrollment, or anything else you need to know.
             </p>
@@ -104,14 +104,14 @@ if ($userId && isset($_GET['enrollment_id'])) {
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <label for="first-name" class="block text-sm font-bold text-slate-800">First Name</label>
+                                <label for="first-name" class="block text-sm font-bold text-gray-500">First Name</label>
                                 <input type="text" id="first-name" name="first-name" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
                                     placeholder="John"
                                     value="<?php echo htmlspecialchars($user_first_name); ?>">
                             </div>
                             <div class="space-y-2">
-                                <label for="last-name" class="block text-sm font-bold text-slate-800">Last Name</label>
+                                <label for="last-name" class="block text-sm font-bold text-gray-500">Last Name</label>
                                 <input type="text" id="last-name" name="last-name" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
                                     placeholder="Doe"
@@ -120,7 +120,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
                         </div>
                         
                         <div class="space-y-2">
-                            <label for="email" class="block text-sm font-bold text-slate-800">Email Address</label>
+                            <label for="email" class="block text-sm font-bold text-gray-500">Email Address</label>
                                 <input type="email" id="email" name="email" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
                                     placeholder="your.email@example.com"
@@ -128,15 +128,15 @@ if ($userId && isset($_GET['enrollment_id'])) {
                         </div>
                         
                         <div class="space-y-2">
-                            <label for="phone" class="block text-sm font-bold text-slate-800">Phone Number (Optional)</label>
+                            <label for="phone" class="block text-sm font-bold text-gray-500">Phone Number (Optional)</label>
                                 <input type="tel" id="phone" name="phone" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
-                                    placeholder="+1 (555) 000-0000"
+                                    placeholder="+95 9 XXX XXX XXX"
                                     value="<?php echo htmlspecialchars($user_phone); ?>">
                         </div>
                         
                         <div class="space-y-2">
-                            <label for="subject" class="block text-sm font-bold text-slate-800">Subject</label>
+                            <label for="subject" class="block text-sm font-bold text-gray-500">Subject</label>
                                 <select id="subject" name="subject" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200">
                                 <option value="">Select a subject</option>
@@ -151,19 +151,19 @@ if ($userId && isset($_GET['enrollment_id'])) {
                         </div>
                         
                         <div class="space-y-2">
-                            <label for="message" class="block text-sm font-bold text-slate-800">Message</label>
+                            <label for="message" class="block text-sm font-bold text-gray-500">Message</label>
                                 <textarea id="message" name="message" rows="6" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200 resize-none"
                                     placeholder="How can we help you today?"><?php echo htmlspecialchars($preset_message); ?></textarea>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" id="privacy" name="privacy" class="w-5 h-5 text-brandOrange border-gray-300 rounded focus:ring-brandOrange focus:ring-2">
-                        <label for="privacy" class="text-sm text-gray-600">
+                        <span class="text-sm text-gray-600">
                             I agree to the <a href="#" class="text-brandOrange hover:text-brandOrangeHover font-medium">Privacy Policy</a> and <a href="#" class="text-brandOrange hover:text-brandOrangeHover font-medium">Terms of Service</a>
-                        </label>
-                    </div>
+                        </span>
+                    </label>
                     
                     <button type="submit" 
                         class="w-full bg-[#FF8A00] hover:bg-[#E07A00] text-white font-bold text-sm py-4 px-6 rounded-xl shadow-[0_4px_12px_rgba(255,138,0,0.2)] transition-all duration-200 transform active:scale-[0.98]
@@ -178,7 +178,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
             
             <div class="lg:col-span-5 lg:pl-8 space-y-8">
                 <div>
-                    <h2 class="text-xl font-bold text-[#0F172A] dark:text-slate-100 mb-6">Get in Touch</h2>
+                    <h2 class="text-xl font-bold text-gray-500 dark:text-slate-100 mb-6">Get in Touch</h2>
                     <div class="space-y-6">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 w-12 h-12 bg-[#FFEAD6] rounded-xl flex items-center justify-center text-[#A87034] dark:text-amber-300">
@@ -187,8 +187,8 @@ if ($userId && isset($_GET['enrollment_id'])) {
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Email Us</h3>
-                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">support@accessedu.com</p>
+                                <h3 class="font-bold text-gray-500 dark:text-slate-100 mb-1">Email Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">accessedu@gmail.com</p>
                                 <p class="text-xs text-gray-400 mt-1">We typically respond within 24 hours</p>
                             </div>
                         </div>
@@ -200,8 +200,8 @@ if ($userId && isset($_GET['enrollment_id'])) {
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Call Us</h3>
-                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">+1 (555) 000-0000</p>
+                                <h3 class="font-bold text-gray-500 dark:text-slate-100 mb-1">Call Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">+95 9 422 404 536</p>
                                 <p class="text-xs text-gray-400 mt-1">Mon-Fri 9am-5pm EST</p>
                             </div>
                         </div>
@@ -214,16 +214,16 @@ if ($userId && isset($_GET['enrollment_id'])) {
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Visit Us</h3>
-                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">123 Learning Way, EdTech City</p>
-                                <p class="text-xs text-gray-400 mt-1">Building A, Suite 200</p>
+                                <h3 class="font-bold text-gray-500 dark:text-slate-100 mb-1">Visit Us</h3>
+                                <p class="text-sm text-[#566473] dark:text-slate-300 font-medium">78th Street, Chanmyathazi Township, Mandalay, Myanmar</p>
+                                <p class="text-xs text-gray-400 mt-1">2nd Floor, AccessEdu Learning Center</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="bg-[#F8F9FA] dark:bg-gray-700 rounded-2xl p-6 border border-gray-100 dark:border-gray-600">
-                    <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-4">Why Contact Us?</h3>
+                    <h3 class="font-bold text-gray-500 dark:text-slate-100 mb-4">Why Contact Us?</h3>
                     <ul class="space-y-3 text-sm text-[#566473] dark:text-slate-300">
                         <li class="flex items-start gap-2">
                             <svg class="w-5 h-5 text-brandOrange mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,7 +260,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
                             </svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-[#0F172A] dark:text-slate-100 mb-1">Quick Response Guaranteed</h3>
+                            <h3 class="font-bold text-gray-500 dark:text-slate-100 mb-1">Quick Response Guaranteed</h3>
                             <p class="text-sm text-[#566473] dark:text-slate-300">We prioritize responding to all inquiries within 24 hours.</p>
                         </div>
                     </div>

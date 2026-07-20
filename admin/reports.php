@@ -434,9 +434,9 @@ if (!empty($payment_filter)) {
             <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-orange-100/50">
                         <tr class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            <th class="px-6 py-4 w-12">#</th>
+                            <th class="px-6 py-4 w-12">No</th>
                             <th class="px-6 py-4">Student</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>

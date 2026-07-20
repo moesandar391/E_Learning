@@ -34,7 +34,7 @@ if ($userId) {
     <div class="max-w-7xl mx-auto px-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-[#0F172A] dark:text-gray-100 tracking-tight">
+            <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-gray-100 tracking-tight">
                 Popular Courses
             </h2>
             <div>

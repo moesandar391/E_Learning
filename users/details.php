@@ -52,14 +52,14 @@ if ($isLoggedIn) {
 ?>
 
 <section class="min-h-screen bg-gray-50 pt-10 pb-16">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto">
 
-        <a href="viewAllCourses.php" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-brandOrange mb-8 transition-colors">
+        <a href="viewAllCourses.php" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-brandOrange mb-8 ml-6 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Back to Courses
         </a>
 
-        <div class="space-y-10">
+        <div class="space-y-10 px-6">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
@@ -74,7 +74,7 @@ if ($isLoggedIn) {
                         <span class="inline-block bg-brandOrange/10 text-brandOrange text-[10px] font-bold uppercase px-3 py-1.5 rounded-full mb-2">
                             <?php echo htmlspecialchars($module['course_name']); ?>
                         </span>
-                        <h1 class="font-serif font-bold text-xl md:text-2xl text-gray-900 mt-1">
+                        <h1 class="font-serif font-bold text-xl md:text-2xl text-brandOchre mt-1">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h1>
                         <div class="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-500">
@@ -117,6 +117,10 @@ if ($isLoggedIn) {
                         <li class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Access on mobile and desktop</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Self-paced learning with no time limits</span>
                         </li>
                     </ul>
                     <div class="mt-auto">

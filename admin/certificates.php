@@ -63,9 +63,9 @@ $result = $conn->query("
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full" id="certificatesTable">
-                    <thead>
+                    <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            <th class="px-6 py-4">#</th>
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Student</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>
@@ -75,9 +75,9 @@ $result = $conn->query("
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php $counter = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors cert-row">
-                                <td class="px-6 py-4 text-sm text-gray-500 font-mono">#<?= $row['id'] ?></td>
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 flex items-center justify-center text-sm font-bold">

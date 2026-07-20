@@ -21,46 +21,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit;
 }
 
-$page = isset($_GET['p']) ? max(1, (int)$_GET['p']) : 1;
-$limit = 10;
-$offset = ($page - 1) * $limit;
-$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
-$where = '';
+ $page = isset($_GET['p']) ? max(1, (int)$_GET['p']) : 1;
+ $limit = 10;
+ $offset = ($page - 1) * $limit;
+ $filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+ $where = '';
 if ($filter === 'unread') $where = 'WHERE is_read = 0';
 elseif ($filter === 'read') $where = 'WHERE is_read = 1';
 
-$countResult = $conn->query("SELECT COUNT(*) as total FROM contacts $where");
-$total = 0;
+ $countResult = $conn->query("SELECT COUNT(*) as total FROM contacts $where");
+ $total = 0;
 if ($countResult && $countRow = $countResult->fetch_assoc()) $total = $countRow['total'];
-$totalPages = max(ceil($total / $limit), 1);
+ $totalPages = max(ceil($total / $limit), 1);
 
-$messages = [];
-$result = $conn->query("SELECT * FROM contacts {$where} ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
+ $messages = [];
+ $result = $conn->query("SELECT * FROM contacts {$where} ORDER BY created_at DESC LIMIT $limit OFFSET $offset");
 if ($result) while ($row = $result->fetch_assoc()) $messages[] = $row;
 
-$unreadCount = 0;
-$r2 = $conn->query('SELECT COUNT(*) as total FROM contacts WHERE is_read=0');
+ $unreadCount = 0;
+ $r2 = $conn->query('SELECT COUNT(*) as total FROM contacts WHERE is_read=0');
 if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
 
-$subjectLabels = [
+ $subjectLabels = [
     'course-info' => 'Course Info', 'pricing' => 'Pricing', 'enrollment' => 'Enrollment',
     'technical' => 'Technical', 'partnership' => 'Partnership', 'feedback' => 'Feedback', 'other' => 'Other'
 ];
 ?>
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
-        <div>
-            <h1 class="text-lg font-semibold text-gray-800">Contact Messages</h1>
-            <p class="text-sm text-gray-500">Customer inquiries from the contact form</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
-            <?php require_once 'includes/admin_notif_icon.php'; ?>
-            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition">
-                <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
-            </a>
-        </div>
-    </header> -->
 
     <main class="flex-1 overflow-y-auto p-8">
         <div class="flex justify-between items-center mb-6">
@@ -72,61 +59,84 @@ $subjectLabels = [
         </div>
 
 <?php if (!empty($messages)): ?>
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-gray-50 border-b border-gray-200">
-                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Subject</th>
-                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Message</th>
-                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+        <div class="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-200">
+            <table class="w-full table-fixed" id="contactsTable">
+                <thead class="bg-orange-100/50">
+                    <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <th class="px-3 py-3 w-10">#</th>
+                        <th class="px-3 py-3 w-[15%]">Name</th>
+                        <th class="px-3 py-3 w-[18%]">Email</th>
+                        <th class="px-3 py-3 w-24">Subject</th>
+                        <th class="px-3 py-3">Message</th>
+                        <th class="px-3 py-3 w-24">Date</th>
+                        <th class="px-3 py-3 w-20 text-center">Status</th>
+                        <th class="px-3 py-3 w-28 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-<?php foreach ($messages as $msg):
+                <tbody class="divide-y divide-gray-100">
+<?php $counter = $offset + 1; foreach ($messages as $msg):
     $name = trim($msg['first_name'] . ' ' . $msg['last_name']);
-    $shortMsg = strlen($msg['message']) > 80 ? substr($msg['message'], 0, 80) . '...' : $msg['message'];
+    $shortMsg = strlen($msg['message']) > 100 ? substr($msg['message'], 0, 100) . '...' : $msg['message'];
     $isMsgRead = $msg['is_read'] == 1;
     $subjectLabel = isset($subjectLabels[$msg['subject']]) ? $subjectLabels[$msg['subject']] : $msg['subject'];
 ?>
-                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors <?php echo $isMsgRead ? '' : 'bg-blue-50/40'; ?>">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    <tr class="hover:bg-gray-50 transition-colors contact-row <?php echo $isMsgRead ? '' : 'bg-blue-50/30'; ?>">
+                        <td class="px-3 py-3 text-xs text-gray-400"><?= $counter++ ?></td>
+                        <td class="px-3 py-3 min-w-0">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brandOrange to-orange-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                                     <?php echo strtoupper($msg['first_name'][0]) . (isset($msg['last_name'][0]) ? strtoupper($msg['last_name'][0]) : ''); ?>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-semibold <?php echo $isMsgRead ? 'text-gray-700' : 'text-gray-900' ?>"><?php echo htmlspecialchars($name); ?></p>
-                                    <?php if ($msg['phone']): ?><p class="text-xs text-gray-400"><?php echo htmlspecialchars($msg['phone']); ?></p><?php endif; ?>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-gray-700 truncate" title="<?= htmlspecialchars($name) ?>"><?= htmlspecialchars($name) ?></p>
+                                    <?php if ($msg['phone']): ?><p class="text-[11px] text-gray-400 truncate" title="<?= htmlspecialchars($msg['phone']) ?>"><?= htmlspecialchars($msg['phone']) ?></p><?php endif; ?>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600"><?php echo htmlspecialchars($msg['email']); ?></td>
-                        <td class="px-6 py-4"><span class="inline-block px-2.5 py-1 rounded-lg text-xs font-medium <?php echo $isMsgRead ? 'bg-gray-100 text-gray-600' : 'bg-purple-100 text-purple-800' ?>"><?php echo htmlspecialchars($subjectLabel); ?></span></td>
-                        <td class="px-6 py-4 text-sm <?php echo $isMsgRead ? 'text-gray-500' : 'text-gray-800 font-medium' ?>"><?php echo htmlspecialchars($shortMsg); ?><?php if (!$isMsgRead): ?><span class="w-2 h-2 bg-brandOrange rounded-full inline-block ml-2 align-middle"></span><?php endif; ?></td>
-                        <td class="px-6 py-4 text-sm text-gray-400 whitespace-nowrap"><?php echo date('M d, Y', strtotime($msg['created_at'])); ?><br><span class="text-xs"><?php echo date('h:i A', strtotime($msg['created_at'])); ?></span></td>
-                        <td class="px-6 py-4 text-center">
-                            <?php if ($isMsgRead): ?><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Read</span>
-                            <?php else: ?><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><span class="w-2 h-2 bg-yellow-400 rounded-full mr-1.5 inline-block"></span> Unread</span><?php endif; ?>
+                        <td class="px-3 py-3 min-w-0">
+                            <span class="text-sm text-gray-600 truncate block" title="<?= htmlspecialchars($msg['email']) ?>"><?= htmlspecialchars($msg['email']) ?></span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex items-center justify-center gap-1">
-                                <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').showModal();" class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors" title="View">
+                        <td class="px-3 py-3">
+                            <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-medium truncate max-w-full <?php echo $isMsgRead ? 'bg-gray-100 text-gray-500' : 'bg-purple-50 text-purple-700 border border-purple-200' ?>" title="<?= htmlspecialchars($subjectLabel) ?>"><?= htmlspecialchars($subjectLabel) ?></span>
+                        </td>
+                        <td class="px-3 py-3 min-w-0">
+                            <div class="relative bg-gray-50 rounded-lg px-3 py-2 border border-gray-100">
+                                <p class="text-xs text-gray-500 leading-relaxed line-clamp-2" title="<?= htmlspecialchars($msg['message']) ?>"><?= htmlspecialchars($shortMsg) ?></p>
+                                <?php if (!$isMsgRead): ?><span class="absolute top-2 right-2 w-2 h-2 bg-brandOrange rounded-full flex-shrink-0"></span><?php endif; ?>
+                            </div>
+                        </td>
+                        <td class="px-3 py-3 min-w-0">
+                            <span class="text-xs text-gray-500 block truncate" title="<?= date('M d, Y h:i A', strtotime($msg['created_at'])) ?>"><?= date('M d, Y', strtotime($msg['created_at'])) ?></span>
+                            <span class="text-[10px] text-gray-400 block"><?= date('h:i A', strtotime($msg['created_at'])) ?></span>
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            <?php if ($isMsgRead): ?>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-200">
+                                    <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                    Read
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                    <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span>
+                                    Unread
+                                </span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            <div class="flex items-center justify-center gap-0.5">
+                                <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').showModal();" class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors" title="View">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </button>
                                 <form method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
 <?php if ($isMsgRead): ?>
                                     <input type="hidden" name="action" value="mark_unread">
-                                    <button type="submit" class="p-2 rounded-lg text-yellow-600 hover:bg-yellow-50 transition-colors" title="Mark as Unread">
+                                    <button type="submit" class="p-1.5 rounded-lg text-yellow-600 hover:bg-yellow-50 transition-colors" title="Mark as Unread">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M9.377 9.377a2.909 2.909 0 010 4.246 2.91 2.91 0 01-4.112 0M13.5 6.75l3.375 2.369m0 0L17.25 12l3.375 3.75"/></svg>
                                     </button>
 <?php else: ?>
                                     <input type="hidden" name="action" value="mark_read">
-                                    <button type="submit" class="p-2 rounded-lg text-green-600 hover:bg-green-50 transition-colors" title="Mark as Read">
+                                    <button type="submit" class="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors" title="Mark as Read">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
 <?php endif; ?>
@@ -134,7 +144,7 @@ $subjectLabels = [
                                 <form method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
                                     <input type="hidden" name="action" value="delete">
-                                    <button type="submit" class="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors" title="Delete" onclick="return confirm('Delete this contact message?');">
+                                    <button type="submit" class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors" title="Delete" onclick="return confirm('Delete this contact message?');">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.003A2 2 0 0116.139 21H7.862a2 2 0 01-1.995-1.997L5 7m5-4h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"/></svg>
                                     </button>
                                 </form>
@@ -144,6 +154,18 @@ $subjectLabels = [
 <?php endforeach; ?>
                 </tbody>
             </table>
+            <?php if ($totalPages > 1): ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                <p class="text-sm text-gray-500">Page <?php echo $page; ?> of <?php echo $totalPages; ?> (<?php echo $total; ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="?p=1<?php echo $filter ? '&filter='.$filter : ''; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?p=<?php echo $i . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-1.5 text-sm rounded-lg border <?php echo $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?php echo $i; ?></a>
+                    <?php endfor; ?>
+                    <a href="?p=<?php echo $totalPages . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
 <?php else: ?>
         <div class="bg-white rounded-xl border border-gray-200 p-16 text-center shadow-sm">
@@ -152,16 +174,6 @@ $subjectLabels = [
             </div>
             <h3 class="text-lg font-semibold text-gray-500 mb-2">No contact messages</h3>
             <p class="text-sm text-gray-400">When visitors submit the contact form, their messages will appear here.</p>
-        </div>
-<?php endif; ?>
-<?php if ($totalPages > 1): ?>
-        <div class="flex items-center justify-between mt-6">
-            <p class="text-sm text-gray-500">Page <?php echo $page; ?> of <?php echo $totalPages; ?> (<?php echo $total; ?> messages)</p>
-            <div class="flex gap-2">
-                <?php if ($page > 1): ?><a href="?p=<?php echo $page-1 . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-2 rounded-lg text-sm font-medium bg-white border text-gray-600 hover:bg-gray-50">Previous</a><?php endif; ?>
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?><a href="?p=<?php echo $i . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-2 rounded-lg text-sm font-medium <?php echo $i == $page ? 'bg-brandOrange text-white' : 'bg-white border text-gray-600 hover:bg-gray-50' ?>"><?php echo $i; ?></a><?php endfor; ?>
-                <?php if ($page < $totalPages): ?><a href="?p=<?php echo $page+1 . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-2 rounded-lg text-sm font-medium bg-white border text-gray-600 hover:bg-gray-50">Next</a><?php endif; ?>
-            </div>
         </div>
 <?php endif; ?>
     </main>

@@ -57,6 +57,7 @@ $result = $conn->query("
                 <table class="w-full" id="lessonsTable">
                     <thead class="bg-orange-100/50">
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Lesson</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Module</th>
@@ -67,8 +68,9 @@ $result = $conn->query("
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <?php if ($result && $result->num_rows > 0): ?>
-                            <?php while ($row = $result->fetch_assoc()): ?>
+                            <?php $counter = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                             <tr class="hover:bg-gray-50 transition-colors lesson-row" data-id="<?= $row['id'] ?>">
+                                <td class="px-6 py-4 text-sm text-gray-500"><?= $counter++ ?></td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span class="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 flex items-center justify-center text-sm font-bold">
@@ -76,7 +78,6 @@ $result = $conn->query("
                                         </span>
                                         <div>
                                             <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($row['title']) ?></p>
-                                            <p class="text-xs text-gray-400">ID: #<?= $row['id'] ?></p>
                                         </div>
                                     </div>
                                 </td>
@@ -118,7 +119,7 @@ $result = $conn->query("
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center">
+                                <td colspan="7" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <p class="text-sm text-gray-400 mb-3">No lessons yet</p>
                                     <button onclick="openModal()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brandOrange text-white text-sm font-semibold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
@@ -196,11 +197,11 @@ $result = $conn->query("
                 <div id="videoStatus" class="text-xs mt-1"></div>
             </div>
             <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
-                    Save Lesson
-                </button>
                 <button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">
                     Cancel
+                </button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-brandOrange text-white text-sm font-bold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
+                    Save Lesson
                 </button>
             </div>
         </form>
