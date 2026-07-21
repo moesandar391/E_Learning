@@ -3,46 +3,57 @@ session_set_cookie_params(['path' => '/']);
 session_start();
 require_once '../config/db.php';
 
-$error_message = "";
+ $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+    // Added ?? '' to prevent undefined index warnings
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-    $tables = ['users', 'admin'];
-    $found = false;
+    // --- VALIDATION ADDED HERE ---
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = "Invalid email format. Please include an '@' and a valid domain.";
+    } elseif (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+        $error_message = "Password must include at least one special character.";
+    } else {
+        // --- YOUR ORIGINAL LOGIC STARTS HERE (Unchanged) ---
+        $tables = ['users', 'admin'];
+        $found = false;
 
-    foreach ($tables as $table) {
-        $sql = "SELECT * FROM $table WHERE email = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        foreach ($tables as $table) {
+            $sql = "SELECT * FROM $table WHERE email = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows == 1) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $found = true;
-                session_regenerate_id(true);
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['name'];
-                $_SESSION['role'] = ($table === 'admin') ? 'admin' : 'user';
-                session_write_close();
+            if ($result->num_rows == 1) {
+                $user = $result->fetch_assoc();
+                if (password_verify($password, $user['password'])) {
+                    $found = true;
+                    session_regenerate_id(true);
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['name'];
+                    $_SESSION['role'] = ($table === 'admin') ? 'admin' : 'user';
+                    session_write_close();
 
-                if ($table === 'admin') {
-                    header("Location: ../admin/dashboard.php");
-                } else {
-                    $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                    $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '../users/index.php';
-                    header("Location: $redirect");
+                    if ($table === 'admin') {
+                        header("Location: ../admin/dashboard.php");
+                    } else {
+                        $_SESSION['profile_image'] = $user['profile_image'] ?? null;
+                        $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '../users/index.php';
+                        header("Location: $redirect");
+                    }
+                    exit();
                 }
-                exit();
             }
+            $stmt->close();
         }
-        $stmt->close();
-    }
-    if (!$found) {
-        $error_message = "Invalid email or password.";
+        
+        if (!$found) {
+            $error_message = "Invalid email or password.";
+        }
+        // --- YOUR ORIGINAL LOGIC ENDS HERE ---
     }
 }
 ?>
@@ -68,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 <?php endif; ?>
 
+                <!-- Removed onsubmit JS so native HTML5 browser warnings can appear -->
                 <form action="" method="POST" class="space-y-5">
 
                     <div>
@@ -78,8 +90,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
+                            <!-- type="email" triggers native email format warning -->
                             <input type="email"
                                    name="email"
+                                   id="email"
                                    required
                                    autocomplete="email"
                                    placeholder="you@example.com"
@@ -98,9 +112,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                 </svg>
                             </div>
+                            <!-- Added pattern and title for native special character warning -->
                             <input type="password"
                                    name="password"
+                                   id="password"
                                    required
+                                   pattern=".*[^a-zA-Z0-9].*"
+                                   title="Password must include at least one special character."
                                    autocomplete="current-password"
                                    placeholder="Enter your password"
                                    class="w-full border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-sm text-gray-700 bg-gray-50/50 focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 focus:bg-white transition-all">

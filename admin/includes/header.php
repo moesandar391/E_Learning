@@ -150,6 +150,13 @@
         .dark .sidebar-scroll::-webkit-scrollbar-thumb {
             background: #475569;
         }
+
+        /* Compact tables inside scrollable wrappers */
+        .overflow-x-auto table th,
+        .overflow-x-auto table td {
+            padding: 0.4rem 0.5rem;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body class="bg-brandBg font-sans antialiased">

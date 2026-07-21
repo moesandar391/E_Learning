@@ -1,10 +1,11 @@
 <?php
 require_once '../config/db.php';
+require_once '../includes/enrollment_check.php';
 include_once('../includes/header.php');
 
-$module_id = isset($_GET['module_id']) ? (int)$_GET['module_id'] : 0;
+ $module_id = isset($_GET['module_id']) ? (int)$_GET['module_id'] : 0;
 
-$stmt = $conn->prepare("
+ $stmt = $conn->prepare("
     SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
            m.description, m.requirements, m.what_includes, m.who_is_for,
            c.id AS course_id, c.course_name, c.level, c.instructor_name,
@@ -15,16 +16,16 @@ $stmt = $conn->prepare("
     WHERE m.id = ?
     GROUP BY m.id
 ");
-$stmt->bind_param("i", $module_id);
-$stmt->execute();
-$module = $stmt->get_result()->fetch_assoc();
+ $stmt->bind_param("i", $module_id);
+ $stmt->execute();
+ $module = $stmt->get_result()->fetch_assoc();
 
 if (!$module) {
     echo '<div class="min-h-screen flex items-center justify-center"><p class="text-gray-500 text-lg">Module not found.</p></div>';
     include_once('../includes/footer.php');
     exit;
 }
-$relatedStmt = $conn->prepare("
+ $relatedStmt = $conn->prepare("
 SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
 c.course_name, COUNT(l.id) AS total_lessons
 FROM modules m
@@ -35,20 +36,13 @@ GROUP BY m.id
 LIMIT 3
 ");
 
-$relatedStmt->bind_param("ii", $module['course_id'], $module_id);
-$relatedStmt->execute();
-$relatedModules = $relatedStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+ $relatedStmt->bind_param("ii", $module['course_id'], $module_id);
+ $relatedStmt->execute();
+ $relatedModules = $relatedStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 
-$isLoggedIn = isset($_SESSION['user_id']);
-$isEnrolled = false;
-if ($isLoggedIn) {
-    $userId = $_SESSION['user_id'];
-    $enrollCheck = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ? AND status = 'confirmed'");
-    $enrollCheck->bind_param("ii", $userId, $module_id);
-    $enrollCheck->execute();
-    $isEnrolled = $enrollCheck->get_result()->num_rows > 0;
-}
+ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+ $enrollmentStatus = checkEnrollmentStatus($conn, $userId, $module_id);
 ?>
 
 <section class="min-h-screen bg-gray-50 pt-10 pb-16">
@@ -124,10 +118,31 @@ if ($isLoggedIn) {
                         </li>
                     </ul>
                     <div class="mt-auto">
-                        <a href="<?php echo $isEnrolled ? 'lesson.php' : ($isLoggedIn ? 'enroll.php?module_id=' . $module_id : '../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module_id)); ?>"
-                           class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-brandOrange hover:bg-brandOrangeHover transition-all shadow-[0_4px_12px_rgba(255,138,0,0.3)]">
-                            <?php echo $isEnrolled ? 'Learn Now' : ($isLoggedIn ? 'Enroll Now' : 'Login to Enroll'); ?>
-                        </a>
+                        <?php 
+                        $statusLower = $enrollmentStatus ? strtolower($enrollmentStatus) : false;
+                        
+                        if ($statusLower === 'pending') {
+                            echo '<a href="javascript:void(0)" 
+                                   class="block w-full text-center font-bold text-sm py-4 rounded-xl bg-yellow-500 text-white cursor-not-allowed opacity-80 transition-all shadow-[0_4px_12px_rgba(234,179,8,0.3)]">
+                                    ⏳ Waiting for Confirmation
+                                  </a>';
+                        } elseif ($statusLower === 'confirmed') {
+                            echo '<a href="lesson.php?module_id=' . $module_id . '" 
+                                   class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-green-600 hover:bg-green-700 transition-all shadow-[0_4px_12px_rgba(22,163,74,0.3)]">
+                                    ▶ Learn Now
+                                  </a>';
+                        } elseif (!$userId) {
+                            echo '<a href="../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module_id) . '" 
+                                   class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-brandOrange hover:bg-brandOrangeHover transition-all shadow-[0_4px_12px_rgba(255,138,0,0.3)]">
+                                    Login to Enroll
+                                  </a>';
+                        } else {
+                            echo '<a href="enroll.php?module_id=' . $module_id . '" 
+                                   class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-brandOrange hover:bg-brandOrangeHover transition-all shadow-[0_4px_12px_rgba(255,138,0,0.3)]">
+                                    Enroll Now
+                                  </a>';
+                        }
+                        ?>
                     </div>
                 </div>
             </div>

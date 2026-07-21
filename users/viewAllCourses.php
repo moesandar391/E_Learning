@@ -45,17 +45,8 @@ if (!empty($params)) {
 $stmt->execute();
 $modules = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-$enrolledModuleIds = [];
-if ($userId) {
-    $enrollCheck = $conn->prepare("SELECT module_id FROM enrollments WHERE user_id = ? AND status = 'confirmed'");
-    $enrollCheck->bind_param("i", $userId);
-    $enrollCheck->execute();
-    $enrollResult = $enrollCheck->get_result();
-    while ($row = $enrollResult->fetch_assoc()) {
-        $enrolledModuleIds[] = $row['module_id'];
-    }
-}
+require_once '../includes/enrollment_check.php';
+ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 ?>
 
 <section class="py-12 min-h-screen bg-gray-50">
@@ -75,7 +66,10 @@ if ($userId) {
            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
            class="bg-white border border-orange-200 rounded-lg p-3 w-full max-w-lg text-sm outline-none focus:border-orange-500 text-gray-700 shadow-sm transition">
     
-    <button type="submit" class="hidden">Search</button>
+    <button type="submit" class="bg-brandOrange hover:bg-brandOrangeHover text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        Search
+    </button>
 </form>
 
     <div class="flex gap-3 mb-12 flex-wrap items-center justify-center">
@@ -140,20 +134,13 @@ if ($userId) {
 
                         <div class="flex items-center gap-2">
     <a href="details.php?module_id=<?php echo $module['module_id']; ?>"
-   class="flex-1 text-center text-xs font-medium py-3 rounded-xl transition-all duration-300
-          border border-gray-400 text-gray-500
-          hover:bg-gray-500 hover:text-white hover:border-gray-500
-          hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
-   View Details
-</a>
-
-    <a href="<?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php?module_id=' . urlencode($module['module_id']) : '../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module['module_id'])); ?>"
-       class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
-              border border-orange-600 text-orange-600
-              hover:bg-orange-600 hover:text-white
-              hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-       <?php echo (isset($_SESSION['user_id']) && in_array($module['module_id'], $enrolledModuleIds)) ? 'Learn Now' : 'Enroll Now'; ?>
+       class="flex-1 text-center text-xs font-medium py-3 rounded-xl transition-all duration-300
+              border border-gray-400 text-gray-500
+              hover:bg-gray-500 hover:text-white hover:border-gray-500
+              hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
+       View Details
     </a>
+    <?php echo getEnrollmentButton($conn, $userId, $module['module_id'], '../users/'); ?>
 </div>
                     </div>
                 </div>

@@ -174,8 +174,7 @@ if ($userId) {
             observer.observe(el);
         });
     </script>
-</body>
-</html>
+
 <?php 
 include_once('../includes/footer.php');
 ?>

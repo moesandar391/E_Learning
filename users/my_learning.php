@@ -79,6 +79,17 @@ if ($hasProgress) {
 }
 $stmt->execute();
 $enrolledCourses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// User's existing reviews
+$userReviews = $conn->query("
+    SELECT r.rating, r.review, r.created_at, m.name AS module_name, c.course_name
+    FROM reviews r
+    JOIN modules m ON r.module_id = m.id
+    JOIN courses c ON m.course_id = c.id
+    WHERE r.user_id = $user_id
+    ORDER BY r.created_at DESC
+");
+$userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -163,7 +174,10 @@ foreach ($certificates as $cert) {
                                     </h4>
                                     <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($course['course_name']) ?></p>
                                 </div>
-                                <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">Active</span>
+                                <?php if ($progress == 100): ?>
+                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Completed</span>
+                                <?php endif; ?>
+                                
                             </div>
                             <?php if ($hasProgress): ?>
                             <div class="space-y-2 mt-auto">
@@ -181,8 +195,13 @@ foreach ($certificates as $cert) {
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                     Continue Learning
                                 </span>
-                                <?php if ($progress == 100): ?>
-                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Completed</span>
+                                <?php if ($progress == 100 && !$hasReview): ?>
+                                    <a href="my_review.php?write=1"
+                                       class="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap bg-brandOrange text-white hover:bg-brandOrangeHover">
+                                        Write Review
+                                    </a>
+                                <?php elseif ($progress == 100 && $hasReview): ?>
+                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg whitespace-nowrap">Reviewed</span>
                                 <?php endif; ?>
                             </div>
                         </a>
@@ -198,8 +217,42 @@ foreach ($certificates as $cert) {
                 </div>
             <?php endif; ?>
         </div>
+
+        <!-- Your Reviews -->
+        <div class="bg-white p-8 rounded-2xl border border-gray-200 mt-8 mx-8">
+            <h3 class="text-xl font-bold text-brandOrange mb-6">Your Reviews</h3>
+            <?php if (count($userReviews) > 0): ?>
+                <div class="space-y-4">
+                    <?php foreach ($userReviews as $rev): ?>
+                        <div class="p-4 border border-gray-100 rounded-xl bg-gray-50/50">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800"><?= htmlspecialchars($rev['module_name']) ?></p>
+                                    <p class="text-[11px] text-gray-400"><?= htmlspecialchars($rev['course_name']) ?></p>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="text-lg <?= $i <= $rev['rating'] ? 'text-yellow-400' : 'text-gray-300' ?>">★</span>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                            <?php if ($rev['review']): ?>
+                                <p class="text-sm text-gray-600"><?= htmlspecialchars($rev['review']) ?></p>
+                            <?php endif; ?>
+                            <p class="text-[10px] text-gray-400 mt-2"><?= date('d M Y', strtotime($rev['created_at'])) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl">
+                    <svg class="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <p class="text-sm font-bold text-gray-500">No Reviews Yet</p>
+                    <p class="text-xs text-gray-400 mt-1">Complete a course and leave a review to see it here.</p>
+                </div>
+            <?php endif; ?>
+        </div>
+
     </div>
 </div>
-
 
 <?php include_once('../includes/footer.php'); ?>

@@ -227,59 +227,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
     </a>
 
 </nav>
-            <div class="relative w-72" id="headerSearchWrapper">
-
-    <div class="flex items-center bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-all duration-300 px-3 py-1.5">
-
-        <!-- Search Icon -->
-        <svg class="w-5 h-5 text-gray-400 mr-2"
-             fill="none"
-             stroke="currentColor"
-             viewBox="0 0 24 24">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
-            </path>
-        </svg>
-
-        <!-- Input -->
-        <input
-            id="headerSearchInput"
-            type="text"
-            placeholder="Search courses..."
-            autocomplete="off"
-            class="flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder-gray-400"
-        >
-
-        <!-- Search Button -->
-        <button
-            id="headerSearchBtn"
-            type="button"
-            class="ml-2 w-8 h-8 flex items-center justify-center rounded-full bg-brandOrange text-white hover:scale-105 transition-transform duration-200">
-
-            <svg class="w-4 h-4"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
-                </path>
-            </svg>
-
-        </button>
-
-    </div>
-
-
-    <!-- Search Results Dropdown -->
-    <div id="headerSearchResults"
-         class="absolute left-0 top-full mt-3 w-full bg-white rounded-2xl shadow-xl border border-gray-100 z-[100] hidden overflow-hidden">
-    </div>
-
-</div>
+            
 
             <div class="flex items-center space-x-3">
                 
