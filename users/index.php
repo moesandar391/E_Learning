@@ -3,11 +3,11 @@ require_once '../config/db.php';
 require_once '../includes/enrollment_check.php';
 include_once('../includes/header.php');
 
-$query = "SELECT course_name, description FROM courses";
-$result = $conn->query($query);
-$categories = $result->fetch_all(MYSQLI_ASSOC);
+ $query = "SELECT course_name, description FROM courses";
+ $result = $conn->query($query);
+ $categories = $result->fetch_all(MYSQLI_ASSOC);
 
-$popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
+ $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
                         c.course_name, c.level, c.instructor_name, COUNT(l.id) AS total_lessons
                  FROM modules m
                  JOIN courses c ON m.course_id = c.id
@@ -15,8 +15,8 @@ $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS mod
                  GROUP BY m.id, m.name, m.image, m.price, c.course_name, c.level, c.instructor_name
                  ORDER BY m.id DESC
                  LIMIT 6";
-$popularResult = $conn->query($popularQuery);
-$popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
+ $popularResult = $conn->query($popularQuery);
+ $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
 
  $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
  $heroEnrolled = false;
@@ -40,7 +40,7 @@ if ($userId) {
     // make sure it is inside this if statement or somewhere else in the code.
 }
 
-$reviews = $conn->query("
+ $reviews = $conn->query("
     SELECT r.rating, r.review, r.created_at, u.name AS user_name, m.name AS module_name
     FROM reviews r
     JOIN users u ON r.user_id = u.id
@@ -48,6 +48,26 @@ $reviews = $conn->query("
     ORDER BY r.created_at DESC
     LIMIT 6
 ")->fetch_all(MYSQLI_ASSOC);
+
+ $stmtLearners = $conn->query("SELECT COUNT(DISTINCT user_id) AS total FROM enrollments WHERE status = 'confirmed'");
+ $activeLearners = $stmtLearners->fetch_assoc()['total'];
+
+// Format number: 1500 → 1.5k, 50000 → 50k
+function formatLearnerCount($num) {
+    if ($num >= 1000) {
+        return round($num / 1000, 1) . 'k+';
+    }
+    return $num . '+';
+}
+ $learnerText = formatLearnerCount($activeLearners);
+
+  $stmtRating = $conn->query("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total_reviews FROM reviews");
+ $ratingData = $stmtRating->fetch_assoc();
+ $avgRating = $ratingData['avg_rating'] ?? 0;
+ $totalReviews = $ratingData['total_reviews'] ?? 0;
+
+// Convert to percentage: 4.9/5 = 98%
+ $satisfactionRate = $totalReviews > 0 ? round(($avgRating / 5) * 100) : 0;
 ?>
     <main class="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 dark:text-gray-200">
         
@@ -67,26 +87,24 @@ $reviews = $conn->query("
 
             <div class="pt-4 flex flex-wrap gap-4">
     <a href="<?php echo $heroEnrolled ? 'my_learning.php' : (isset($_SESSION['user_id']) ? 'enroll.php' : '../auth/login.php?redirect=' . urlencode('../users/enroll.php')); ?>" 
-       class="group relative px-7 py-3.5 font-semibold text-slate-700 rounded-xl transition-all shadow-md overflow-hidden border-2 border-brandOrange hover:text-white">
+       class="px-7 py-3.5 font-semibold text-white bg-brandOrange rounded-xl transition-all shadow-md hover:bg-orange-600">
         
-        <span class="absolute inset-0 bg-brandOrange -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
-        
-        <span class="relative z-10 transition-colors duration-500"><?php echo $heroEnrolled ? 'Learn Now' : 'Enroll Now'; ?></span>
+        <?php echo $heroEnrolled ? 'Learn Now' : 'Enroll Now'; ?>
     </a>
 
     <a href="../users/courses.php" 
-       class="group relative px-7 py-3.5 font-semibold text-slate-700 rounded-xl transition-all shadow-sm overflow-hidden border-2 border-gray-300 hover:text-white">
+       class="group relative px-7 py-3.5 font-semibold text-slate-700 rounded-xl transition-all shadow-sm overflow-hidden border-2 border-brandOrange hover:text-white">
         
-        <span class="absolute inset-0 bg-slate-700 -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
+        <span class="absolute inset-0 bg-brandOrange -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0 -z-10"></span>
         
         <span class="relative z-10 transition-colors duration-500">Browse Courses</span>
     </a>
 </div>
         </div>
 
-        <div class="lg:col-span-7 h-[400px] sm:h-[520px] relative w-full rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+        <div class="lg:col-span-7 h-[400px] sm:h-[520px] relative w-full rounded-2xl shadow-xl border border-gray-100">
             
-            <div class="absolute inset-0 w-full h-full">
+            <div class="absolute inset-0 w-full h-full rounded-2xl overflow-hidden">
                 <div class="slide active absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out">
                     <img src="../assets/home.jpg" alt="Workspace Slide 1" class="w-full h-full object-cover">
                 </div>
@@ -100,9 +118,9 @@ $reviews = $conn->query("
                 </div>
             </div>
 
-            <div class="absolute inset-0 bg-black/5 z-10"></div>
+            <div class="absolute inset-0 bg-black/5 z-10 rounded-2xl pointer-events-none"></div>
 
-            <div class="absolute bottom-6 left-6 z-20 w-52 bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/60 shadow-[0_-8px_24px_rgba(15,23,42,0.12),0_12px_24px_rgba(15,23,42,0.18)] transform hover:scale-[1.02] transition-transform duration-300">
+            <div class="absolute bottom-10 -left-16 sm:-left-24 z-20 w-52 bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/60 shadow-[0_-8px_24px_rgba(15,23,42,0.12),0_12px_24px_rgba(15,23,42,0.18)] transform hover:scale-[1.02] transition-transform duration-300">
                 
                 <div class="absolute -top-3.5 -right-2 bg-brandOchre text-white rounded-full p-2 shadow-md">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 01.788 0l4 1.714a.999.999 0 01.356.257l2.644-1.13a1 1 0 000-1.84l-7-3zM7 10.3a1 1 0 01.17-.557l1.28.548a3.001 3.001 0 003.1 0l1.28-.548a1 1 0 01.17.557v1.8a1 1 0 01-1 1H8a1 1 0 01-1-1v-1.8z"></path></svg>
@@ -150,7 +168,7 @@ $reviews = $conn->query("
                     'M11 3.055A9.001 9.001 0 1020.894 21 9.001 9.001 0 0011.894 3.055zM15.5 7.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
                     'M12 14c3.866 0 7-2.477 7-5s-3.134-5-7-5-7 2.477-7 5 3.134 5 7 5zm-6-5c0 3.31 2.69 6 6 6s6-2.69 6-6-2.69-6-6-6-6 2.69-6 6z',
                     'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0a2 2 0 002-2v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z',
-                    'M13 16h-1a4 4 0 01-4-4 0 0 4 4zm0 0V8m0 8a4 4 0 110-8 4 4 0 010 8z',
+                    'M13 16h-1a4 4 0 01-4-4 0 0 4 4 4zm0 0V8m0 8a4 4 0 110-8 4 4 0 010 8z',
                     'M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2z',
                     'M4 3a3 3 0 000 6v10a3 3 0 003 3h10a3 3 0 003-3V9a3 3 0 000-6H4zm0 2h12a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm4 3a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H9a1 1 0 01-1-1V8zm0 5a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 01-1 1H9a1 1 0 01-1-1v-2z',
                     'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11H3m2 0a2 2 0 012 2v6a2 2 0 01-2 2m0-8h4m4 0h4'
@@ -290,7 +308,7 @@ $reviews = $conn->query("
                     English is the most widely spoken second language in the world. Whether you're traveling, networking, or making friends online, English breaks down barriers and brings people together across 100+ countries.
                 </p>
                 <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                    Our interactive classroom environment helps you practice real conversations — just like the ones you'll have in the real world. From group discussions to presentations, every session builds your confidence.
+                    Our smart e-learning platform tracks your progress and adapts to your learning style. From bite-sized lessons to full certifications, every step keeps you motivated and moving forward.
                 </p>
                 <div class="flex items-center gap-6 pt-2">
                     <div>
@@ -376,12 +394,12 @@ $reviews = $conn->query("
                         $status = checkEnrollmentStatus($conn, $userId, $module['module_id']);
                         $statusLower = $status ? strtolower($status) : false;
 
-                        if ($statusLower === 'pending') {
+                        if ($statusLower === 'pending' || $statusLower === 'needs_correction') {
                             echo '<a href="javascript:void(0)" 
                                    class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
                                           border border-yellow-500 text-yellow-600 bg-yellow-50 cursor-not-allowed opacity-80">
                                     <span class="inline-flex items-center justify-center gap-2">
-                                        ⏳ Waiting
+                                        ⏳ Waiting for Confirmation
                                     </span>
                                 </a>';
                         } elseif ($statusLower === 'confirmed') {
@@ -494,44 +512,30 @@ $reviews = $conn->query("
                 
                 <div class="grid grid-cols-2 gap-6 pt-4">
                     <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">50k+</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Active Learners</div>
-                    </div>
+    <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+    </div>
+    <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300"><?php echo $learnerText; ?></div>
+    <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Active Learners</div>
+</div>
                     
                     <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">98%</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Satisfaction Rate</div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0-4v2m0 6v2m0-6H4m16 0h-2m-4 0h-2m4 0v2m0 6v2m0-6H14"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">100+</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Expert Instructors</div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.004 5.004 0 006.323 0M15 6l3-1M15 6l-3 9a5.004 5.004 0 006.323 0M9 12l3 6m0 0l3-6m-6 0V4m12 4v8m-4-4h8"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">25</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Years of Excellence</div>
-                    </div>
+    <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+    </div>
+    <div class="flex items-baseline gap-1.5">
+        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300"><?php echo $satisfactionRate; ?>%</div>
+        <?php if ($totalReviews > 0): ?>
+        <span class="text-[10px] font-medium text-[#A87034]/50 dark:text-amber-300/50">(<?php echo number_format($avgRating, 1); ?>/5)</span>
+        <?php endif; ?>
+    </div>
+    <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Satisfaction Rate</div>
+</div>
+            
                 </div>
             </div>
             

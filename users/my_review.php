@@ -163,29 +163,54 @@ $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
 
         <!-- Your Reviews -->
         <div class="bg-white p-8 rounded-2xl border border-gray-200 mt-8 mx-6">
-            <h3 class="text-xl font-bold text-brandOrange mb-6">Your Reviews</h3>
+            <!-- <h3 class="text-xl font-bold text-brandOrange mb-6">Your Reviews</h3> -->
             <?php if (count($userReviews) > 0): ?>
-                <div class="space-y-4">
-                    <?php foreach ($userReviews as $rev): ?>
-                        <div class="p-4 border border-gray-100 rounded-xl bg-gray-50/50">
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800"><?php echo htmlspecialchars($rev['module_name']); ?></p>
-                                    <p class="text-[11px] text-gray-400"><?php echo htmlspecialchars($rev['course_name']); ?></p>
-                                </div>
-                                <div class="flex items-center gap-0.5">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span class="text-lg <?php echo $i <= $rev['rating'] ? 'text-yellow-400' : 'text-gray-300'; ?>">★</span>
-                                    <?php endfor; ?>
-                                </div>
-                            </div>
-                            <?php if ($rev['review']): ?>
-                                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($rev['review']); ?></p>
-                            <?php endif; ?>
-                            <p class="text-[10px] text-gray-400 mt-2"><?php echo date('d M Y', strtotime($rev['created_at'])); ?></p>
-                        </div>
-                    <?php endforeach; ?>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <?php foreach ($userReviews as $rev): ?>
+    <div class="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 overflow-hidden">
+        
+        <!-- Top accent line -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-amber-400"></div>
+        
+        <div class="p-5">
+            
+            <!-- Module Info -->
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center text-white text-sm font-bold shadow-sm flex-shrink-0">
+                    <?php echo strtoupper(substr($rev['module_name'], 0, 1)); ?>
                 </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-bold text-gray-800 leading-tight truncate"><?php echo htmlspecialchars($rev['module_name']); ?></p>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-wider"><?php echo htmlspecialchars($rev['course_name']); ?></p>
+                </div>
+            </div>
+
+            <!-- Stars -->
+            <div class="flex items-center gap-0.5 mb-3">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <svg class="w-4 h-4 <?php echo $i <= $rev['rating'] ? 'text-yellow-400' : 'text-gray-200'; ?>" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                <?php endfor; ?>
+                <span class="text-[11px] text-gray-400 ml-2 font-medium"><?php echo $rev['rating']; ?>.0</span>
+            </div>
+
+            <!-- Review Text -->
+            <?php if ($rev['review']): ?>
+            <div class="relative pl-3 border-l-2 border-orange-200 mb-3">
+                <p class="text-sm text-gray-600 leading-relaxed italic">"<?php echo htmlspecialchars($rev['review']); ?>"</p>
+            </div>
+            <?php endif; ?>
+
+            <!-- Date -->
+            <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <?php echo date('d M Y', strtotime($rev['created_at'])); ?>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
             <?php else: ?>
                 <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl">
                     <svg class="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>

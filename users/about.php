@@ -1,16 +1,35 @@
 <?php 
+session_start();
 require_once '../config/db.php';
 include_once('../includes/header.php');
 
-$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-$hasEnrollment = false;
+ $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+ $hasEnrollment = false;
 if ($userId) {
     $enrollCheck = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND status = 'confirmed' LIMIT 1");
     $enrollCheck->bind_param("i", $userId);
     $enrollCheck->execute();
     $hasEnrollment = $enrollCheck->get_result()->num_rows > 0;
 }
+
+// === DATABASE QUERIES FOR STATS ===
+ $totalLearners = $conn->query("SELECT COUNT(DISTINCT user_id) AS total FROM enrollments WHERE status = 'confirmed'")->fetch_assoc()['total'];
+
+ $ratingData = $conn->query("SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM reviews")->fetch_assoc();
+ $avgRating = $ratingData['avg_rating'] ?? 0;
+ $totalReviews = $ratingData['total'] ?? 0;
+ $satisfactionRate = $totalReviews > 0 ? round(($avgRating / 5) * 100) : 0;
+
+function formatLearnerCount($num) {
+    if ($num >= 1000) {
+        return round($num / 1000, 1) . 'k+';
+    }
+    return $num . '+';
+}
+ $learnerText = formatLearnerCount($totalLearners);
+// ===================================
 ?>
+
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
             <h1 class="font-serif font-bold text-5xl md:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
@@ -27,7 +46,7 @@ if ($userId) {
                         Founded in 2020, Access Edu began as a small tutoring center in Singapore with a vision to make quality English education accessible to everyone. Over the years, we've grown into a global platform serving learners in over 50 countries.
                     </p>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
-                        Our journey started with just 5 students and one passionate tutor. Today, we boast a community of over 50,000+ active learners who have mastered English and transformed their careers through our comprehensive programs.
+                        Our journey started with just 5 students and one passionate tutor. Today, we boast a community of over <?php echo $learnerText; ?> active learners who have mastered English and transformed their careers through our comprehensive programs.
                     </p>
                 </div>
                 
@@ -38,7 +57,7 @@ if ($userId) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">50k+</div>
+                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300"><?php echo $learnerText; ?></div>
                         <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Active Learners</div>
                     </div>
                     
@@ -48,28 +67,13 @@ if ($userId) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">98%</div>
+                        <div class="flex items-baseline gap-1.5">
+                            <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300"><?php echo $satisfactionRate; ?>%</div>
+                            <?php if ($totalReviews > 0): ?>
+                            <span class="text-[10px] font-medium text-[#A87034]/50 dark:text-amber-300/50">(<?php echo number_format($avgRating, 1); ?>/5)</span>
+                            <?php endif; ?>
+                        </div>
                         <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Satisfaction Rate</div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0-4v2m0 6v2m0-6H4m16 0h-2m-4 0h-2m4 0v2m0 6v2m0-6H14"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">100+</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Expert Instructors</div>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <div class="w-12 h-12 bg-[#FFEAD6] rounded-lg flex items-center justify-center text-[#A87034] dark:text-amber-300">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.004 5.004 0 006.323 0M15 6l3-1M15 6l-3 9a5.004 5.004 0 006.323 0M9 12l3 6m0 0l3-6m-6 0V4m12 4v8m-4-4h8"></path>
-                            </svg>
-                        </div>
-                        <div class="text-2xl font-bold text-[#A87034] dark:text-amber-300">25</div>
-                        <div class="text-xs font-semibold text-[#566473] dark:text-slate-300">Years of Excellence</div>
                     </div>
                 </div>
             </div>
@@ -135,10 +139,10 @@ if ($userId) {
                 <div class="max-w-3xl mx-auto text-center">
                     <h2 class="font-serif font-bold text-3xl mb-4">Ready to Start Your English Journey?</h2>
                     <p class="text-base text-white/90 mb-8">
-                        Join 50,000+ learners who have mastered English and unlocked new opportunities in their personal and professional lives.
+                        Join <?php echo $learnerText; ?> learners who have mastered English and unlocked new opportunities in their personal and professional lives.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="<?php echo $hasEnrollment ? 'my_learning.php' : 'enroll.php'; ?>" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">
+                        <a href="<?php echo $hasEnrollment ? 'my_learning.php' : 'index.php'; ?>" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">
                             <?php echo $hasEnrollment ? 'Learn Now' : 'Enroll Now'; ?>
                         </a>
                         <a href="contact.php" class="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl border border-white/20 transition-all duration-200">
@@ -151,7 +155,6 @@ if ($userId) {
     </div>
     
     <script>
-        // Scroll reveal animations
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px'
@@ -166,7 +169,6 @@ if ($userId) {
             });
         }, observerOptions);
         
-        // Observe elements for animation
         document.querySelectorAll('.font-serif, .space-y-4, .grid, .bg-white, .bg-gradient-to-r').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';

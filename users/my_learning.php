@@ -90,6 +90,20 @@ $userReviews = $conn->query("
     ORDER BY r.created_at DESC
 ");
 $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
+
+// Waiting enrollments (payment done, awaiting admin confirmation)
+ $stmtWaiting = $conn->prepare("
+    SELECT m.id AS module_id, c.course_name, m.name AS module_name,
+           m.image, m.price, e.created_at
+    FROM enrollments e
+    JOIN modules m ON e.module_id = m.id
+    JOIN courses c ON m.course_id = c.id
+    WHERE e.user_id = ? AND e.status = 'pending'
+    ORDER BY e.created_at DESC
+");
+ $stmtWaiting->bind_param("i", $user_id);
+ $stmtWaiting->execute();
+ $waitingEnrollments = $stmtWaiting->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -142,6 +156,42 @@ foreach ($certificates as $cert) {
                 </div>
             <?php endif; ?>
         </div>
+
+<!-- Waiting Enrollments -->
+<div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8 mx-8">
+    <h3 class="text-xl font-bold text-brandOrange mb-6">Waiting</h3>
+    <?php if (!empty($waitingEnrollments)): ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <?php foreach ($waitingEnrollments as $waiting): ?>
+                <div class="p-5 border border-yellow-200 rounded-2xl bg-yellow-50/50 transition-all duration-200">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="pr-4">
+                            <h4 class="font-bold text-gray-800 leading-snug">
+                                <?= htmlspecialchars($waiting['module_name']) ?>
+                            </h4>
+                            <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($waiting['course_name']) ?></p>
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full whitespace-nowrap">
+                            <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle>
+                                <path class="opacity-75" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 2a10 10 0 0110 10"></path>
+                            </svg>
+                            Waiting
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                        <svg class="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Payment received. Awaiting admin confirmation to start learning.</span>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="text-center py-10">
+            <p class="text-gray-400 text-sm">No enrollments awaiting confirmation.</p>
+        </div>
+    <?php endif; ?>
+</div>
 
         <!-- Enrolled Courses -->
         <div class="bg-white p-8 rounded-2xl border border-gray-200 mx-8">
@@ -218,39 +268,6 @@ foreach ($certificates as $cert) {
             <?php endif; ?>
         </div>
 
-        <!-- Your Reviews -->
-        <div class="bg-white p-8 rounded-2xl border border-gray-200 mt-8 mx-8">
-            <h3 class="text-xl font-bold text-brandOrange mb-6">Your Reviews</h3>
-            <?php if (count($userReviews) > 0): ?>
-                <div class="space-y-4">
-                    <?php foreach ($userReviews as $rev): ?>
-                        <div class="p-4 border border-gray-100 rounded-xl bg-gray-50/50">
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800"><?= htmlspecialchars($rev['module_name']) ?></p>
-                                    <p class="text-[11px] text-gray-400"><?= htmlspecialchars($rev['course_name']) ?></p>
-                                </div>
-                                <div class="flex items-center gap-0.5">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span class="text-lg <?= $i <= $rev['rating'] ? 'text-yellow-400' : 'text-gray-300' ?>">★</span>
-                                    <?php endfor; ?>
-                                </div>
-                            </div>
-                            <?php if ($rev['review']): ?>
-                                <p class="text-sm text-gray-600"><?= htmlspecialchars($rev['review']) ?></p>
-                            <?php endif; ?>
-                            <p class="text-[10px] text-gray-400 mt-2"><?= date('d M Y', strtotime($rev['created_at'])) ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl">
-                    <svg class="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    <p class="text-sm font-bold text-gray-500">No Reviews Yet</p>
-                    <p class="text-xs text-gray-400 mt-1">Complete a course and leave a review to see it here.</p>
-                </div>
-            <?php endif; ?>
-        </div>
 
     </div>
 </div>

@@ -53,8 +53,8 @@ if (!$module) {
     exit();
 }
 
-// 3. Prevent Duplicate Enrollment (allow re-enrollment if previous was rejected)
-$check = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ? AND LOWER(status) != 'rejected'");
+// 3. Prevent Duplicate Enrollment (allow re-enrollment if previous was rejected or needs correction)
+$check = $conn->prepare("SELECT id FROM enrollments WHERE user_id = ? AND module_id = ? AND LOWER(status) NOT IN ('rejected', 'needs_correction')");
 $check->bind_param("ii", $user_id, $module_id);
 $check->execute();
 if ($check->get_result()->num_rows > 0) {

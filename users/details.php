@@ -52,6 +52,16 @@ LIMIT 3
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Back to Courses
         </a>
+         <!-- === BACK BUTTON ADDED HERE === -->
+        <!-- <div class="mb-8">
+            <a href="javascript:history.back()" class="inline-flex items-center gap-2 bg-white border-2 border-gray-200 text-slate-700 hover:text-white hover:bg-brandOrange hover:border-brandOrange px-4 py-2 mb-8 ml-6 rounded-xl shadow-sm transition-all duration-300 text-sm font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back
+            </a>
+        </div> -->
+        <!-- === END BACK BUTTON === -->
 
         <div class="space-y-10 px-6">
 
@@ -121,7 +131,7 @@ LIMIT 3
                         <?php 
                         $statusLower = $enrollmentStatus ? strtolower($enrollmentStatus) : false;
                         
-                        if ($statusLower === 'pending') {
+                        if ($statusLower === 'pending' || $statusLower === 'needs_correction') {
                             echo '<a href="javascript:void(0)" 
                                    class="block w-full text-center font-bold text-sm py-4 rounded-xl bg-yellow-500 text-white cursor-not-allowed opacity-80 transition-all shadow-[0_4px_12px_rgba(234,179,8,0.3)]">
                                     ⏳ Waiting for Confirmation

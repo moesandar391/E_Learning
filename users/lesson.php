@@ -102,12 +102,12 @@ while ($row = $revResult->fetch_assoc()) {
                         Your browser does not support the video tag.
                     </video>
                 </div>
-                <div class="text-sm mt-1">
+                <!-- <div class="text-sm mt-1">
                     <a href="../admin/<?php echo htmlspecialchars($activeLesson['video']); ?>" target="_blank" class="text-brandOrange hover:underline inline-flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         Download Video
                     </a>
-                </div>
+                </div> -->
 
                 <div class="flex items-center justify-between">
                     <p class="text-brandOchre font-bold leading-relaxed text-2xl">

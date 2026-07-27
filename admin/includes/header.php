@@ -157,19 +157,28 @@
             padding: 0.4rem 0.5rem;
             font-size: 0.75rem;
         }
+
+        /* ── Sidebar collapse adjustments ── */
+        body:has(#sidebar.collapsed) header {
+            margin-left: 5rem !important;
+            width: calc(100% - 5rem) !important;
+        }
+        body:has(#sidebar.collapsed) > div.flex {
+            margin-left: 5rem !important;
+        }
     </style>
 </head>
-<body class="bg-brandBg font-sans antialiased">
+<body class="bg-brandBg font-sans antialiased overflow-hidden">
 
 <!-- ✅ FIXED HEADER: sticky top-0 z-50 -->
-<header class="h-16 bg-white border-b border-gray-200 flex items-center w-full sticky top-0 z-50">
+<header class="h-16 bg-white border-b border-gray-200 flex items-center w-full sticky top-0 z-50 ml-64" style="transition: margin-left 0.3s ease-in-out; width: calc(100% - 16rem);">
     
-    <div class="w-64 flex items-center px-6 border-r border-gray-300 flex-shrink-0">
-        <img src="../assets/Logo 3.png" class="w-8 h-8 mr-3 object-contain" alt="Logo">
-        <span class="text-xl font-bold tracking-tight text-gray-800">
+    <div class="w-64 flex items-center px-8 border-r border-gray-300 flex-shrink-0 hidden">
+        <img src="../assets/Logo 3.png" class="w-8 h-8 mr-3 object-contain hidden" alt="Logo">
+        <span class="text-xl font-bold tracking-tight text-gray-800 hidden">
             <span class="text-orange-500">Access</span>Edu
         </span>
-        <button id="sidebarToggle" class="ml-auto text-gray-500">
+        <button class="ml-auto text-gray-500">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke-width="2"/><line x1="9" y1="4" x2="9" y2="20" stroke-width="2"/></svg>
         </button>
     </div>
@@ -211,4 +220,4 @@
 </script>
 
 <!-- ✅ FIXED LAYOUT: calc(100vh - 4rem) to account for fixed header -->
-<div class="flex" style="height: calc(100vh - 4rem);">
+<div class="flex ml-64 overflow-hidden" style="height: calc(100vh - 4rem); transition: margin-left 0.3s ease-in-out;">

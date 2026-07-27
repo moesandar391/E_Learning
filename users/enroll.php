@@ -163,8 +163,6 @@ function isLightColor($hex) {
                                 <span class="method-text font-medium text-gray-700 text-sm transition-all duration-300">
                                     <?php echo htmlspecialchars($method['name']); ?>
                                 </span>
-                                
-                                <i class="fa-solid fa-circle-check ml-auto text-lg hidden selected-check transition-all duration-300"></i>
                             </button>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -261,9 +259,22 @@ function isLightColor($hex) {
             </div>
 
             <!-- Purchase Button -->
-            <button onclick="processPurchase(event)" id="purchaseBtn" class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-200 text-[15px]">
+            <!-- <button onclick="processPurchase(event)" id="purchaseBtn" class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-200 text-[15px]">
                 Purchase Now - <?php echo number_format($price); ?> MMK
-            </button>
+            </button> -->
+
+             <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="courses.php" class="flex-1 flex items-center justify-center gap-2 text-[15px] font-bold py-4 rounded-2xl shadow-sm border-2 border-orange-500 text-slate-700 bg-white hover:bg-orange-500 hover:text-white transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Courses
+                </a>
+                <button onclick="processPurchase(event)" id="purchaseBtn" class="flex-1 bg-orange-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-200 text-[15px]">
+                    Purchase Now - <?php echo number_format($price); ?> MMK
+                </button>
+            </div>
         </div>
     </div>
 </main>
@@ -288,7 +299,6 @@ function selectPaymentMethod(btn) {
     var color = btn.getAttribute('data-brand-color');
     var whiteText = btn.getAttribute('data-white-text') === '1';
     var txtColor = whiteText ? '#ffffff' : '#1f2937';
-    var chkColor = whiteText ? '#ffffff' : '#374151';
     var logoShadow = whiteText ? '0 1px 4px rgba(0,0,0,0.15)' : 'none';
 
     document.querySelectorAll('.payment-btn').forEach(function(b) {
@@ -298,7 +308,6 @@ function selectPaymentMethod(btn) {
         b.style.transform = 'scale(1)';
         b.querySelector('.method-text').style.color = '#374151';
         b.querySelector('.method-text').style.fontWeight = '500';
-        b.querySelector('.selected-check').style.display = 'none';
         b.querySelector('.method-logo').style.boxShadow = 'none';
     });
 
@@ -308,8 +317,6 @@ function selectPaymentMethod(btn) {
     btn.style.transform = 'scale(1.02)';
     btn.querySelector('.method-text').style.color = txtColor;
     btn.querySelector('.method-text').style.fontWeight = '600';
-    btn.querySelector('.selected-check').style.display = 'inline-block';
-    btn.querySelector('.selected-check').style.color = chkColor;
     btn.querySelector('.method-logo').style.boxShadow = logoShadow;
 
     selectedMethod = btn.getAttribute('data-method-name');
@@ -432,6 +439,24 @@ function processPurchase(event) {
         btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-70');
     });
 }
+
+// Auto-select K Pay on page load
+document.addEventListener('DOMContentLoaded', function() {
+    var buttons = document.querySelectorAll('.payment-btn');
+    if (buttons.length > 0) {
+        var kPayBtn = null;
+        for (var i = 0; i < buttons.length; i++) {
+            var name = buttons[i].getAttribute('data-method-name').toLowerCase();
+            if (name.includes('k pay') || name.includes('kpay') || name.includes('kbz')) {
+                kPayBtn = buttons[i];
+                break;
+            }
+        }
+        // Fallback to the first method if K Pay is not found
+        var btnToSelect = kPayBtn || buttons[0];
+        selectPaymentMethod(btnToSelect);
+    }
+});
 </script>
 
 <?php include_once('../includes/footer.php'); ?>

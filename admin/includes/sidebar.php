@@ -2,9 +2,7 @@
     /* Only 3 lines of CSS needed for the toggle animation */
     #sidebar {
         transition: width 0.3s ease-in-out;
-        /* Changed to 'visible' so tooltips can escape the sidebar in BOTH open and closed states */
-        overflow: visible; 
-        position: relative;
+        overflow: visible;
     }
     #sidebar.collapsed {
         width: 80px !important;
@@ -35,26 +33,6 @@
     }
     #sidebar.collapsed > div:first-child:hover > div:first-child {
         opacity: 0 !important;
-    }
-
-    /* ── Toggle Icon Hover State (Appears over logo) ── */
-    #sidebar.collapsed > div:first-child > div:last-child {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 8px;
-        z-index: 20;
-        opacity: 0; 
-        pointer-events: none; 
-        transition: opacity 0.2s ease;
-    }
-    #sidebar.collapsed > div:first-child:hover > div:last-child {
-        opacity: 1 !important;
-        pointer-events: auto !important;
     }
 
     /* ══════════════════════════════════════════════════════════ */
@@ -168,34 +146,25 @@
 </style>
 
 <aside id="sidebar"
-     class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0">
+     class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 fixed left-0 top-0 h-screen z-50">
     
-    <!-- <div class="h-16 flex items-center justify-between px-6 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
+    <div class="h-16 flex items-center px-8 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
         <div class="flex items-center overflow-hidden">
             <img src="../assets/Logo 3.png"
                  alt="AccessEdu Logo"
-                 class="w-10 h-10 object-contain mr-3 flex-shrink-0">
-            <h1 class="text-xl font-extrabold tracking-tight whitespace-nowrap sidebar-header-text">
-                <span class="text-brandOrange">Access</span>
+                 class="w-8 h-8 object-contain mr-3 flex-shrink-0">
+            <h1 class="text-xl font-bold tracking-tight whitespace-nowrap sidebar-header-text">
+                <span class="text-orange-500">Access</span>
                 <span class="text-gray-800 dark:text-gray-100">Edu</span>
             </h1>
         </div>
-
-        <div class="flex items-center gap-1">
-            <button id="sidebarToggle"
-            class="group w-9 h-9 flex items-center justify-center rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer">
-        <svg id="toggleIcon"
-             xmlns="http://www.w3.org/2000/svg"
-             class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-brandOrange transition-colors duration-200 transition-transform duration-300"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor">
-            <rect x="3" y="4" width="18" height="16" rx="2" stroke-width="2"/>
-            <line x1="9" y1="4" x2="9" y2="20" stroke-width="2"/>
-        </svg>
-    </button>
-        </div>
-    </div> -->
+        <button id="sidebarToggle" class="ml-auto group w-9 h-9 flex items-center justify-center rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer">
+            <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-brandOrange transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="16" rx="2" stroke-width="2"/>
+                <line x1="9" y1="4" x2="9" y2="20" stroke-width="2"/>
+            </svg>
+        </button>
+    </div>
 
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         <p class="px-3 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 nav-text">Main</p>
@@ -230,7 +199,7 @@
             <span class="nav-text">Payments</span>
         </a>
         <a href="certificates.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 <?php echo basename($_SERVER['PHP_SELF']) === 'certificates.php' ? 'bg-brandOrange bg-opacity-10 text-brandOrange' : 'text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-brandOrange'; ?>">
-            <svg class="w-5 h-5 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke="join="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            <svg class="w-5 h-5 flex-shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
             <span class="nav-text">Certificates</span>
         </a>
 

@@ -59,8 +59,7 @@ $result = $conn->query("
                         <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Lesson</th>
-                            <th class="px-6 py-4">Course</th>
-                            <th class="px-6 py-4">Module</th>
+                            <th class="px-6 py-4">Course / Module</th>
                             <th class="px-6 py-4">Video</th>
                             <th class="px-6 py-4">Created</th>
                             <th class="px-6 py-4 text-center">Actions</th>
@@ -81,9 +80,9 @@ $result = $conn->query("
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600"><?= htmlspecialchars($row['course_name']) ?></td>
                                 <td class="px-6 py-4">
-                                    <span class="text-sm text-gray-600"><?= htmlspecialchars($row['module_name']) ?></span>
+                                    <p class="text-sm font-medium text-gray-700"><?= htmlspecialchars($row['course_name']) ?></p>
+                                    <p class="text-xs text-gray-400"><?= htmlspecialchars($row['module_name']) ?></p>
                                 </td>
                                 <td class="px-6 py-4">
                                     <?php if ($row['video']): ?>

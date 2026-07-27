@@ -6,8 +6,16 @@
  $limit = 10;
  $page = max(1, intval($_GET['page'] ?? 1));
  $offset = ($page - 1) * $limit;
+ $statusFilter = $_GET['status'] ?? 'all';
 
- $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+ $where = '';
+ $params = [];
+ if ($statusFilter !== 'all') {
+     $safeStatus = $conn->real_escape_string($statusFilter);
+     $where = "WHERE LOWER(e.status) = '$safeStatus'";
+ }
+
+ $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments e $where")->fetch_row()[0] ?? 0;
  $total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
  $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
  $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;
@@ -30,6 +38,7 @@
     JOIN modules m ON e.module_id = m.id
     JOIN courses c ON m.course_id = c.id
     LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
+    $where
     ORDER BY
         CASE
             WHEN LOWER(e.status) = 'pending' THEN 1
@@ -122,10 +131,10 @@
                     <!-- Status Filter -->
                     <select id="statusFilter"
                         class="cursor-pointer px-3 py-2 text-sm border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All Status</option>
+                        <option value="pending" <?= $statusFilter === 'pending' ? 'selected' : '' ?>>Pending</option>
+                        <option value="confirmed" <?= $statusFilter === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                        <option value="rejected" <?= $statusFilter === 'rejected' ? 'selected' : '' ?>>Rejected</option>
                     </select>
                     <!-- Search -->
                     <div class="relative">
@@ -193,7 +202,7 @@
                                 <td class="px-3 py-3">
                                     <?php if (!empty($row['receipt'])): ?>
                                         <a href="#" onclick="event.preventDefault(); document.getElementById('receiptModal<?= $row['id'] ?>').classList.remove('hidden'); document.getElementById('receiptModal<?= $row['id'] ?>').classList.add('flex')"
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition">
+                                            class="inline-flex items-center gap-1 px-1 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                             View Receipt
                                         </a>
@@ -267,11 +276,12 @@
             <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total_enrollments ?> total)</p>
                 <div class="flex items-center gap-1">
-                    <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <?php $qs = $statusFilter !== 'all' ? "&status=$statusFilter" : ''; ?>
+                    <a href="?page=1<?= $qs ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
+                        <a href="?page=<?= $i . $qs ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
                     <?php endfor; ?>
-                    <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                    <a href="?page=<?= $totalPages . $qs ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
                 </div>
             </div>
             <?php endif; ?>
@@ -296,26 +306,26 @@ const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
 
 function filterTable() {
-
     const keyword = searchInput.value.toLowerCase().trim();
-    const status = statusFilter.value;
-
     document.querySelectorAll('.payment-row').forEach(function(row){
-
         const text = row.innerText.toLowerCase();
-        const rowStatus = row.dataset.status;
-
-        const matchSearch = text.includes(keyword);
-        const matchStatus = status === 'all' || rowStatus === status;
-
-        row.style.display = (matchSearch && matchStatus) ? '' : 'none';
-
+        row.style.display = text.includes(keyword) ? '' : 'none';
     });
-
 }
 
 searchInput.addEventListener('keyup', filterTable);
-statusFilter.addEventListener('change', filterTable);
+
+statusFilter.addEventListener('change', function() {
+    const val = this.value;
+    const params = new URLSearchParams(window.location.search);
+    if (val === 'all') {
+        params.delete('status');
+    } else {
+        params.set('status', val);
+    }
+    params.delete('page');
+    window.location.search = params.toString();
+});
 
 document.querySelectorAll('.confirm-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
