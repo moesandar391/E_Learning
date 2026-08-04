@@ -67,8 +67,8 @@ if (!empty($students)) {
         </div>
     </header> -->
 
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="grid grid-cols-4 gap-6 mb-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center justify-between mb-4">
                     <span class="text-sm font-medium text-gray-500">Total Students</span>
@@ -232,9 +232,12 @@ if (!empty($students)) {
                 <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $studentCount ?> total)</p>
                 <div class="flex items-center gap-1">
                     <a href="?page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <a href="?page=<?= $i ?>" class="px-3 py-1.5 text-sm rounded-lg border <?= $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?= $i ?></a>
-                    <?php endfor; ?>
+                    <a href="?page=<?= max(1, $page - 1) ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">&lt;</a>
+                    <form method="GET" class="flex items-center gap-1" onsubmit="var v=parseInt(this.querySelector('input').value);if(v>0&&v<=<?= $totalPages ?>)location.href='?page='+v;return false;">
+                        <label class="text-sm text-gray-500">Page</label>
+                        <input type="number" min="1" max="<?= $totalPages ?>" value="<?= $page ?>" class="w-16 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
+                    </form>
+                    <a href="?page=<?= min($totalPages, $page + 1) ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">&gt;</a>
                     <a href="?page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
                 </div>
             </div>

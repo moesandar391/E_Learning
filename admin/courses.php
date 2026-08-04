@@ -22,7 +22,7 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
         </div>
     </header> -->
 
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div class="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-200">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div class="flex items-center gap-4">

@@ -108,15 +108,15 @@ $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
 
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-brandOchre mb-8 px-8">My Dashboard</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-brandOchre mb-6 sm:mb-8 px-4 sm:px-8">My Dashboard</h1>
 
         <!-- Stats Cards -->
-        <div class="flex gap-4 items-center justify-center mb-8 px-8">
-            <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center w-48 shadow-sm">
+        <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6 sm:mb-8 px-4 sm:px-8">
+            <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center flex-1 shadow-sm">
                 <p class="text-blue-500 text-3xl font-bold"><?= $learningCount ?></p>
                 <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Courses Learning</p>
             </div>
-            <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center w-48 shadow-sm">
+            <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center flex-1 shadow-sm">
                 <p class="text-green-500 text-3xl font-bold"><?= $completedCount ?></p>
                 <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Courses Completed</p>
             </div>
@@ -135,8 +135,8 @@ foreach ($certificates as $cert) {
     }
 }
 ?>
-        <div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8 mx-8">
-            <h3 class="text-xl font-bold text-brandOrange mb-6">My Certificates</h3>
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 mb-6 sm:mb-8 mx-4 sm:mx-8">
+            <h3 class="text-lg sm:text-xl font-bold text-brandOrange mb-6">My Certificates</h3>
             <?php if (!empty($certificates)): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <?php foreach ($uniqueCertificates as $cert): ?>
@@ -158,8 +158,8 @@ foreach ($certificates as $cert) {
         </div>
 
 <!-- Waiting Enrollments -->
-<div class="bg-white p-8 rounded-2xl border border-gray-200 mb-8 mx-8">
-    <h3 class="text-xl font-bold text-brandOrange mb-6">Waiting</h3>
+<div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 mb-6 sm:mb-8 mx-4 sm:mx-8">
+    <h3 class="text-lg sm:text-xl font-bold text-brandOrange mb-6">Waiting</h3>
     <?php if (!empty($waitingEnrollments)): ?>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <?php foreach ($waitingEnrollments as $waiting): ?>
@@ -194,8 +194,8 @@ foreach ($certificates as $cert) {
 </div>
 
         <!-- Enrolled Courses -->
-        <div class="bg-white p-8 rounded-2xl border border-gray-200 mx-8">
-            <h3 class="text-xl font-bold text-brandOrange mb-6">Enrolled Courses</h3>
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 mx-4 sm:mx-8">
+            <h3 class="text-lg sm:text-xl font-bold text-brandOrange mb-6">Enrolled Courses</h3>
             <?php if (count($enrolledCourses) > 0): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <?php foreach ($enrolledCourses as $course):

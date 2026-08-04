@@ -69,7 +69,7 @@ function formatLearnerCount($num) {
 // Convert to percentage: 4.9/5 = 98%
  $satisfactionRate = $totalReviews > 0 ? round(($avgRating / 5) * 100) : 0;
 ?>
-    <main class="w-full max-w-7xl mx-auto px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 dark:text-gray-200">
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 dark:text-gray-200">
         
         <div class="lg:col-span-5 space-y-6">
             <div class="inline-block bg-brandOrange text-white text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg shadow-sm">
@@ -120,7 +120,7 @@ function formatLearnerCount($num) {
 
             <div class="absolute inset-0 bg-black/5 z-10 rounded-2xl pointer-events-none"></div>
 
-            <div class="absolute bottom-10 -left-16 sm:-left-24 z-20 w-52 bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-white/60 shadow-[0_-8px_24px_rgba(15,23,42,0.12),0_12px_24px_rgba(15,23,42,0.18)] transform hover:scale-[1.02] transition-transform duration-300">
+            <div class="absolute bottom-10 -left-4 sm:-left-16 lg:-left-24 z-20 w-44 sm:w-52 bg-white/90 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/60 shadow-[0_-8px_24px_rgba(15,23,42,0.12),0_12px_24px_rgba(15,23,42,0.18)] transform hover:scale-[1.02] transition-transform duration-300">
                 
                 <div class="absolute -top-3.5 -right-2 bg-brandOchre text-white rounded-full p-2 shadow-md">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 01.788 0l4 1.714a.999.999 0 01.356.257l2.644-1.13a1 1 0 000-1.84l-7-3zM7 10.3a1 1 0 01.17-.557l1.28.548a3.001 3.001 0 003.1 0l1.28-.548a1 1 0 01.17.557v1.8a1 1 0 01-1 1H8a1 1 0 01-1-1v-1.8z"></path></svg>
@@ -134,7 +134,7 @@ function formatLearnerCount($num) {
     </main>
 
     <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
             
             <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
                 <div>
@@ -204,8 +204,8 @@ function formatLearnerCount($num) {
 <!-- ── HOW IT WORK SECTION (Project Colors Applied) ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
 <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
-    <div class="max-w-7xl mx-auto px-6">
-        
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
             <div>
                 <span class="text-sm font-medium text-brandTextGray dark:text-gray-200 tracking-wide">Over 1,235+ Course</span>
@@ -216,7 +216,7 @@ function formatLearnerCount($num) {
         </div>
 
         <!-- CHANGED: grid → flex, arrows are now real flex children -->
-        <div class="flex flex-col md:flex-row items-center justify-center gap-0">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
             
             <!-- Step 1 -->
             <div class="bg-orange-50 rounded-2xl p-10 text-center border border-orange-100 hover:shadow-lg transition-all duration-300 w-full md:w-auto md:flex-1">
@@ -263,7 +263,7 @@ function formatLearnerCount($num) {
 <!-- ── IMPORTANT FOR ENGLISH LEARNING ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
 <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
-    <div class="max-w-7xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
         
         <!-- Section Header -->
         <div class="text-center max-w-2xl mx-auto mb-16">
@@ -285,8 +285,8 @@ function formatLearnerCount($num) {
                          class="w-full h-80 lg:h-[420px] object-cover">
                 </div>
                 <!-- Floating stat badge -->
-                <div class="absolute -bottom-5 -right-3 lg:-right-6 bg-brandOrange text-white rounded-2xl px-6 py-4 shadow-lg shadow-orange-200">
-                    <p class="text-2xl font-bold leading-none">1.5B+</p>
+                <div class="absolute -bottom-5 -right-2 sm:-right-3 lg:-right-6 bg-brandOrange text-white rounded-2xl px-4 sm:px-6 py-3 sm:py-4 shadow-lg shadow-orange-200">
+                    <p class="text-xl sm:text-2xl font-bold leading-none">1.5B+</p>
                     <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Global Speakers</p>
                 </div>
                 <!-- Floating tag on image -->
@@ -331,8 +331,8 @@ function formatLearnerCount($num) {
     </div>
 </section>
 
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 px-6 font-sans">
-    <div class="max-w-7xl mx-auto">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-orange-400 tracking-tight">
@@ -373,7 +373,7 @@ function formatLearnerCount($num) {
 
                 <div class="p-7 flex flex-col justify-between relative z-20">
                     <div class="flex-1">
-                        <h3 class="font-serif font-bold text-[#0F172A] dark:text-white text-md leading-snug mb-6 group-hover:text-[#FF8A00] dark:group-hover:text-orange-400 transition-colors duration-300 line-clamp-2">
+                        <h3 class="font-serif font-bold text-[#FF8A00] dark:text-orange-400 text-md leading-snug mb-6 line-clamp-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
                     </div>
@@ -448,7 +448,7 @@ function formatLearnerCount($num) {
 </section>
 
 <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
-    <div class="max-w-7xl mx-auto px-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
 <!-- Row 2: Text Left + Image Right (Gradient Fallback) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16 lg:mb-24">
             
@@ -480,8 +480,8 @@ function formatLearnerCount($num) {
                 </div>
             
                 <!-- Floating stat badge -->
-                <div class="absolute -bottom-5 -left-3 lg:-left-6 bg-blue-600 text-white rounded-2xl px-6 py-4 shadow-lg shadow-blue-200">
-                    <p class="text-2xl font-bold leading-none">+20%</p>
+                <div class="absolute -bottom-5 -left-2 sm:-left-3 lg:-left-6 bg-blue-600 text-white rounded-2xl px-4 sm:px-6 py-3 sm:py-4 shadow-lg shadow-blue-200">
+                    <p class="text-xl sm:text-2xl font-bold leading-none">+20%</p>
                     <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Higher Income</p>
                 </div>
                 
@@ -490,9 +490,9 @@ function formatLearnerCount($num) {
     </div>
 </section>
 
-<div class="max-w-7xl mx-auto px-6 py-16">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-5xl md:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
+            <h1 class="font-serif font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
             <p class="text-lg text-[#566473] dark:text-slate-300 max-w-3xl mx-auto">
                 We empower global communicators through immersive English language learning. Our mission is to bridge cultures and unlock international opportunities for learners worldwide.
             </p>
@@ -540,7 +540,7 @@ function formatLearnerCount($num) {
             </div>
             
             <div class="lg:col-span-7 relative max-w-2xl mx-auto w-full">
-                <div class="absolute -bottom-4 -right-4 w-40 h-40 bg-[#FF8A00] rounded-3xl -z-10"></div>
+                <div class="absolute -bottom-4 -right-4 w-20 h-20 sm:w-28 sm:h-28 lg:w-40 lg:h-40 bg-[#FF8A00] rounded-3xl -z-10"></div>
                 
                 <div class="relative rounded-[32px] overflow-hidden shadow-2xl border border-gray-200">
                     <img src="../assets/about.png" alt="Access Edu Community" class="w-full h-auto object-cover block" onerror="this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200'">

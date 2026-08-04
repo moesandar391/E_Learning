@@ -82,7 +82,7 @@ require_once '../includes/enrollment_check.php';
 
                 <div class="p-7 flex-1 flex flex-col justify-between relative z-20">
                     <div>
-                        <h3 class="font-serif font-bold text-[#0F172A] dark:text-slate-100 text-md leading-snug mb-4 group-hover:text-[#FF8A00] transition-colors duration-300 line-clamp-2">
+                        <h3 class="font-serif font-bold text-[#FF8A00] dark:text-orange-400 text-md leading-snug mb-4 line-clamp-2">
                             <?php echo htmlspecialchars($module['module_name']); ?>
                         </h3>
 

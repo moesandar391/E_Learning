@@ -151,8 +151,8 @@ try {
         </div>
     </header> -->
 
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="grid grid-cols-4 gap-6 mb-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center justify-between mb-4">
                     <span class="text-sm font-medium text-gray-500">Total Students</span>
@@ -210,8 +210,8 @@ try {
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="col-span-2 bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 sm:mb-8">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="font-semibold text-gray-800">Enrollment Overview</h3>
                     <!-- <span class="text-xs text-gray-400">Last 6 months</span> -->
@@ -269,7 +269,7 @@ try {
         <!-- ═══════════════════════════════════════════════════════
              ── Payment Method Pie Chart Section (NEW) ──
              ═══════════════════════════════════════════════════════ -->
-        <div class="grid grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="font-semibold text-gray-800">Payment Methods</h3>
@@ -287,7 +287,7 @@ try {
                 </div>
             </div>
 
-            <div class="col-span-2 bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="font-semibold text-gray-800">Payment Method Breakdown</h3>
                     <span class="text-xs px-2.5 py-1 rounded-full bg-orange-50 text-brandOrange font-medium"><?= count($pieLabels) ?> methods</span>

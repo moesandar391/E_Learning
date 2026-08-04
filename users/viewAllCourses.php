@@ -55,7 +55,7 @@ require_once '../includes/enrollment_check.php';
     <p class="text-gray-600 text-center mb-8">Comprehensive pathways to master the English language.</p>
     
     <!-- Search and Filter Bar -->
-    <form action="courses.php" method="GET" class="flex items-center justify-center gap-4 mb-10">
+    <form action="courses.php" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10">
     <select name="level" onchange="this.form.submit()" class="cursor-pointer bg-white border border-orange-200 rounded-lg p-3 text-sm focus:outline-none focus:border-orange-500 text-gray-700 shadow-sm">
         <option value="">All Levels</option>
         <option value="Beginner" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Beginner') ? 'selected' : ''; ?>>Beginner</option>
@@ -64,9 +64,9 @@ require_once '../includes/enrollment_check.php';
     
     <input type="text" name="search" placeholder="Search For Courses" 
            value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
-           class="bg-white border border-orange-200 rounded-lg p-3 w-full max-w-lg text-sm outline-none focus:border-orange-500 text-gray-700 shadow-sm transition">
+           class="bg-white border border-orange-200 rounded-lg p-3 w-full sm:max-w-lg text-sm outline-none focus:border-orange-500 text-gray-700 shadow-sm transition">
     
-    <button type="submit" class="bg-brandOrange hover:bg-brandOrangeHover text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors shadow-sm flex items-center gap-2">
+    <button type="submit" class="bg-brandOrange hover:bg-brandOrangeHover text-white font-bold px-6 py-3 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         Search
     </button>

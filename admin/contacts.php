@@ -49,7 +49,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
 ?>
 <div class="flex-1 flex flex-col overflow-hidden">
 
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div class="flex justify-between items-center mb-6">
             <div class="flex gap-3 items-baseline">
                 <a href="contacts.php" class="px-4 py-2 rounded-lg text-sm font-medium <?php echo $filter === '' ? 'bg-brandOrange text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'; ?>">All</a>
@@ -158,11 +158,15 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
             <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p class="text-sm text-gray-500">Page <?php echo $page; ?> of <?php echo $totalPages; ?> (<?php echo $total; ?> total)</p>
                 <div class="flex items-center gap-1">
-                    <a href="?p=1<?php echo $filter ? '&filter='.$filter : ''; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <a href="?p=<?php echo $i . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-1.5 text-sm rounded-lg border <?php echo $i === $page ? 'bg-brandOrange text-white border-brandOrange' : 'border-gray-200 text-gray-600 hover:bg-gray-50' ?> transition"><?php echo $i; ?></a>
-                    <?php endfor; ?>
-                    <a href="?p=<?php echo $totalPages . ($filter ? '&filter='.$filter : ''); ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                    <?php $pageFilterQs = $filter ? '&filter='.$filter : ''; ?>
+                    <a href="?p=1<?php echo $pageFilterQs; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <a href="?p=<?php echo max(1, $page - 1) . $pageFilterQs; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">&lt;</a>
+                    <form method="GET" class="flex items-center gap-1" onsubmit="var v=parseInt(this.querySelector('input').value);if(v>0&&v<=<?php echo $totalPages; ?>)location.href='?p='+v+'<?php echo $pageFilterQs; ?>';return false;">
+                        <label class="text-sm text-gray-500">Page</label>
+                        <input type="number" min="1" max="<?php echo $totalPages; ?>" value="<?php echo $page; ?>" class="w-16 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
+                    </form>
+                    <a href="?p=<?php echo min($totalPages, $page + 1) . $pageFilterQs; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">&gt;</a>
+                    <a href="?p=<?php echo $totalPages . $pageFilterQs; ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?php echo $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
                 </div>
             </div>
             <?php endif; ?>

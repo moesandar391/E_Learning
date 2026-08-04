@@ -63,7 +63,7 @@ LIMIT 3
         </div> -->
         <!-- === END BACK BUTTON === -->
 
-        <div class="space-y-10 px-6">
+        <div class="space-y-10 px-4 sm:px-6">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">

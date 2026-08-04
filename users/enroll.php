@@ -88,7 +88,7 @@ function isLightColor($hex) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <main class="bg-gray-50 min-h-screen py-12">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 px-6">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 px-4 sm:px-6">
         
         <!-- LEFT: Module Info -->
         <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm h-fit">

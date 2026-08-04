@@ -158,7 +158,18 @@
             font-size: 0.75rem;
         }
 
-        /* ── Sidebar collapse adjustments ── */
+                /* ── Sidebar collapse adjustments ── */
+        
+        /* Open Sidebar State */
+        body:has(#sidebar:not(.collapsed)) header {
+            margin-left: 16rem !important; /* 16rem = 64 (lg:ml-64) */
+            width: calc(100% - 16rem) !important;
+        }
+        body:has(#sidebar:not(.collapsed)) > div.flex {
+            margin-left: 16rem !important;
+        }
+
+        /* Closed Sidebar State */
         body:has(#sidebar.collapsed) header {
             margin-left: 5rem !important;
             width: calc(100% - 5rem) !important;
@@ -166,13 +177,31 @@
         body:has(#sidebar.collapsed) > div.flex {
             margin-left: 5rem !important;
         }
+
+        @media (max-width: 1023px) {
+            body:has(#sidebar) header,
+            body:has(#sidebar.collapsed) header {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            body:has(#sidebar) > div.flex,
+            body:has(#sidebar.collapsed) > div.flex {
+                margin-left: 0 !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-brandBg font-sans antialiased overflow-hidden">
+<body class="bg-brandBg font-sans antialiased lg:overflow-hidden">
 
 <!-- ✅ FIXED HEADER: sticky top-0 z-50 -->
-<header class="h-16 bg-white border-b border-gray-200 flex items-center w-full sticky top-0 z-50 ml-64" style="transition: margin-left 0.3s ease-in-out; width: calc(100% - 16rem);">
-    
+<header class="h-16 bg-white border-b border-gray-200 flex items-center w-full sticky top-0 z-50" style="transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;">
+    <!-- Mobile hamburger -->
+    <button id="mobileSidebarToggle" class="lg:hidden ml-4 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer text-gray-500 hover:text-brandOrange">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+
     <div class="w-64 flex items-center px-8 border-r border-gray-300 flex-shrink-0 hidden">
         <img src="../assets/Logo 3.png" class="w-8 h-8 mr-3 object-contain hidden" alt="Logo">
         <span class="text-xl font-bold tracking-tight text-gray-800 hidden">
@@ -183,16 +212,17 @@
         </button>
     </div>
 
-    <div class="flex-1 flex items-center justify-between px-8">
-        <div>
-            <h2 class="text-lg font-semibold text-gray-800"><?= htmlspecialchars($pageInfo['title']) ?></h2>
-            <p class="text-sm text-gray-500"><?= htmlspecialchars($pageInfo['subtitle']) ?></p>
+    <div class="flex-1 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 min-w-0">
+        <div class="min-w-0">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-800 truncate"><?= htmlspecialchars($pageInfo['title']) ?></h2>
+            <p class="text-xs sm:text-sm text-gray-500 truncate"><?= htmlspecialchars($pageInfo['subtitle']) ?></p>
         </div>
 
-        <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-500"><?php echo date('l, F j, Y'); ?></span>
+        <div class="flex items-center gap-3 sm:gap-5 flex-shrink-0">
+            <span class="hidden sm:inline text-xs sm:text-sm text-gray-500 whitespace-nowrap"><?php echo date('l, F j, Y'); ?></span>
+            
             <?php require_once 'includes/admin_notif_icon.php'; ?>
-            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition">
+            <a href="settings.php" class="w-9 h-9 rounded-full bg-gradient-to-br from-brandOrange to-orange-400 text-white flex items-center justify-center text-sm font-bold shadow-sm hover:opacity-90 transition flex-shrink-0">
                 <?php echo strtoupper(substr($_SESSION['username'] ?? 'A', 0, 1)); ?>
             </a>
         </div>
@@ -205,6 +235,7 @@
         document.documentElement.classList.toggle('dark', theme === 'dark');
         localStorage.setItem('admin-theme', theme);
     }
+    window.setTheme = setTheme;
     var stored = localStorage.getItem('admin-theme');
     if (stored) {
         setTheme(stored);
@@ -220,4 +251,4 @@
 </script>
 
 <!-- ✅ FIXED LAYOUT: calc(100vh - 4rem) to account for fixed header -->
-<div class="flex ml-64 overflow-hidden" style="height: calc(100vh - 4rem); transition: margin-left 0.3s ease-in-out;">
+<div class="flex lg:ml-64 overflow-hidden" style="height: calc(100vh - 4rem); transition: margin-left 0.3s ease-in-out;">

@@ -169,25 +169,16 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden pt-20">
 
     <header class="w-full bg-white border-b border-gray-100 fixed top-0 left-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+
             <div class="flex items-center gap-2">
-                <img src="../assets/Logo 3.png" alt="Logo" class="h-10 w-auto">
-                <span class="text-2xl font-serif font-bold text-brandOchre tracking-tight">
+                <img src="../assets/Logo 3.png" alt="Logo" class="h-8 sm:h-10 w-auto">
+                <span class="text-xl sm:text-2xl font-serif font-bold text-brandOchre tracking-tight">
                     Access Edu
                 </span>
             </div>
 
-            <button id="mobileMenuBtn" class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Menu">
-                <svg id="menuOpenIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-                <svg id="menuCloseIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-
-            <nav class="hidden md:flex items-center space-x-12 font-medium text-gray-500 dark:text-slate-200">
+            <nav class="hidden lg:flex items-center space-x-8 xl:space-x-12 font-medium text-gray-500 dark:text-slate-200">
 
     <a href="../users/index.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Home
@@ -229,7 +220,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 </nav>
             
 
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3">
                 
                <button id="userDarkModeToggle"
                     class="w-9 h-9 flex items-center justify-center rounded-lg border border-orange-200 bg-orange-50 hover:bg-orange-100 dark:hover:bg-gray-700 transition flex-shrink-0 cursor-pointer text-slate-600 hover:text-brandOchre"
@@ -240,8 +231,18 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     </svg>
                 </button>
 
+                <button id="mobileMenuBtn" class="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Menu">
+                    <svg id="menuOpenIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg id="menuCloseIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
                 <?php 
                 $header_profile_img = null;
+                $notif_count = 0;
                 if (isset($_SESSION['user_id'])) {
                     require_once __DIR__ . '/../config/db.php';
                     require_once __DIR__ . '/notification_helper.php';
@@ -252,10 +253,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     $header_profile_img = $row ? ($row['profile_image'] ?? null) : null;
                     $notif_count = get_unread_notification_count($_SESSION['user_id']);
                 }
+                ?>
 
-                if (isset($_SESSION['username'])): 
-                    $initial = strtoupper(substr($_SESSION['username'], 0, 1));
-                ?>                    
                     <div class="relative" id="notifWrapper">
                         <button id="notifBtn" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Notifications">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,6 +277,9 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                         </div>
                     </div>
 
+                <?php if (isset($_SESSION['username'])): 
+                    $initial = strtoupper(substr($_SESSION['username'], 0, 1));
+                ?>                    
                     <div class="relative" id="profileWrapper">
                         <button id="profileBtn" class="w-10 h-10 rounded-full bg-brandOrange flex items-center justify-center text-white font-bold text-2xl border border-gray-200 overflow-hidden">
                             <?php if ($header_profile_img && file_exists(__DIR__ . '/../users/' . $header_profile_img)): ?>
@@ -313,11 +315,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     </div>
 
                         <?php else: ?>
-                    <div class="relative inline-block p-[2px] rounded-full overflow-hidden">
-    
-    <div class="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#00f7ff_0%,#7c3aed_50%,#ec4899_100%)]"></div>
-
-    <a href="../auth/login.php" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
+                    <div class="hidden">
+                        <a href="../auth/login.php" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
         Login
     </a>
 </div>
@@ -338,10 +337,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             </div>
 
             <!-- Mobile Menu Overlay -->
-            <div id="mobileMenu" class="fixed inset-0 z-40 hidden lg:hidden">
-                <div id="mobileMenuBackdrop" class="absolute inset-0 bg-black/50"></div>
-                <div class="absolute left-0 top-0 h-full w-72 max-w-[85vw] bg-white shadow-xl pt-20 overflow-y-auto">
-                    <div class="px-4 py-4 space-y-1">
+            <div id="mobileMenu" class="absolute left-0 top-full w-full bg-white shadow-xl border-t border-gray-100 overflow-hidden lg:hidden" style="max-height:0; transition: max-height 0.35s ease-in-out;">
+                <div class="px-4 py-4 space-y-1 overflow-y-auto" style="max-height:calc(100vh - 5rem);">
                         <a href="../users/index.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                             Home
@@ -407,7 +404,6 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                             <a href="../auth/register.php" class="flex items-center justify-center px-6 py-3 border-2 border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">Get Started</a>
                         <?php endif; ?>
                     </div>
-                </div>
             </div>
 
         </div>
@@ -540,7 +536,9 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             });
         }
 
-        setInterval(fetchNotifications, 15000);
+        if (document.querySelector('#profileWrapper')) {
+            setInterval(fetchNotifications, 15000);
+        }
     })();
 
     // Dark mode toggle
@@ -685,17 +683,38 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 (function() {
     var menuBtn = document.getElementById('mobileMenuBtn');
     var menu = document.getElementById('mobileMenu');
-    var backdrop = document.getElementById('mobileMenuBackdrop');
     var openIcon = document.getElementById('menuOpenIcon');
     var closeIcon = document.getElementById('menuCloseIcon');
 
     if (!menuBtn || !menu) return;
 
-    function toggleMenu() {
-        menu.classList.toggle('hidden');
+    var isOpen = false;
+
+    function openMenu() {
+        isOpen = true;
+        menu.style.maxHeight = menu.scrollHeight + 'px';
         if (openIcon && closeIcon) {
-            openIcon.classList.toggle('hidden');
-            closeIcon.classList.toggle('hidden');
+            openIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+        }
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+        isOpen = false;
+        menu.style.maxHeight = '0';
+        if (openIcon && closeIcon) {
+            openIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }
+        document.body.style.overflow = '';
+    }
+
+    function toggleMenu() {
+        if (isOpen) {
+            closeMenu();
+        } else {
+            openMenu();
         }
     }
 
@@ -704,23 +723,24 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
         toggleMenu();
     });
 
-    if (backdrop) {
-        backdrop.addEventListener('click', function() {
-            toggleMenu();
-        });
-    }
-
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && menu && !menu.classList.contains('hidden')) {
-            toggleMenu();
+        if (e.key === 'Escape' && isOpen) {
+            closeMenu();
         }
+    });
+
+    // Close menu when a nav link inside it is clicked
+    menu.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            closeMenu();
+        });
     });
 
     var profileBtn = document.getElementById('profileBtn');
     if (profileBtn) {
         profileBtn.addEventListener('click', function() {
-            if (menu && !menu.classList.contains('hidden')) {
-                toggleMenu();
+            if (isOpen) {
+                closeMenu();
             }
         });
     }

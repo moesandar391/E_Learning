@@ -97,7 +97,7 @@ $image_path = ($admin && !empty($admin['profile_image'])) ? $upload_dir . $admin
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
 
         <?php if ($message): ?>
         <div class="mb-6 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2">

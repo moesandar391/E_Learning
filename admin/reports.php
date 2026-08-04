@@ -280,6 +280,17 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
     'cb pay' => 'bg-teal-50 text-teal-700', 'cbpay' => 'bg-teal-50 text-teal-700',
 ];
 
+// ── Pagination ──
+ $limit = 10;
+ $page = max(1, intval($_GET['page'] ?? 1));
+ $offset = ($page - 1) * $limit;
+ $total = $conn->query("
+    SELECT COUNT(*) FROM enrollments e 
+    $join_modules $join_courses 
+    WHERE $whereSql
+")->fetch_row()[0] ?? 0;
+ $totalPages = max(1, ceil($total / $limit));
+
 // ── Detailed Table Data ──
  $report_data = $conn->query("
     SELECT e.id, u.name AS student, c.course_name, m.name AS module_name, pm.name AS payment_method, m.price, e.enroll_date, e.created_at
@@ -289,7 +300,7 @@ if (!empty($payment_filter)) $where[] = "e.payment_method_id = " . (int)$payment
     JOIN courses c ON m.course_id = c.id 
     LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
     WHERE $whereSql 
-    ORDER BY e.created_at DESC LIMIT 500
+    ORDER BY e.created_at DESC LIMIT $offset, $limit
 ");
 
  $export_url = htmlspecialchars($_SERVER['PHP_SELF'] . '?' . http_build_query(array_merge($_GET, ['export' => 'excel'])));
@@ -323,7 +334,7 @@ if (!empty($payment_filter)) {
         </div>
     </header> -->
 
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <!-- ── Filters ── -->
         <form method="GET" class="bg-white rounded-xl border border-gray-200 p-6 mb-8 hover:shadow-lg transition-shadow duration-200 no-print">
             <div class="grid grid-cols-5 gap-4 items-end">
@@ -361,7 +372,7 @@ if (!empty($payment_filter)) {
         </form>
 
         <!-- ── Summary Cards ── -->
-        <div class="grid grid-cols-4 gap-6 mb-8 no-print">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8 no-print">
             <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
                 <span class="text-sm font-medium text-gray-500">Filtered Revenue</span>
                 <p class="text-3xl font-bold text-gray-900 mt-2"><?= number_format($total_revenue) ?> <span class="text-base font-medium text-gray-500">MMK</span></p>
@@ -490,6 +501,27 @@ if (!empty($payment_filter)) {
                     </tbody>
                 </table>
             </div>
+            <?php if ($totalPages > 1): ?>
+            <?php
+                $pageParams = $_GET;
+                unset($pageParams['page']);
+                $pageQs = http_build_query($pageParams);
+                $pagePrefix = $pageQs ? '?' . $pageQs . '&' : '?';
+            ?>
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between no-print">
+                <p class="text-sm text-gray-500">Page <?= $page ?> of <?= $totalPages ?> (<?= $total ?> total)</p>
+                <div class="flex items-center gap-1">
+                    <a href="<?= $pagePrefix ?>page=1" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">First</a>
+                    <a href="<?= $pagePrefix ?>page=<?= max(1, $page - 1) ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page <= 1 ? 'pointer-events-none opacity-40' : '' ?>">&lt;</a>
+                    <form method="GET" class="flex items-center gap-1" onsubmit="var v=parseInt(this.querySelector('input').value);if(v>0&&v<=<?= $totalPages ?>)location.href='<?= $pagePrefix ?>page='+v;return false;">
+                        <label class="text-sm text-gray-500">Page</label>
+                        <input type="number" min="1" max="<?= $totalPages ?>" value="<?= $page ?>" class="w-16 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
+                    </form>
+                    <a href="<?= $pagePrefix ?>page=<?= min($totalPages, $page + 1) ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">&gt;</a>
+                    <a href="<?= $pagePrefix ?>page=<?= $totalPages ?>" class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition <?= $page >= $totalPages ? 'pointer-events-none opacity-40' : '' ?>">Last</a>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 </div>

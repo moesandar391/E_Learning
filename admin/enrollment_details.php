@@ -46,7 +46,7 @@ $badge = match($s) {
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div class="max-w-3xl mx-auto space-y-6">
             <!-- Student Info -->
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
