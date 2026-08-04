@@ -142,7 +142,8 @@ LIMIT 3
                                     ▶ Learn Now
                                   </a>';
                         } elseif (!$userId) {
-                            echo '<a href="../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module_id) . '" 
+                            $_SESSION['redirect_module'] = $module_id;
+                            echo '<a href="../auth/login.php" 
                                    class="block w-full text-center text-white font-bold text-sm py-4 rounded-xl bg-brandOrange hover:bg-brandOrangeHover transition-all shadow-[0_4px_12px_rgba(255,138,0,0.3)]">
                                     Login to Enroll
                                   </a>';

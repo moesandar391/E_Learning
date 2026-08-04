@@ -414,7 +414,8 @@ function formatLearnerCount($num) {
                                     </span>
                                 </a>';
                         } elseif (!$userId) {
-                            echo '<a href="../auth/login.php?redirect=' . urlencode('../users/enroll.php?module_id=' . $module['module_id']) . '" 
+                            $_SESSION['redirect_module'] = $module['module_id'];
+                            echo '<a href="../auth/login.php" 
                                    class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
                                           border border-orange-600 text-orange-600
                                           hover:bg-orange-600 hover:text-white

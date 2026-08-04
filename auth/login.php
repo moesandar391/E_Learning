@@ -33,8 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: ../admin/dashboard.php");
                 } else {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                    $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : '../users/index.php';
-                    header("Location: $redirect");
+                    redirectAfterLogin($conn, $user['id']);
                 }
                 exit();
             }
@@ -44,6 +43,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!$found) {
         $error_message = "Invalid email or password.";
     }
+}
+
+/**
+ * Redirect a normal user right after login according to their
+ * enrollment status for the module stored in $_SESSION['redirect_module'].
+ * Reads and clears $_SESSION['redirect_module'].
+ */
+function redirectAfterLogin($conn, $user_id) {
+    require_once __DIR__ . '/../includes/enrollment_check.php';
+
+    // If no pending module was selected (e.g. normal login), go to dashboard.
+    if (!isset($_SESSION['redirect_module'])) {
+        header("Location: ../users/index.php");
+        exit;
+    }
+
+    $module_id = (int)$_SESSION['redirect_module'];
+    unset($_SESSION['redirect_module']);
+
+    $status = checkEnrollmentStatus($conn, $user_id, $module_id);
+    $statusLower = $status ? strtolower($status) : false;
+
+    // Enrolled and approved -> go straight to lessons.
+    if ($statusLower === 'confirmed') {
+        header("Location: ../users/lesson.php?module_id=$module_id");
+        exit;
+    }
+
+    // Enrolled but awaiting admin approval -> show dashboard with a message.
+    if ($statusLower === 'pending' || $statusLower === 'needs_correction') {
+        $_SESSION['enroll_pending_message'] =
+            "Your enrollment request has been submitted successfully. " .
+            "Please wait for the administrator to approve your enrollment before accessing the lessons.";
+        header("Location: ../users/my_learning.php");
+        exit;
+    }
+
+    // No enrollment record or rejected -> allow (re)enrollment.
+    header("Location: ../users/enroll.php?module_id=$module_id");
+    exit;
 }
 ?>
 

@@ -110,6 +110,14 @@ $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
     <div class="max-w-7xl mx-auto">
         <h1 class="text-2xl sm:text-3xl font-bold text-brandOchre mb-6 sm:mb-8 px-4 sm:px-8">My Dashboard</h1>
 
+        <?php if (isset($_SESSION['enroll_pending_message'])): ?>
+            <div class="mx-4 sm:mx-8 mb-6 flex items-start gap-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl px-5 py-4 text-sm">
+                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span><?php echo htmlspecialchars($_SESSION['enroll_pending_message']); ?></span>
+            </div>
+            <?php unset($_SESSION['enroll_pending_message']); ?>
+        <?php endif; ?>
+
         <!-- Stats Cards -->
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6 sm:mb-8 px-4 sm:px-8">
             <div class="bg-white p-6 rounded-2xl border border-gray-200 text-center flex-1 shadow-sm">

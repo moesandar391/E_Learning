@@ -19,6 +19,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_lesson']) &&
     exit;
 }
 
+// Enrollment guard: only users with an approved enrollment may view lessons.
+require_once __DIR__ . '/../includes/enrollment_check.php';
+
+if (!$user_id) {
+    $_SESSION['redirect_module'] = $module_id;
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+$enrollStatus = checkEnrollmentStatus($conn, $user_id, $module_id);
+$enrollStatusLower = $enrollStatus ? strtolower($enrollStatus) : false;
+
+if ($enrollStatusLower === 'pending' || $enrollStatusLower === 'needs_correction') {
+    $_SESSION['enroll_pending_message'] =
+        "Your enrollment request has been submitted successfully. " .
+        "Please wait for the administrator to approve your enrollment before accessing the lessons.";
+    header("Location: my_learning.php");
+    exit;
+}
+
+if ($enrollStatusLower !== 'confirmed') {
+    header("Location: enroll.php?module_id=$module_id");
+    exit;
+}
+
 include_once('../includes/header.php');
 
 $sql = "SELECT l.*, m.name AS module_name, c.course_name 
