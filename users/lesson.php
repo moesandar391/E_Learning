@@ -226,19 +226,46 @@ while ($row = $revResult->fetch_assoc()) {
                 $totalLessons = count($allLessons);
                 $completedCount = count($completedIds);
                 $allCompleted = $totalLessons > 0 && $completedCount === $totalLessons;
+
+                // Quiz gate: quiz must be passed before the certificate is available.
+                $quiz = null;
+                $quizPassed = false;
+                if ($user_id) {
+                    $qz = $conn->prepare("SELECT * FROM quizzes WHERE module_id = ? AND status = 'active' ORDER BY id DESC LIMIT 1");
+                    $qz->bind_param("i", $module_id);
+                    $qz->execute();
+                    $quiz = $qz->get_result()->fetch_assoc();
+                    if ($quiz) {
+                        $qc = $conn->query("SELECT COUNT(*) AS c FROM quiz_questions WHERE quiz_id = {$quiz['id']}")->fetch_assoc()['c'];
+                        if ($qc == 0) { $quiz = null; }
+                        else {
+                            $qr = $conn->prepare("SELECT passed, score FROM quiz_results WHERE user_id = ? AND quiz_id = ? ORDER BY id DESC LIMIT 1");
+                            $qr->bind_param("ii", $user_id, $quiz['id']);
+                            $qr->execute();
+                            $res = $qr->get_result()->fetch_assoc();
+                            $quizPassed = $res && (int)$res['passed'] === 1;
+                        }
+                    }
+                }
                 ?>
                 <div class="mt-4">
-                    <?php if ($allCompleted): ?>
+                    <?php if ($allCompleted && $quiz && $quizPassed): ?>
                         <button onclick="downloadCertificate(event, <?php echo $module_id; ?>)"
-                           class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-bold transition border bg-green-50 text-green-700 border-green-300 hover:bg-green-100" style="cursor:default">
+                           class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-bold transition border bg-green-50 text-green-700 border-green-300 hover:bg-green-100" style="cursor:pointer">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             Download Certificate
                         </button>
+                    <?php elseif ($allCompleted && $quiz): ?>
+                        <a href="quiz.php?module_id=<?php echo $module_id; ?>"
+                           class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-bold transition bg-brandOrange text-white hover:bg-brandOrangeHover shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Take Quiz
+                            <span class="text-xs font-normal opacity-80">(to earn certificate)</span>
+                        </a>
                     <?php else: ?>
                         <div class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-bold border bg-gray-100 text-gray-400 border-gray-200" style="cursor:default;pointer-events:none">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Download Certificate
-                            <span class="text-xs ml-1">(<?php echo $completedCount; ?>/<?php echo $totalLessons; ?>)</span>
+                            <?php echo $allCompleted ? ($quiz ? 'Complete the quiz to earn your certificate' : 'Quiz not available yet') : 'Complete all lessons first'; ?>
                         </div>
                     <?php endif; ?>
                 </div>

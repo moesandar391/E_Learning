@@ -13,6 +13,7 @@ $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS mod
                  FROM modules m
                  JOIN courses c ON m.course_id = c.id
                  LEFT JOIN lessons l ON m.id = l.module_id
+                 WHERE m.status = 'active'
                  GROUP BY m.id, m.name, m.image, m.price, c.course_name, c.level, c.instructor_name
                  ORDER BY m.id DESC
                  LIMIT 6";

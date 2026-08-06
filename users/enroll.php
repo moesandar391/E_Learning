@@ -10,10 +10,10 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once '../config/db.php';
 
- $sql = "SELECT c.course_name, m.name AS module_name, m.price, m.image 
+ $sql = "SELECT c.course_name, m.name AS module_name, m.price, m.image, m.status
        FROM modules m 
        JOIN courses c ON m.course_id = c.id 
-       WHERE m.id = ?";
+       WHERE m.id = ? AND m.status = 'active'";
  $stmt = $conn->prepare($sql);
  $stmt->bind_param("i", $module_id);
  $stmt->execute();

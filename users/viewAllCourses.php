@@ -12,7 +12,7 @@ $sql = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image
         FROM modules m
         JOIN courses c ON m.course_id = c.id
         LEFT JOIN lessons l ON m.id = l.module_id
-        WHERE 1=1"; // '1=1' makes it easy to append dynamic AND conditions
+        WHERE 1=1 AND m.status = 'active'"; // '1=1' makes it easy to append dynamic AND conditions
 
 $params = [];
 $types = "";

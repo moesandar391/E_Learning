@@ -16,7 +16,7 @@ $stmt = $conn->prepare("
            m.price
     FROM modules m
     JOIN courses c ON m.course_id = c.id
-    WHERE m.name LIKE ? OR c.course_name LIKE ?
+    WHERE m.status = 'active' AND (m.name LIKE ? OR c.course_name LIKE ?)
     LIMIT 8
 ");
 $stmt->bind_param("ss", $like, $like);

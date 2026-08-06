@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS modules (
     name VARCHAR(100) NOT NULL,
     image VARCHAR(255) DEFAULT NULL,
     price DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('active','inactive') DEFAULT 'active',
     description TEXT,
     requirements TEXT,
     what_includes TEXT,
@@ -173,4 +174,88 @@ CREATE TABLE IF NOT EXISTS lesson_progress (
     UNIQUE KEY unique_progress (user_id, lesson_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quizzes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    module_id INT DEFAULT NULL,
+    quiz_title VARCHAR(100) NOT NULL,
+    passing_score INT NOT NULL DEFAULT 70 COMMENT 'Percentage required to pass',
+    question_limit INT NOT NULL DEFAULT 100 COMMENT 'Questions shown per attempt',
+    time_limit INT NOT NULL DEFAULT 0 COMMENT 'Time limit in minutes, 0 = none',
+    random_questions TINYINT(1) NOT NULL DEFAULT 1,
+    random_answers TINYINT(1) NOT NULL DEFAULT 1,
+    status ENUM('active','inactive') NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    question_text TEXT NOT NULL,
+    explanation TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question_id INT NOT NULL,
+    option_text VARCHAR(255) NOT NULL,
+    is_correct TINYINT(1) NOT NULL DEFAULT 0,
+    position INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    user_id INT NOT NULL,
+    qlimit INT NOT NULL DEFAULT 0,
+    status ENUM('in_progress','completed') NOT NULL DEFAULT 'in_progress',
+    start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    end_time DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempt_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    attempt_id INT NOT NULL,
+    question_id INT NOT NULL,
+    display_order INT NOT NULL DEFAULT 0,
+    options_order VARCHAR(512) DEFAULT NULL,
+    UNIQUE KEY uniq_attempt_q (attempt_id, question_id),
+    FOREIGN KEY (attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    attempt_id INT NOT NULL,
+    question_id INT NOT NULL,
+    option_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_attempt_q (attempt_id, question_id),
+    FOREIGN KEY (attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
+    FOREIGN KEY (option_id) REFERENCES quiz_options(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS quiz_results (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    user_id INT NOT NULL,
+    attempt_id INT NULL,
+    attempt_number INT NOT NULL DEFAULT 1,
+    total_questions INT NOT NULL DEFAULT 0,
+    correct_count INT NOT NULL DEFAULT 0,
+    wrong_count INT NOT NULL DEFAULT 0,
+    score INT NOT NULL COMMENT 'Percentage score 0-100',
+    passed TINYINT(1) NOT NULL DEFAULT 0,
+    attempt_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -120,20 +120,12 @@ switch ($action) {
             exit;
         }
 
-        // Get image to delete
-        $stmt = $conn->prepare("SELECT image FROM modules WHERE id = ?");
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-
-        $stmt = $conn->prepare("DELETE FROM modules WHERE id = ?");
+        // Soft delete: hide the module instead of permanently removing the record.
+        // Data (module + lessons + enrollments) remains in the database.
+        $stmt = $conn->prepare("UPDATE modules SET status = 'inactive' WHERE id = ?");
         $stmt->bind_param('i', $id);
         if ($stmt->execute()) {
-            // Delete image file
-            if ($row && $row['image'] && file_exists($uploadDir . $row['image'])) {
-                unlink($uploadDir . $row['image']);
-            }
-            echo json_encode(['success' => true, 'message' => 'Module deleted successfully.']);
+            echo json_encode(['success' => true, 'message' => 'Module deactivated successfully.']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to delete module.']);
         }

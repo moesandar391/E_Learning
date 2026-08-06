@@ -43,13 +43,18 @@ if (!move_uploaded_file($_FILES['receipt']['tmp_name'], $targetPath)) {
 }
 
 // 2. Fetch Module Details
-$mod = $conn->prepare("SELECT m.id, m.name, m.price, m.course_id, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id WHERE m.id = ?");
+$mod = $conn->prepare("SELECT m.id, m.name, m.price, m.course_id, m.status, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id WHERE m.id = ?");
 $mod->bind_param("i", $module_id);
 $mod->execute();
 $module = $mod->get_result()->fetch_assoc();
 
 if (!$module) {
     echo json_encode(['success' => false, 'message' => 'Module not found.']);
+    exit();
+}
+
+if (strtolower($module['status']) !== 'active') {
+    echo json_encode(['success' => false, 'message' => 'This module is no longer available for enrollment.']);
     exit();
 }
 

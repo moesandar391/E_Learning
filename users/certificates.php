@@ -52,6 +52,28 @@ if ($completedCount < $lessonCount) {
     die("You have not completed all lessons yet. ($completedCount/$lessonCount)");
 }
 
+// Quiz gate: the module quiz must be passed before a certificate is issued.
+$quizRow = $conn->query("SELECT id FROM quizzes WHERE module_id = $module_id AND status = 'active' ORDER BY id DESC LIMIT 1")->fetch_assoc();
+if (!$quizRow) {
+    if (isset($_GET['validate'])) {
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => false, 'error' => 'No quiz has been set up for this module yet.']);
+        exit;
+    }
+    http_response_code(403);
+    die("No quiz has been set up for this module yet.");
+}
+$passedRow = $conn->query("SELECT passed FROM quiz_results WHERE user_id = $user_id AND quiz_id = {$quizRow['id']} ORDER BY id DESC LIMIT 1")->fetch_assoc();
+if (!$passedRow || (int)$passedRow['passed'] !== 1) {
+    if (isset($_GET['validate'])) {
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => false, 'error' => 'You must pass the module quiz to earn your certificate.']);
+        exit;
+    }
+    http_response_code(403);
+    die("You must pass the module quiz to earn your certificate.");
+}
+
 $enrollRow = $conn->query("SELECT id FROM enrollments WHERE user_id = $user_id AND module_id = $module_id")->fetch_assoc();
 $enrollId = $enrollRow ? $enrollRow['id'] : 0;
 

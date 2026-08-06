@@ -7,12 +7,13 @@ $limit = 10;
 $page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
 
-$total = $conn->query("SELECT COUNT(*) FROM modules")->fetch_row()[0] ?? 0;
+$total = $conn->query("SELECT COUNT(*) FROM modules WHERE status = 'active'")->fetch_row()[0] ?? 0;
 $totalPages = max(1, ceil($total / $limit));
 $result = $conn->query("
     SELECT m.id, m.name, m.price, m.image, m.created_at, c.course_name
     FROM modules m
     JOIN courses c ON m.course_id = c.id
+    WHERE m.status = 'active'
     ORDER BY m.created_at DESC
     LIMIT $offset, $limit
 ");
@@ -325,7 +326,7 @@ document.getElementById('moduleForm').addEventListener('submit', function(e) {
 });
 
 function deleteModule(id) {
-    if (!confirm('Are you sure you want to delete this module? Related lessons will also be deleted.')) return;
+    if (!confirm('Are you sure you want to delete this module? It will be hidden from the module list and course catalog. Enrolled students can still continue learning.')) return;
     fetch('modules_ajax.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

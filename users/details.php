@@ -13,7 +13,7 @@ include_once('../includes/header.php');
     FROM modules m
     JOIN courses c ON m.course_id = c.id
     LEFT JOIN lessons l ON m.id = l.module_id
-    WHERE m.id = ?
+    WHERE m.id = ? AND m.status = 'active'
     GROUP BY m.id
 ");
  $stmt->bind_param("i", $module_id);
@@ -31,7 +31,7 @@ c.course_name, COUNT(l.id) AS total_lessons
 FROM modules m
 JOIN courses c ON m.course_id = c.id
 LEFT JOIN lessons l ON m.id = l.module_id
-WHERE m.course_id = ? AND m.id != ?
+WHERE m.course_id = ? AND m.id != ? AND m.status = 'active'
 GROUP BY m.id
 LIMIT 3
 ");
