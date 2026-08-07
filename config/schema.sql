@@ -253,9 +253,23 @@ CREATE TABLE IF NOT EXISTS quiz_results (
     total_questions INT NOT NULL DEFAULT 0,
     correct_count INT NOT NULL DEFAULT 0,
     wrong_count INT NOT NULL DEFAULT 0,
-    score INT NOT NULL COMMENT 'Percentage score 0-100',
+    score INT NOT NULL DEFAULT 0 COMMENT 'Percentage score 0-100',
     passed TINYINT(1) NOT NULL DEFAULT 0,
     attempt_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    module_id INT NOT NULL,
+    rating TINYINT NOT NULL,
+    review TEXT,
+    status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_review (user_id, module_id),
+    KEY module_id (module_id),
+    CONSTRAINT reviews_chk_1 CHECK (rating >= 1 AND rating <= 5)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

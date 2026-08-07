@@ -3,6 +3,20 @@ require_once '../config/db.php';
 include_once('includes/header.php');
 require_once 'includes/sidebar.php';
 
+// Handle approve / reject actions
+if (isset($_GET['action'], $_GET['id'])) {
+    $id = intval($_GET['id']);
+    $action = $_GET['action'];
+    if (in_array($action, ['approve', 'reject'], true)) {
+        $newStatus = $action === 'approve' ? 'approved' : 'rejected';
+        $stmt = $conn->prepare("UPDATE reviews SET status = ? WHERE id = ?");
+        $stmt->bind_param("si", $newStatus, $id);
+        $stmt->execute();
+    }
+    header('Location: reviews.php');
+    exit;
+}
+
 $limit = 12;
 $page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
@@ -10,14 +24,14 @@ $offset = ($page - 1) * $limit;
 $total = $conn->query("SELECT COUNT(*) FROM reviews")->fetch_row()[0] ?? 0;
 $totalPages = max(1, ceil($total / $limit));
 
-$stmt = "SELECT r.id, r.rating, r.review, r.created_at, 
+$stmt = "SELECT r.id, r.rating, r.review, r.status, r.created_at, 
                 u.name AS user_name, u.email AS user_email,
                 m.name AS module_name, c.course_name
          FROM reviews r
          JOIN users u ON r.user_id = u.id
          JOIN modules m ON r.module_id = m.id
          JOIN courses c ON m.course_id = c.id
-         ORDER BY r.created_at DESC
+         ORDER BY FIELD(r.status, 'pending', 'approved', 'rejected'), r.created_at DESC
          LIMIT $offset, $limit";
 $reviews = $conn->query($stmt)->fetch_all(MYSQLI_ASSOC);
 ?>
@@ -44,7 +58,12 @@ $reviews = $conn->query($stmt)->fetch_all(MYSQLI_ASSOC);
                             <p class="text-xs text-gray-400"><?php echo htmlspecialchars($rv['user_email']); ?></p>
                         </div>
                     </div>
-                    <span class="text-xs text-gray-400 whitespace-nowrap"><?php echo date('M d, Y', strtotime($rv['created_at'])); ?></span>
+                    <div class="text-right">
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide <?php echo $rv['status'] === 'approved' ? 'bg-green-100 text-green-700' : ($rv['status'] === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'); ?>">
+                            <?php echo htmlspecialchars($rv['status']); ?>
+                        </span>
+                        <span class="block text-xs text-gray-400 mt-1 whitespace-nowrap"><?php echo date('M d, Y', strtotime($rv['created_at'])); ?></span>
+                    </div>
                 </div>
                 <div class="flex items-center gap-0.5 mb-3">
                     <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -60,6 +79,22 @@ $reviews = $conn->query($stmt)->fetch_all(MYSQLI_ASSOC);
                 </div>
                 <div class="flex-1">
                     <p class="text-sm text-gray-600 leading-relaxed"><?php echo htmlspecialchars($rv['review'] ?: 'No written review'); ?></p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2">
+                    <?php if ($rv['status'] !== 'approved'): ?>
+                        <a href="?action=approve&id=<?php echo $rv['id']; ?>" class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
+                            Approve
+                        </a>
+                    <?php else: ?>
+                        <span class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-700 border border-green-200">Approved</span>
+                    <?php endif; ?>
+                    <?php if ($rv['status'] !== 'rejected'): ?>
+                        <a href="?action=reject&id=<?php echo $rv['id']; ?>" class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
+                            Reject
+                        </a>
+                    <?php else: ?>
+                        <span class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 border border-red-200">Rejected</span>
+                    <?php endif; ?>
                 </div>
             </div>
 <?php endforeach; ?>

@@ -26,7 +26,7 @@
 
             <div class="lg:col-span-2 space-y-4 text-center sm:text-left">
                 <h4 class="text-xs font-bold text-[#0F172A] dark:text-slate-100 uppercase tracking-wider">Explore</h4>
-                <ul class="space-y-2.5 text-sm font-semibold text-[#566473] dark:text-slate-300">
+                <ul class="space-y-2.5 text-sm text-[#566473] dark:text-slate-300">
                     <li><a href="viewAllCourses.php" class="hover:text-brandOrange transition-colors duration-200">Course Catalog</a></li>
                     <li><a href="my_learning.php" class="hover:text-brandOrange transition-colors duration-200">My Learning</a></li>
                     <li><a href="notifications.php" class="hover:text-brandOrange transition-colors duration-200">Notifications</a></li>
@@ -36,7 +36,7 @@
 
             <div class="lg:col-span-3 space-y-4 text-center sm:text-left">
                 <h4 class="text-xs font-bold text-[#0F172A] dark:text-slate-100 uppercase tracking-wider">Company</h4>
-                <ul class="space-y-2.5 text-sm font-semibold text-[#566473] dark:text-slate-300">
+                <ul class="space-y-2.5 text-sm text-[#566473] dark:text-slate-300">
                     <li><a href="about.php" class="hover:text-brandOrange transition-colors duration-200">About Us</a></li>
                     <li><a href="contact.php" class="hover:text-brandOrange transition-colors duration-200">Contact</a></li>
                     <li><a href="viewAllCourses.php" class="hover:text-brandOrange transition-colors duration-200">Browse Courses</a></li>
@@ -46,7 +46,7 @@
 
             <div class="lg:col-span-3 space-y-4 text-center sm:text-left">
                 <h4 class="text-xs font-bold text-[#0F172A] dark:text-slate-100 uppercase tracking-wider">Support</h4>
-                <ul class="space-y-2.5 text-sm font-semibold text-[#566473] dark:text-slate-300">
+                <ul class="space-y-2.5 text-sm text-[#566473] dark:text-slate-300">
                     <li><a href="contact.php" class="hover:text-brandOrange transition-colors duration-200">Help Center</a></li>
                     <li><a href="contact.php" class="hover:text-brandOrange transition-colors duration-200">Contact Support</a></li>
                     <li><a href="about.php" class="hover:text-brandOrange transition-colors duration-200">FAQ</a></li>

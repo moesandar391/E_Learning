@@ -7,6 +7,7 @@ $result = $conn->query("
     FROM reviews r
     JOIN users u ON r.user_id = u.id
     JOIN modules m ON r.module_id = m.id
+    WHERE r.status = 'approved'
     ORDER BY r.created_at DESC
 ");
 if ($result) {
