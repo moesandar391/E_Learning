@@ -11,7 +11,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     $phone = trim($_POST['phone'] ?? '');
-    $dob = $_POST['dob'] ?? '';
     $gender = $_POST['gender'] ?? 'Male';
     $address = trim($_POST['address'] ?? '');
 
@@ -31,9 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($password != $confirm_password) {
         $message = "Passwords do not match!";
         $messageType = "error";
-    } elseif (!empty($dob) && $dob > date('Y-m-d')) {
-        $message = "Date of birth cannot be in the future.";
-        $messageType = "error";
     } elseif (strlen($address) < 5) {
         $message = "Address must be at least 5 characters long.";
         $messageType = "error";
@@ -48,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $messageType = "error";
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO users(name,email,password,phone,address,gender, date_of_birth) VALUES(?,?,?,?,?,?,?)");
-            $stmt->bind_param("sssssss", $username, $email, $hashedPassword, $phone, $address, $gender, $dob);
+            $stmt = $conn->prepare("INSERT INTO users(name,email,password,phone,address,gender) VALUES(?,?,?,?,?,?)");
+            $stmt->bind_param("ssssss", $username, $email, $hashedPassword, $phone, $address, $gender);
             
             if ($stmt->execute()) {
                 require_once __DIR__ . '/../includes/admin_notification_helper.php';
@@ -70,8 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 include_once('../includes/header.php');
-
- $todayDate = date('Y-m-d');
 ?>
 
 <div class="flex items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -128,10 +122,7 @@ include_once('../includes/header.php');
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <!-- Native HTML5 phone tooltip will trigger here -->
                 <input type="text" name="phone" placeholder="Phone (09xxxxxxxxx)" required pattern="09\d{9}" title="Must be 11 digits starting with 09 (e.g., 09123456789)." 
-                       class="bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:border-brandOrange">
-                
-                <input type="date" name="dob" required max="<?php echo $todayDate; ?>" 
-                       class="bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:border-brandOrange">
+                       class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:border-brandOrange">
             </div>
 
             <div class="mb-4">
