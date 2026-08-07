@@ -261,7 +261,7 @@ include_once('../includes/header.php');
                 $letters = ['A', 'B', 'C', 'D'];
                 $i = 0;
                 while ($rq = $review->fetch_assoc()):
-                    $opts = $conn->query("SELECT id, option_text, is_correct FROM quiz_options WHERE question_id = {$rq['question_id']} ORDER BY position ASC")->fetch_all(MYSQLI_ASSOC);
+                    $opts = $conn->query("SELECT id, option_text, is_correct, position FROM quiz_options WHERE question_id = {$rq['question_id']} ORDER BY position ASC")->fetch_all(MYSQLI_ASSOC);
                     $givenCorrect = false;
                     foreach ($opts as $op) {
                         if ((int)$op['is_correct'] === 1 && $rq['given_id'] !== null && (int)$op['id'] === (int)$rq['given_id']) { $givenCorrect = true; }

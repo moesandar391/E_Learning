@@ -23,6 +23,15 @@ function attemptOwnedByUser($conn, $attempt_id, $user_id) {
     return $stmt->get_result()->fetch_assoc();
 }
 
+function accessAllowed($conn, $user_id, $module_id) {
+    $status = checkEnrollmentStatus($conn, $user_id, $module_id);
+    if (strtolower($status) !== 'confirmed') return false;
+
+    $lessonCount = $conn->query("SELECT COUNT(*) AS total FROM lessons WHERE module_id = $module_id")->fetch_assoc()['total'];
+    $completedCount = $conn->query("SELECT COUNT(*) AS done FROM lesson_progress WHERE user_id = $user_id AND lesson_id IN (SELECT id FROM lessons WHERE module_id = $module_id) AND completed = 1")->fetch_assoc()['done'];
+    return $completedCount >= $lessonCount;
+}
+
 switch ($action) {
 
     case 'save':
@@ -33,6 +42,11 @@ switch ($action) {
         $attempt = attemptOwnedByUser($conn, $attempt_id, $user_id);
         if (!$attempt || $attempt['status'] !== 'in_progress') {
             echo json_encode(['success' => false, 'message' => 'This attempt is no longer available.']);
+            exit;
+        }
+
+        if (!accessAllowed($conn, $user_id, (int)$attempt['module_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Access not allowed.']);
             exit;
         }
 
@@ -76,6 +90,11 @@ switch ($action) {
         }
         if ($attempt['status'] === 'completed') {
             echo json_encode(['success' => false, 'message' => 'already_submitted']);
+            exit;
+        }
+
+        if (!accessAllowed($conn, $user_id, (int)$attempt['module_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Access not allowed.']);
             exit;
         }
 

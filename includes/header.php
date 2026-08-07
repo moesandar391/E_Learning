@@ -315,8 +315,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                     </div>
 
                         <?php else: ?>
-                    <div class="hidden">
-                        <a href="../auth/login.php" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
+                    <div class="hidden lg:block">
+                        <a href="../auth/login.php?from=header" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
         Login
     </a>
 </div>
