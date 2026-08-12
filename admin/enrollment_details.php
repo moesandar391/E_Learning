@@ -120,10 +120,10 @@ $badge = match($s) {
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Actions</h3>
                 <div class="flex items-center gap-3">
-                    <button onclick="updateStatus(<?= $row['id'] ?>, 'confirm')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition">
+                    <button onclick="updateStatus(<?= $row['id'] ?>, 'confirm')" class="px-4 py-2 text-sm font-semibold rounded-lg border transition <?= $s === 'rejected' ? 'bg-green-100 text-green-800 border-green-200 opacity-50 cursor-not-allowed' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' ?>" <?= $s === 'rejected' ? 'disabled' : '' ?>>
                         Confirm Enrollment
                     </button>
-                    <button onclick="openRejectModal(<?= $row['id'] ?>)" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
+                    <button onclick="openRejectModal(<?= $row['id'] ?>)" class="px-4 py-2 text-sm font-semibold rounded-lg border transition <?= $s === 'confirmed' ? 'bg-red-100 text-red-800 border-red-200 opacity-50 cursor-not-allowed' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' ?>" <?= $s === 'confirmed' ? 'disabled' : '' ?>>
                         Reject Enrollment
                     </button>
                 </div>

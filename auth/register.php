@@ -121,7 +121,7 @@ include_once('../includes/header.php');
 
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <!-- Native HTML5 phone tooltip will trigger here -->
-                <input type="text" name="phone" placeholder="Phone (09xxxxxxxxx)" required pattern="09\d{9}" title="Must be 11 digits starting with 09 (e.g., 09123456789)." 
+                <input type="tel" name="phone" placeholder="Phone (09xxxxxxxxx)" required maxlength="11" oninput="sanitizePhone(this)" pattern="09\d{9}" title="Must be 11 digits starting with 09 (e.g., 09123456789)." 
                        class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:border-brandOrange">
             </div>
 
@@ -214,9 +214,21 @@ function validateForm(){
         return false; // Stops the form from submitting
     }
 
+    // 2. Phone validation (Shows JavaScript Alert)
+    let phone = document.querySelector('input[name="phone"]').value.trim();
+    if (!/^09\d{9}$/.test(phone)) {
+        alert("Phone number must be 11 digits starting with 09 (e.g., 09123456789).");
+        return false;
+    }
+
     // If the name is valid, return true. 
     // The browser will then automatically check the HTML5 native validation for the other fields.
     return true;
+}
+
+// Block non-digit characters in the phone field as the user types
+function sanitizePhone(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
 }
 
 function toggleVisibility() {

@@ -3,6 +3,7 @@ session_start();
 require_once '../config/db.php';
 require_once '../includes/notification_helper.php';
 require_once '../includes/admin_notification_helper.php';
+require_once '../includes/mailer.php';
 
 header('Content-Type: application/json');
 
@@ -20,7 +21,7 @@ if ($action === 'confirm' || $action === 'reject') {
         exit;
     }
 
-    $enroll = $conn->query("SELECT e.user_id, u.name AS user_name, m.name AS module_name, c.course_name 
+    $enroll = $conn->query("SELECT e.user_id, e.status AS enroll_status, u.name AS user_name, u.email AS user_email, m.name AS module_name, c.course_name 
         FROM enrollments e
         JOIN users u ON e.user_id = u.id
         JOIN modules m ON e.module_id = m.id
@@ -32,7 +33,15 @@ if ($action === 'confirm' || $action === 'reject') {
         exit;
     }
 
+    $currentStatus = strtolower($enroll['enroll_status'] ?? 'pending');
+
     if ($action === 'confirm') {
+        // Duplicate prevention: a confirmed enrollment must not be notified/emailed again
+        if ($currentStatus === 'confirmed') {
+            echo json_encode(['success' => true, 'message' => 'Enrollment is already confirmed.']);
+            exit;
+        }
+
         $conn->query("UPDATE enrollments SET status = 'confirmed' WHERE id = $enroll_id");
         $mod_id = $conn->query("SELECT module_id FROM enrollments WHERE id = $enroll_id")->fetch_row()[0];
         create_notification(
@@ -41,8 +50,24 @@ if ($action === 'confirm' || $action === 'reject') {
             'my_learning.php',
             'enrollment'
         );
+
+        // Approval email sent after status update + website notification (email failure must not block the flow)
+        $mailSubject = 'Enrollment Successful - Access Edu';
+        $mailBody = "Dear " . $enroll['user_name'] . ",\n\n"
+            . "Congratulations! Your enrollment for \"" . $enroll['module_name'] . "\" (" . $enroll['course_name'] . ") has been approved.\n\n"
+            . "You can now access your lessons by logging in to your account and going to the My dashboard section."
+            // . "http://" . $_SERVER['HTTP_HOST'] . "/E_Learning/users/my_learning.php\n\n"
+            . "Happy learning!\nAccess Edu Team";
+        send_mail($enroll['user_email'], $mailSubject, $mailBody);
+
         echo json_encode(['success' => true, 'message' => 'Enrollment confirmed.']);
     } else {
+        // Duplicate prevention: a rejected enrollment must not be notified/emailed again
+        if ($currentStatus === 'rejected') {
+            echo json_encode(['success' => true, 'message' => 'Enrollment is already rejected.']);
+            exit;
+        }
+
         $reason = trim($_POST['reason'] ?? '');
         $conn->query("UPDATE enrollments SET status = 'rejected' WHERE id = $enroll_id");
 
@@ -58,6 +83,17 @@ if ($action === 'confirm' || $action === 'reject') {
             'contact.php?enrollment_id=' . $enroll_id,
             'enrollment'
         );
+
+        // Rejection email sent after status update + website notification (email failure must not block the flow)
+        $mailSubject = 'Enrollment Rejected - Access Edu';
+        $mailBody = "Dear " . $enroll['user_name'] . ",\n\n"
+            . "We regret to inform you that your enrollment for \"" . $enroll['module_name'] . "\" (" . $enroll['course_name'] . ") has been rejected.\n\n";
+        if ($reason) {
+            $mailBody .= "Reason: " . $reason . "\n\n";
+        }
+        $mailBody .= "If you have any questions, please contact our support team.\n\nAccess Edu Team";
+        send_mail($enroll['user_email'], $mailSubject, $mailBody);
+
         echo json_encode(['success' => true, 'message' => 'Enrollment rejected.']);
     }
     exit;

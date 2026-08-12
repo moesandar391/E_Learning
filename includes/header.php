@@ -1,5 +1,17 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
+/* Current page — used to keep the active nav underline visible */
+$header_current = basename($_SERVER['PHP_SELF'] ?? 'index.php');
+$header_home    = ($header_current === 'index.php');
+$header_courses = in_array($header_current, ['courses.php', 'viewAllCourses.php', 'details.php', 'enroll.php', 'lesson.php'], true);
+$header_review  = in_array($header_current, ['reviews.php', 'my_review.php', 'write_review.php'], true);
+$header_about   = ($header_current === 'about.php');
+$header_contact = ($header_current === 'contact.php');
+/* Reusable underline <span>: keeps the same hover animation, stays full-when-active */
+function header_underline($active) {
+    return '<span class="absolute bottom-0 left-0 h-0.5 ' . ($active ? 'w-full' : 'w-0') . ' bg-brandOrange transition-all duration-300 group-hover:w-full"></span>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -182,7 +194,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
     <a href="../users/index.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Home
-        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+        <?php echo header_underline($header_home); ?>
     </a>
 
     <div class="relative group">
@@ -191,7 +203,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
-            <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+            <?php echo header_underline($header_courses); ?>
         </a>
 
         <div class="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -205,16 +217,16 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
     </div>
     <a href="../users/reviews.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Review
-        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+        <?php echo header_underline($header_review); ?>
     </a>
     <a href="../users/about.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         About
-        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+        <?php echo header_underline($header_about); ?>
     </a>
 
     <a href="../users/contact.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
         Contact
-        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-brandOrange transition-all duration-300 group-hover:w-full"></span>
+        <?php echo header_underline($header_contact); ?>
     </a>
 
 </nav>
@@ -339,13 +351,13 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             <!-- Mobile Menu Overlay -->
             <div id="mobileMenu" class="absolute left-0 top-full w-full bg-white shadow-xl border-t border-gray-100 overflow-hidden lg:hidden" style="max-height:0; transition: max-height 0.35s ease-in-out;">
                 <div class="px-4 py-4 space-y-1 overflow-y-auto" style="max-height:calc(100vh - 5rem);">
-                        <a href="../users/index.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                        <a href="../users/index.php" class="flex items-center px-4 py-3 rounded-lg <?php echo $header_home ? 'bg-orange-50 text-brandOchre' : 'text-gray-700'; ?> hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                             Home
                         </a>
 
                         <div>
-                            <button onclick="toggleMobileCourses()" class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                            <button onclick="toggleMobileCourses()" class="w-full flex items-center justify-between px-4 py-3 rounded-lg <?php echo $header_courses ? 'bg-orange-50 text-brandOchre' : 'text-gray-700'; ?> hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                                 <span class="flex items-center">
                                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                                     Courses
@@ -364,17 +376,17 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
                             </div>
                         </div>
 
-                        <a href="../users/reviews.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                        <a href="../users/reviews.php" class="flex items-center px-4 py-3 rounded-lg <?php echo $header_review ? 'bg-orange-50 text-brandOchre' : 'text-gray-700'; ?> hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             Review
                         </a>
 
-                        <a href="../users/about.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                        <a href="../users/about.php" class="flex items-center px-4 py-3 rounded-lg <?php echo $header_about ? 'bg-orange-50 text-brandOchre' : 'text-gray-700'; ?> hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             About
                         </a>
 
-                        <a href="../users/contact.php" class="flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-orange-50 hover:text-brandOchre font-medium transition">
+                        <a href="../users/contact.php" class="flex items-center px-4 py-3 rounded-lg <?php echo $header_contact ? 'bg-orange-50 text-brandOchre' : 'text-gray-700'; ?> hover:bg-orange-50 hover:text-brandOchre font-medium transition">
                             <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             Contact
                         </a>

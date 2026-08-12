@@ -34,7 +34,7 @@ if ($hasProgress) {
 
 // Certificates
 $certs = $conn->query("
-    SELECT DISTINCT c.course_name, m.id AS module_id
+    SELECT DISTINCT c.course_name, m.id AS module_id, m.name AS module_name
     FROM certificates cert
     JOIN enrollments e ON cert.enroll_id = e.id
     JOIN modules m ON e.module_id = m.id
@@ -152,12 +152,12 @@ foreach ($certificates as $cert) {
                 </a>
             </div>
             <?php if (!empty($certificates)): ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <?php foreach ($uniqueCertificates as $cert): ?>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <?php foreach ($uniqueCertificates as $cert): ?>
                         <div class="relative overflow-hidden p-6 border-2 border-orange-100 rounded-2xl bg-gradient-to-br from-orange-50 to-white text-center shadow-sm hover:shadow-md transition-shadow">
                             <span class="text-5xl mb-4 block">🎓</span>
-                            <p class="text-sm font-bold text-gray-800 uppercase tracking-wide leading-tight"><?= htmlspecialchars($cert['course_name']) ?></p>
-                            <p class="text-[10px] text-gray-500 mt-2">Certified Student</p>
+                            <p class="text-sm font-bold text-gray-800 uppercase tracking-wide leading-tight"><?= htmlspecialchars($cert['module_name']) ?></p>
+                            <p class="text-[10px] text-gray-500 mt-2"><?= htmlspecialchars($cert['course_name']) ?></p>
                         </div>
                     <?php endforeach; ?>
                 </div>

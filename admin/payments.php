@@ -250,10 +250,12 @@
                                 </td>
                                 <td class="px-3 py-3 whitespace-nowrap">
                                     <div class="flex items-center gap-1.5">
-                                        <button class="confirm-btn px-2 py-1 text-xs font-semibold rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition" data-id="<?= $row['id'] ?>">
+                                        <?php $isRejected = $s === 'rejected'; ?>
+                                        <button class="confirm-btn px-2 py-1 text-xs font-semibold rounded-md border transition <?= $isRejected ? 'bg-green-100 text-green-800 border-green-200 opacity-50 cursor-not-allowed' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' ?>" data-id="<?= $row['id'] ?>" <?= $isRejected ? 'disabled' : '' ?>>
                                             Confirm
                                         </button>
-                                        <button class="reject-btn px-2 py-1 text-xs font-semibold rounded-md bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition" data-id="<?= $row['id'] ?>">
+                                        <?php $isConfirmed = $s === 'confirmed'; ?>
+                                        <button class="reject-btn px-2 py-1 text-xs font-semibold rounded-md border transition <?= $isConfirmed ? 'bg-red-100 text-red-800 border-red-200 opacity-50 cursor-not-allowed' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' ?>" data-id="<?= $row['id'] ?>" <?= $isConfirmed ? 'disabled' : '' ?>>
                                             Reject
                                         </button>
                                     </div>
@@ -344,6 +346,11 @@ document.querySelectorAll('.confirm-btn').forEach(function(btn) {
                     if (data.success) {
                         var statusCell = row.querySelector('td:nth-child(8)');
                         statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-green-50 text-green-700 border-green-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmed</span>';
+                        var rejectBtn = row.querySelector('.reject-btn');
+                        if (rejectBtn) {
+                            rejectBtn.disabled = true;
+                            rejectBtn.className = 'reject-btn px-2 py-1 text-xs font-semibold rounded-md bg-red-100 text-red-800 border border-red-200 opacity-50 cursor-not-allowed transition';
+                        }
                     } else {
                         alert(data.message);
                     }
@@ -380,6 +387,11 @@ function submitRejection() {
                 if (row) {
                     var statusCell = row.querySelector('td:nth-child(8)');
                     statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Rejected</span>';
+                    var confirmBtn = row.querySelector('.confirm-btn');
+                    if (confirmBtn) {
+                        confirmBtn.disabled = true;
+                        confirmBtn.className = 'confirm-btn px-2 py-1 text-xs font-semibold rounded-md bg-green-100 text-green-800 border border-green-200 opacity-50 cursor-not-allowed transition';
+                    }
                 }
                 document.getElementById('rejectModal').classList.add('hidden');
             } else {

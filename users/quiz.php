@@ -245,7 +245,7 @@ include_once('../includes/header.php');
             </div>
         </div>
 
-        <?php if ($resultRow): ?>
+        <?php if ($resultRow && $resPassed): ?>
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h3 class="font-bold text-gray-800">Answer Review</h3>
