@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS courses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     course_name VARCHAR(50) NOT NULL,
     instructor_name VARCHAR(30),
-    level VARCHAR(10),
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -33,6 +32,8 @@ CREATE TABLE IF NOT EXISTS modules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
+    level VARCHAR(20) DEFAULT NULL,
+    recommended_prev_module_id INT DEFAULT NULL,
     image VARCHAR(255) DEFAULT NULL,
     price DECIMAL(10,2) DEFAULT 0.00,
     status ENUM('active','inactive') DEFAULT 'active',
@@ -47,6 +48,12 @@ CREATE TABLE IF NOT EXISTS modules (
         FOREIGN KEY (course_id) 
         REFERENCES courses(id) 
         ON DELETE CASCADE 
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_modules_prev
+        FOREIGN KEY (recommended_prev_module_id) 
+        REFERENCES modules(id) 
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS lessons (

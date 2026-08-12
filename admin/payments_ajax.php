@@ -55,7 +55,7 @@ if ($action === 'confirm' || $action === 'reject') {
         $mailSubject = 'Enrollment Successful - Access Edu';
         $mailBody = "Dear " . $enroll['user_name'] . ",\n\n"
             . "Congratulations! Your enrollment for \"" . $enroll['module_name'] . "\" (" . $enroll['course_name'] . ") has been approved.\n\n"
-            . "You can now access your lessons by logging in to your account and going to the My dashboard section."
+            . "You can now access your lessons by logging in to your account and going to the My dashboard section"
             // . "http://" . $_SERVER['HTTP_HOST'] . "/E_Learning/users/my_learning.php\n\n"
             . "Happy learning!\nAccess Edu Team";
         send_mail($enroll['user_email'], $mailSubject, $mailBody);

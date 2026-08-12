@@ -412,7 +412,7 @@ function header_underline($active) {
                                 Logout
                             </a>
                         <?php else: ?>
-                            <a href="../auth/login.php" class="flex items-center justify-center px-6 py-3 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition text-sm">Login</a>
+                            <a href="../auth/login.php?from=header" class="flex items-center justify-center px-6 py-3 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition text-sm">Login</a>
                             <a href="../auth/register.php" class="flex items-center justify-center px-6 py-3 border-2 border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">Get Started</a>
                         <?php endif; ?>
                     </div>

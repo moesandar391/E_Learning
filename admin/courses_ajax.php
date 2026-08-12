@@ -13,7 +13,7 @@ $action = $_REQUEST['action'] ?? '';
 
 if ($action === 'get' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
-    $stmt = $conn->prepare("SELECT id, course_name, instructor_name, level, description FROM courses WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, course_name, instructor_name, description FROM courses WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
@@ -37,10 +37,9 @@ if ($action === 'create') {
         exit;
     }
     $instructor = trim($_POST['instructor_name'] ?? '');
-    $level = trim($_POST['level'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $stmt = $conn->prepare("INSERT INTO courses (course_name, instructor_name, level, description) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $instructor, $level, $description);
+    $stmt = $conn->prepare("INSERT INTO courses (course_name, instructor_name, description) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $name, $instructor, $description);
     $stmt->execute();
     echo json_encode(['success' => true]);
     exit;
@@ -54,10 +53,9 @@ if ($action === 'update') {
         exit;
     }
     $instructor = trim($_POST['instructor_name'] ?? '');
-    $level = trim($_POST['level'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $stmt = $conn->prepare("UPDATE courses SET course_name = ?, instructor_name = ?, level = ?, description = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $name, $instructor, $level, $description, $id);
+    $stmt = $conn->prepare("UPDATE courses SET course_name = ?, instructor_name = ?, description = ? WHERE id = ?");
+    $stmt->bind_param("sssi", $name, $instructor, $description, $id);
     $stmt->execute();
     echo json_encode(['success' => true]);
     exit;

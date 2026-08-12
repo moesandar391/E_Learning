@@ -21,7 +21,7 @@ switch ($action) {
 
     case 'get':
         $id = (int)($_GET['id'] ?? 0);
-        $stmt = $conn->prepare("SELECT id, course_id, name, price, image FROM modules WHERE id = ?");
+        $stmt = $conn->prepare("SELECT id, course_id, name, level, recommended_prev_module_id, price, image FROM modules WHERE id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -35,6 +35,8 @@ switch ($action) {
     case 'create':
         $course_id = (int)($_POST['course_id'] ?? 0);
         $name = trim($_POST['name'] ?? '');
+        $level = trim($_POST['level'] ?? '');
+        $recommended_prev_module_id = (int)($_POST['recommended_prev_module_id'] ?? 0);
         $price = floatval($_POST['price'] ?? 0);
 
         if (!$course_id || !$name) {
@@ -56,8 +58,8 @@ switch ($action) {
             }
         }
 
-        $stmt = $conn->prepare("INSERT INTO modules (course_id, name, price, image) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param('isds', $course_id, $name, $price, $image);
+        $stmt = $conn->prepare("INSERT INTO modules (course_id, name, level, recommended_prev_module_id, price, image) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('issids', $course_id, $name, $level, $recommended_prev_module_id, $price, $image);
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Module created successfully.']);
         } else {
@@ -69,6 +71,8 @@ switch ($action) {
         $id = (int)($_POST['id'] ?? 0);
         $course_id = (int)($_POST['course_id'] ?? 0);
         $name = trim($_POST['name'] ?? '');
+        $level = trim($_POST['level'] ?? '');
+        $recommended_prev_module_id = (int)($_POST['recommended_prev_module_id'] ?? 0);
         $price = floatval($_POST['price'] ?? 0);
         $existing_image = $_POST['existing_image'] ?? '';
 
@@ -104,8 +108,8 @@ switch ($action) {
             $image = $existing_image;
         }
 
-        $stmt = $conn->prepare("UPDATE modules SET course_id = ?, name = ?, price = ?, image = ? WHERE id = ?");
-        $stmt->bind_param('isdsi', $course_id, $name, $price, $image, $id);
+        $stmt = $conn->prepare("UPDATE modules SET course_id = ?, name = ?, level = ?, recommended_prev_module_id = ?, price = ?, image = ? WHERE id = ?");
+        $stmt->bind_param('issidsi', $course_id, $name, $level, $recommended_prev_module_id, $price, $image, $id);
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Module updated successfully.']);
         } else {

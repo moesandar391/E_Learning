@@ -33,7 +33,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     header("Location: ../admin/dashboard.php");
                 } else {
                     $_SESSION['profile_image'] = $user['profile_image'] ?? null;
-                    if (isset($_GET['from']) && $_GET['from'] === 'header') {
+                    // Regular logins (header button or registration-form login) go to index.php.
+                    // Only an explicit "enroll" / "login to enroll" flow (redirect_module set,
+                    // no from marker) keeps its original redirectAfterLogin() behavior.
+                    if (isset($_GET['from']) || !isset($_SESSION['redirect_module'])) {
                         header("Location: ../users/index.php");
                     } else {
                         redirectAfterLogin($conn, $user['id']);

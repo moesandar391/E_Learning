@@ -10,14 +10,24 @@ $offset = ($page - 1) * $limit;
 $total = $conn->query("SELECT COUNT(*) FROM modules WHERE status = 'active'")->fetch_row()[0] ?? 0;
 $totalPages = max(1, ceil($total / $limit));
 $result = $conn->query("
-    SELECT m.id, m.name, m.price, m.image, m.created_at, c.course_name
+    SELECT m.id, m.name, m.level, m.recommended_prev_module_id, m.price, m.image, m.created_at,
+           c.course_name, p.name AS prev_module_name, pc.course_name AS prev_course_name
     FROM modules m
     JOIN courses c ON m.course_id = c.id
+    LEFT JOIN modules p ON p.id = m.recommended_prev_module_id
+    LEFT JOIN courses pc ON pc.id = p.course_id
     WHERE m.status = 'active'
     ORDER BY m.created_at DESC
     LIMIT $offset, $limit
 ");
 $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_name ASC");
+$prevOptions = $conn->query("
+    SELECT m.id, m.name, m.level, c.course_name
+    FROM modules m
+    JOIN courses c ON m.course_id = c.id
+    WHERE m.status = 'active'
+    ORDER BY c.course_name ASC, m.name ASC
+");
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -60,6 +70,8 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                             <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Image</th>
                             <th class="px-6 py-4">Module</th>
+                            <th class="px-6 py-4">Level</th>
+                            <th class="px-6 py-4">Optional Previous</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Price</th>
                             <th class="px-6 py-4">Created</th>
@@ -92,6 +104,41 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                                         </div>
                                     </div>
                                 </td>
+                                <td class="px-6 py-4">
+                                    <?php if (!empty($row['level'])): ?>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium <?php
+                                            echo match($row['level']) {
+                                                'Beginner' => 'bg-green-50 text-green-700',
+                                                'Elementary' => 'bg-blue-50 text-blue-700',
+                                                'Pre-Intermediate' => 'bg-indigo-50 text-indigo-700',
+                                                'Intermediate' => 'bg-yellow-50 text-yellow-700',
+                                                'Advanced' => 'bg-red-50 text-red-700',
+                                                default => 'bg-gray-50 text-gray-500'
+                                            };
+                                        ?>"><span class="w-1.5 h-1.5 rounded-full <?php
+                                            echo match($row['level']) {
+                                                'Beginner' => 'bg-green-500',
+                                                'Elementary' => 'bg-blue-500',
+                                                'Pre-Intermediate' => 'bg-indigo-500',
+                                                'Intermediate' => 'bg-yellow-500',
+                                                'Advanced' => 'bg-red-500',
+                                                default => 'bg-gray-400'
+                                            };
+                                        ?>"></span><?= htmlspecialchars($row['level']) ?></span>
+                                    <?php else: ?>
+                                        <span class="text-xs text-gray-400">-</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <?php if (!empty($row['prev_module_name'])): ?>
+                                        <span class="inline-flex items-center gap-1.5 text-gray-600">
+                                            <svg class="w-3.5 h-3.5 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                            <?= htmlspecialchars($row['prev_course_name'] ?? '') ?> &middot; <?= htmlspecialchars($row['prev_module_name']) ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="text-xs text-gray-400">None</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="px-6 py-4 text-sm text-gray-600"><?= htmlspecialchars($row['course_name']) ?></td>
                                 <td class="px-6 py-4">
                                     <span class="text-sm font-semibold text-gray-700"><?= number_format($row['price']) ?> MMK</span>
@@ -120,7 +167,7 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
+                                <td colspan="9" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                     <p class="text-sm text-gray-400 mb-3">No modules yet</p>
                                     <button onclick="openModal()" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brandOrange text-white text-sm font-semibold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">
@@ -201,6 +248,29 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                        placeholder="e.g. Speaking">
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                <select name="level" id="moduleLevel"
+                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent">
+                    <option value="">Select level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Elementary">Elementary</option>
+                    <option value="Pre-Intermediate">Pre-Intermediate</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Optional Previous Module</label>
+                <select name="recommended_prev_module_id" id="modulePrev"
+                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent">
+                    <option value="">None (no previous module recommended)</option>
+                    <?php $prevOptions->data_seek(0); while ($p = $prevOptions->fetch_assoc()): ?>
+                        <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['course_name'] . ' — ' . $p['name'] . ' (' . ($p['level'] ?? 'No level') . ')') ?></option>
+                    <?php endwhile; ?>
+                </select>
+                <p class="text-[11px] text-gray-400 mt-1">A suggestion only — users can still enroll in this module without completing it.</p>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Price (MMK)</label>
                 <input type="number" name="price" id="modulePrice" step="0.01" min="0"
                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent"
@@ -267,7 +337,14 @@ function openModal(id) {
                     document.getElementById('moduleId').value = d.data.id;
                     document.getElementById('moduleCourse').value = d.data.course_id;
                     document.getElementById('moduleName').value = d.data.name;
+                    document.getElementById('moduleLevel').value = d.data.level || '';
                     document.getElementById('modulePrice').value = d.data.price;
+
+                    var prevSelect = document.getElementById('modulePrev');
+                    prevSelect.value = d.data.recommended_prev_module_id || '';
+                    prevSelect.querySelectorAll('option').forEach(function(o) {
+                        o.disabled = (o.value == String(d.data.id));
+                    });
 
                     if (d.data.image) {
                         document.getElementById('existingImage').value = d.data.image;

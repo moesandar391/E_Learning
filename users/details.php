@@ -1,6 +1,7 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/enrollment_check.php';
+require_once '../includes/module_path_helper.php';
 include_once('../includes/header.php');
 
  $module_id = isset($_GET['module_id']) ? (int)$_GET['module_id'] : 0;
@@ -8,10 +9,14 @@ include_once('../includes/header.php');
  $stmt = $conn->prepare("
     SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
            m.description, m.requirements, m.what_includes, m.who_is_for,
-           c.id AS course_id, c.course_name, c.level, c.instructor_name,
+           c.id AS course_id, c.course_name, m.level, c.instructor_name,
+           p.id AS prev_module_id, p.name AS prev_module_name, p.level AS prev_level,
+           pc.course_name AS prev_course_name,
            COUNT(DISTINCT l.id) AS total_lessons
     FROM modules m
     JOIN courses c ON m.course_id = c.id
+    LEFT JOIN modules p ON p.id = m.recommended_prev_module_id
+    LEFT JOIN courses pc ON pc.id = p.course_id
     LEFT JOIN lessons l ON m.id = l.module_id
     WHERE m.id = ? AND m.status = 'active'
     GROUP BY m.id
@@ -156,6 +161,64 @@ LIMIT 3
                         ?>
                     </div>
                 </div>
+            </div>
+
+            <?php
+            $prevProgress = !empty($module['prev_module_id']) ? getUserModuleProgress($conn, $userId, (int)$module['prev_module_id']) : null;
+            ?>
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm">
+                <div class="flex flex-col lg:flex-row lg:items-center gap-5">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <h2 class="font-serif font-bold text-xl text-gray-700">Flexible Learning Path</h2>
+                        </div>
+                        <p class="text-sm text-gray-500 leading-relaxed">
+                            This module is <?php echo htmlspecialchars($module['level'] ?? 'level not set'); ?> level. You can enroll in it at any time —
+                            the structure below is a <strong>recommendation, not a requirement</strong>.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <?php if (!empty($module['prev_module_id'])): ?>
+                            <a href="details.php?module_id=<?php echo (int)$module['prev_module_id']; ?>"
+                               class="flex-1 lg:flex-none text-center px-5 py-3 rounded-xl border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-100 transition">
+                                <span class="block text-[10px] uppercase tracking-wider text-gray-400">Optional previous</span>
+                                <?php echo htmlspecialchars($module['prev_course_name'] ?? ''); ?> — <?php echo htmlspecialchars($module['prev_module_name']); ?>
+                                <?php if (!empty($module['prev_level'])): ?>
+                                    <span class="block text-[10px] mt-0.5 font-normal"><?php echo htmlspecialchars($module['prev_level']); ?> level</span>
+                                <?php endif; ?>
+                            </a>
+                            <svg class="w-6 h-6 text-brandOrange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <?php else: ?>
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>No previous module — start here
+                            </span>
+                        <?php endif; ?>
+                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium bg-brandOrange/10 text-brandOrange">
+                            <?php echo htmlspecialchars($module['level'] ?? '—'); ?>
+                        </span>
+                    </div>
+                </div>
+                <?php if (!empty($module['prev_module_id']) && $prevProgress): ?>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <?php if ($prevProgress === 'completed'): ?>
+                            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                You've completed "<?php echo htmlspecialchars($module['prev_module_name']); ?>" — you're ready for this module.
+                            </span>
+                        <?php elseif ($prevProgress === 'in_progress'): ?>
+                            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-orange-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                You're learning "<?php echo htmlspecialchars($module['prev_module_name']); ?>" — you can continue here whenever you like.
+                            </span>
+                        <?php else: ?>
+                            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                You haven't started "<?php echo htmlspecialchars($module['prev_module_name']); ?>" yet — optional, but useful preparation.
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

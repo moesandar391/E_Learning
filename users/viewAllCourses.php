@@ -8,7 +8,7 @@ $level = isset($_GET['level']) ? $_GET['level'] : '';
 
 // Base query
 $sql = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
-               c.level, c.id AS course_id, c.course_name, c.instructor_name, COUNT(l.id) AS total_lessons
+               m.level, c.id AS course_id, c.course_name, c.instructor_name, COUNT(l.id) AS total_lessons
         FROM modules m
         JOIN courses c ON m.course_id = c.id
         LEFT JOIN lessons l ON m.id = l.module_id
@@ -31,7 +31,7 @@ if (!empty($search)) {
 }
 
 if (!empty($level)) {
-    $sql .= " AND c.level = ?";
+    $sql .= " AND m.level = ?";
     $params[] = $level;
     $types .= "s";
 }
@@ -55,11 +55,15 @@ require_once '../includes/enrollment_check.php';
     <p class="text-gray-600 text-center mb-8">Comprehensive pathways to master the English language.</p>
     
     <!-- Search and Filter Bar -->
-    <form action="courses.php" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10">
+    <form action="viewAllCourses.php" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mb-10">
+    <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter); ?>">
     <select name="level" onchange="this.form.submit()" class="cursor-pointer bg-white border border-orange-200 rounded-lg p-3 text-sm focus:outline-none focus:border-orange-500 text-gray-700 shadow-sm">
         <option value="">All Levels</option>
         <option value="Beginner" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Beginner') ? 'selected' : ''; ?>>Beginner</option>
+        <option value="Elementary" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Elementary') ? 'selected' : ''; ?>>Elementary</option>
+        <option value="Pre-Intermediate" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Pre-Intermediate') ? 'selected' : ''; ?>>Pre-Intermediate</option>
         <option value="Intermediate" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Intermediate') ? 'selected' : ''; ?>>Intermediate</option>
+        <option value="Advanced" <?php echo (isset($_GET['level']) && $_GET['level'] == 'Advanced') ? 'selected' : ''; ?>>Advanced</option>
     </select>
     
     <input type="text" name="search" placeholder="Search For Courses" 
@@ -77,8 +81,11 @@ require_once '../includes/enrollment_check.php';
         $buttons = ['All', 'Cambridge', 'English Grammar', 'Writing Course', 'General English', 'English for Kids'];
         foreach ($buttons as $btn): 
             $activeClass = ($filter == $btn) ? 'bg-orange-600 text-white' : 'bg-white text-gray-700';
+            $extraParams = [];
+            if (!empty($level))  $extraParams[] = 'level=' . urlencode($level);
+            if (!empty($search)) $extraParams[] = 'search=' . urlencode($search);
         ?>
-            <a href="?filter=<?php echo urlencode($btn); ?>" 
+            <a href="?filter=<?php echo urlencode($btn); ?><?php echo $extraParams ? '&' . implode('&', $extraParams) : ''; ?>" 
                class="px-6 py-2 border border-gray-200 rounded-full hover:bg-orange-600 hover:text-white transition shadow-sm <?php echo $activeClass; ?>">
                <?php echo $btn; ?>
             </a>

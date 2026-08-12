@@ -143,7 +143,7 @@ include_once('../includes/header.php');
             <div class="text-center mt-5 pt-5 border-t border-gray-100">
                 <p class="text-sm text-gray-500">
                     Already have an account?
-                    <a href="login.php" class="text-brandOrange font-semibold hover:text-orange-600 hover:underline transition-colors ml-1">
+                    <a href="login.php?from=register" class="text-brandOrange font-semibold hover:text-orange-600 hover:underline transition-colors ml-1">
                         Login
                     </a>
                 </p>

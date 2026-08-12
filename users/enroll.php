@@ -9,8 +9,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config/db.php';
+require_once '../includes/module_path_helper.php';
 
- $sql = "SELECT c.course_name, m.name AS module_name, m.price, m.image, m.status
+ $sql = "SELECT c.course_name, m.name AS module_name, m.price, m.image, m.status, m.level
        FROM modules m 
        JOIN courses c ON m.course_id = c.id 
        WHERE m.id = ? AND m.status = 'active'";
@@ -24,6 +25,10 @@ if (!$details) {
     header("Location: my_learning.php");
     exit();
 }
+
+ $userId = $_SESSION['user_id'];
+ $prevRec = getRecommendedPrevModule($conn, $module_id);
+ $prevProgress = $prevRec ? getUserModuleProgress($conn, $userId, (int)$prevRec['prev_module_id']) : null;
 
 include_once('../includes/header.php');
 
@@ -104,6 +109,13 @@ function isLightColor($hex) {
                 <?php echo htmlspecialchars($courseName); ?>
             </span>
             <h2 class="text-2xl font-bold mb-4"><?php echo htmlspecialchars($moduleName); ?></h2>
+            <?php if (!empty($details['level'])): ?>
+                <div class="mb-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-brandOrange/10 text-brandOrange">
+                        <?php echo htmlspecialchars($details['level']); ?> level
+                    </span>
+                </div>
+            <?php endif; ?>
             <div class="space-y-3 border-t border-gray-100 pt-4">
                 <h3 class="font-bold text-lg text-orange-600">Total Amount : <?php echo number_format($price); ?> MMK</h3>
                 <p class="text-gray-500 font-semibold">LifeTime Provided Services</p>
@@ -262,6 +274,37 @@ function isLightColor($hex) {
             <!-- <button onclick="processPurchase(event)" id="purchaseBtn" class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-orange-600 hover:shadow-xl transition-all duration-200 text-[15px]">
                 Purchase Now - <?php echo number_format($price); ?> MMK
             </button> -->
+
+             <?php if ($prevRec): ?>
+                <div class="bg-white border border-orange-200 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-4 h-4 text-brandOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-gray-800">Optional suggestion before enrolling</p>
+                            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                "<?php echo htmlspecialchars($prevRec['prev_course_name'] ?? ''); ?> — <?php echo htmlspecialchars($prevRec['prev_module_name']); ?>"
+                                (<?php echo htmlspecialchars($prevRec['prev_level'] ?? 'no level'); ?>) is a recommended first step, but it is not required.
+                                If this module matches your current English level, go ahead and enroll.
+                            </p>
+                            <?php if ($userId && $prevProgress): ?>
+                                <div class="mt-2">
+                                    <?php if ($prevProgress === 'completed'): ?>
+                                        <span class="text-xs font-medium text-green-600">✓ You've completed it.</span>
+                                    <?php elseif ($prevProgress === 'in_progress'): ?>
+                                        <span class="text-xs font-medium text-orange-600">⏳ You're still learning it.</span>
+                                    <?php else: ?>
+                                        <span class="text-xs font-medium text-gray-400">You haven't started it yet.</span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                            <a href="details.php?module_id=<?php echo (int)$prevRec['prev_module_id']; ?>"
+                               class="inline-block mt-2 text-xs font-semibold text-brandOrange hover:underline">View this module →</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
              <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-4">

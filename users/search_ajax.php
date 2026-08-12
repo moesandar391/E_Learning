@@ -12,7 +12,7 @@ if (strlen($q) < 1) {
 $like = "%" . $q . "%";
 $stmt = $conn->prepare("
     SELECT m.id, m.name AS module_name, m.image,
-           c.course_name, c.level, c.instructor_name,
+           c.course_name, m.level, c.instructor_name,
            m.price
     FROM modules m
     JOIN courses c ON m.course_id = c.id

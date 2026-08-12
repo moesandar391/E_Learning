@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
 $stmt = $conn->prepare("
     SELECT e.id AS enroll_id, e.enroll_date, e.status, e.receipt,
            m.id AS module_id, m.name AS module_name, m.price, m.image,
-           c.course_name, c.level,
+           c.course_name, m.level,
            pm.name AS payment_method,
            COUNT(l.id) AS total_lessons,
            COUNT(lp.id) AS completed_lessons
@@ -52,7 +52,7 @@ $stmt = $conn->prepare("
     LEFT JOIN lesson_progress lp ON l.id = lp.lesson_id AND lp.user_id = ?
     LEFT JOIN reviews r ON r.user_id = e.user_id AND r.module_id = e.module_id
     WHERE e.user_id = ? AND e.status = 'confirmed'
-    GROUP BY e.id, e.enroll_date, e.status, e.receipt, m.id, m.name, m.price, m.image, c.course_name, c.level, pm.name
+    GROUP BY e.id, e.enroll_date, e.status, e.receipt, m.id, m.name, m.price, m.image, c.course_name, m.level, pm.name
     HAVING total_lessons > 0 AND completed_lessons = total_lessons AND COUNT(r.id) = 0
     ORDER BY e.enroll_date DESC
 ");

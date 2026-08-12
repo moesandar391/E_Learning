@@ -4,7 +4,7 @@
 
 <?php
 $total = $conn->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0;
-$result = $conn->query("SELECT id, course_name, instructor_name, level, description, created_at, updated_at FROM courses ORDER BY created_at DESC");
+$result = $conn->query("SELECT id, course_name, instructor_name, description, created_at, updated_at FROM courses ORDER BY created_at DESC");
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -47,7 +47,6 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                             <th class="px-6 py-4">No.</th>
                             <th class="px-6 py-4">Course</th>
                             <th class="px-6 py-4">Instructor</th>
-                            <th class="px-6 py-4">Level</th>
                             <th class="px-6 py-4">Description</th>
                             <th class="px-6 py-4">Created</th>
                             <th class="px-6 py-4 text-center">Actions</th>
@@ -67,17 +66,6 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600"><?= htmlspecialchars($row['instructor_name'] ?? '-') ?></td>
-                                <td class="px-6 py-4">
-                                    <?php if ($row['level'] === 'Beginner'): ?>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Beginner</span>
-                                    <?php elseif ($row['level'] === 'Intermediate'): ?>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700"><span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Intermediate</span>
-                                    <?php elseif ($row['level'] === 'Advanced'): ?>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Advanced</span>
-                                    <?php else: ?>
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-500"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span><?= htmlspecialchars($row['level'] ?? '-') ?></span>
-                                    <?php endif; ?>
-                                </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate"><?= htmlspecialchars($row['description'] ?? '-') ?></td>
                                 <td class="px-6 py-4 text-sm text-gray-500"><?= date('M j, Y', strtotime($row['created_at'])) ?></td>
                                 <td class="px-6 py-4 text-center">
@@ -143,16 +131,6 @@ $result = $conn->query("SELECT id, course_name, instructor_name, level, descript
                        placeholder="e.g. John Doe">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                <select name="level" id="courseLevel"
-                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent">
-                    <option value="">Select level</option>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                </select>
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea name="description" id="courseDesc" rows="3"
                           class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent"
@@ -184,7 +162,6 @@ function openModal(id) {
                     document.getElementById('courseId').value = d.data.id;
                     document.getElementById('courseName').value = d.data.course_name;
                     document.getElementById('instructorName').value = d.data.instructor_name || '';
-                    document.getElementById('courseLevel').value = d.data.level || '';
                     document.getElementById('courseDesc').value = d.data.description || '';
                 }
             });
