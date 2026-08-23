@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
     address VARCHAR(50),
     gender VARCHAR(10),
     date_of_birth DATE,
+    reset_token VARCHAR(64) DEFAULT NULL,
+    reset_token_expires DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -101,24 +103,6 @@ CREATE TABLE IF NOT EXISTS payment_method (
     status TINYINT(1) DEFAULT 1, -- 1 for active, 0 for inactive
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-CREATE TABLE IF NOT EXISTS payments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    enroll_id INT NOT NULL,
-    payment_method_id INT NOT NULL,
-    payment_date DATE NOT NULL,
-    status ENUM('pending','completed','failed') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_payments_enrollment
-        FOREIGN KEY (enroll_id)
-        REFERENCES enrollments(id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_payments_method
-        FOREIGN KEY (payment_method_id)
-        REFERENCES payment_method(id)
-        ON DELETE CASCADE
-);
 CREATE TABLE IF NOT EXISTS certificates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     quizresult_id INT NOT NULL,
@@ -160,8 +144,7 @@ CREATE TABLE IF NOT EXISTS admin_notifications (
 
 CREATE TABLE IF NOT EXISTS contacts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) DEFAULT NULL,
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(50) DEFAULT NULL,
     subject VARCHAR(100) NOT NULL,

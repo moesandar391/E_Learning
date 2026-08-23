@@ -136,7 +136,7 @@ function redirectAfterLogin($conn, $user_id) {
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
-                            <a href="#" class="text-xs text-brandOrange hover:text-orange-600 font-medium transition-colors">Forgot password?</a>
+                            <a href="forgot_password.php" class="text-xs text-brandOrange hover:text-orange-600 font-medium transition-colors">Forgot password?</a>
                         </div>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">

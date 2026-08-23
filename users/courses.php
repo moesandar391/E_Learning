@@ -9,13 +9,15 @@ $result = $conn->query($query);
 $categories = $result->fetch_all(MYSQLI_ASSOC);
 
 $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
-                        c.course_name, m.level, c.instructor_name, COUNT(l.id) AS total_lessons
+                        c.course_name, m.level, c.instructor_name, COUNT(l.id) AS total_lessons,
+                        COUNT(DISTINCT e.id) AS enroll_count
                  FROM modules m
                  JOIN courses c ON m.course_id = c.id
                  LEFT JOIN lessons l ON m.id = l.module_id
+                 LEFT JOIN enrollments e ON e.module_id = m.id AND e.status = 'confirmed'
                  WHERE m.status = 'active'
                  GROUP BY m.id, m.name, m.image, m.price, c.course_name, m.level, c.instructor_name
-                 ORDER BY m.id DESC
+                 ORDER BY enroll_count DESC, m.id DESC
                  LIMIT 6";
 $popularResult = $conn->query($popularQuery);
 $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
@@ -37,9 +39,15 @@ require_once '../includes/enrollment_check.php';
         </div> -->
         <!-- === END BACK BUTTON === -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-gray-100 tracking-tight">
-                Popular Courses
-            </h2>
+             <div>
+                <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-orange-400 tracking-tight">
+                    Popular Courses
+                </h2>
+                <p class="text-sm text-[#566473] dark:text-slate-200 mt-2 font-medium">
+                    Handpicked courses our learners love most
+                </p>
+            </div>
+        
             <div>
                 <a href="viewAllCourses.php" class="inline-flex items-center gap-2 bg-brandOrange hover:bg-brandOrangeHover text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors duration-200 shadow-sm">
                     <span>Load More Courses</span>
@@ -112,7 +120,10 @@ require_once '../includes/enrollment_check.php';
               border border-gray-400 text-gray-500
               hover:bg-gray-500 hover:text-white hover:border-gray-500
               hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
-       View Details
+      <span class="inline-flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                View
+                           </span>
     </a>
 
     <?php echo getEnrollmentButton($conn, $userId, $module['module_id'], '../users/'); ?>

@@ -7,7 +7,7 @@
     'lessons.php'       => ['title' => 'Lessons',     'subtitle' => 'Manage all lessons across modules'],
     'quizzes.php'       => ['title' => 'Quizzes',     'subtitle' => 'Manage module quizzes'],
     'questions.php'     => ['title' => 'Questions',   'subtitle' => 'Manage the quiz question bank'],
-    'quiz_report.php'   => ['title' => 'Quiz Report', 'subtitle' => 'Quiz attempts, pass rates and analytics'],
+    'quiz_report.php'   => ['title' => 'Quiz Attempts', 'subtitle' => 'Quiz attempts, pass rates and analytics'],
     'enrollments.php'   => ['title' => 'Enrollments', 'subtitle' => 'Track all student enrollments'],
     'payments.php'      => ['title' => 'Payments',    'subtitle' => 'Manage enrollment payments'],
     'certificates.php'  => ['title' => 'Certificates','subtitle' => 'Manage issued certificates'],
@@ -26,6 +26,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | <?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard'; ?> | Access Edu</title>
+    <script>document.documentElement.classList.add('preload');</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,6 +52,10 @@
         }
     </script>
     <style>
+        /* Prevent any transition from animating during initial page load */
+        html.preload * {
+            transition: none !important;
+        }
         .dark body,
         .dark .bg-brandBg { background-color: #0f172a; }
         .dark .bg-white { background-color: #1e293b; }
@@ -192,6 +197,52 @@
                 margin-left: 0 !important;
             }
         }
+
+        /* ═══════════════════════════════════════════════════════════
+           ── Shared Responsive Adjustments (applied to every admin page)
+           Desktop/Laptop (>=1024px): unchanged.
+           Tablet/Mobile (<1024px): fluid, wrap-safe, no page overflow.
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 1023px) {
+            /* Prevent horizontal scroll of the whole page */
+            body {
+                overflow-x: hidden;
+            }
+
+            /* Table toolbar rows / pagination footers wrap instead of overflowing */
+            main .flex.items-center.justify-between {
+                flex-wrap: wrap;
+                row-gap: 0.6rem;
+            }
+
+            /* Fixed-width search inputs become fluid on small screens */
+            main input.w-60,
+            main input.w-64 {
+                width: 100%;
+                max-width: 15rem;
+            }
+
+            /* Keep w-96 dialogs inside small viewports */
+            .w-96 {
+                width: calc(100% - 2rem);
+                max-width: 24rem;
+            }
+
+            /* Notification dropdown stays fully on-screen */
+            #adminNotifDropdown {
+                position: fixed;
+                left: 50%;
+                right: auto;
+                top: 4rem;
+                transform: translateX(-50%);
+                max-width: calc(100vw - 2rem);
+            }
+
+            /* Smooth horizontal scrolling for table containers */
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
 </head>
 <body class="bg-brandBg font-sans antialiased lg:overflow-hidden">
@@ -216,7 +267,7 @@
     </div>
 
     <div class="flex-1 flex items-center justify-between gap-2 px-4 sm:px-6 lg:px-8 min-w-0">
-        <div class="min-w-0">
+        <div class="w-40 sm:w-64 lg:w-72 flex-shrink-0">
             <h2 class="text-base sm:text-lg font-semibold text-gray-800 truncate"><?= htmlspecialchars($pageInfo['title']) ?></h2>
             <p class="text-xs sm:text-sm text-gray-500 truncate"><?= htmlspecialchars($pageInfo['subtitle']) ?></p>
         </div>
@@ -234,6 +285,11 @@
 
 <script>
 (function() {
+    window.addEventListener('load', function() {
+        requestAnimationFrame(function() {
+            document.documentElement.classList.remove('preload');
+        });
+    });
     function setTheme(theme) {
         document.documentElement.classList.toggle('dark', theme === 'dark');
         localStorage.setItem('admin-theme', theme);

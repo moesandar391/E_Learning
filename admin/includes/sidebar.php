@@ -3,17 +3,108 @@
         transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
         overflow: visible;
     }
-    #sidebar.collapsed {
-        width: 80px !important;
+
+    #sidebarToggle { position: relative; }
+    #sidebarToggle::after {
+        content: "Close sidebar";
+        position: absolute;
+        left: calc(100% + 12px);
+        top: 50%;
+        transform: translateY(-50%) translateX(8px);
+        background-color: #EA580C;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 1px solid #EA580C;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        z-index: 1000;
     }
-    
-    #sidebar.collapsed .nav-text,
-    #sidebar.collapsed .sidebar-header-text {
-        display: none;
+    #sidebarToggle:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+    }
+    .dark #sidebarToggle::after {
+        background-color: #1f2937;
+        color: #f9fafb;
+        border-color: #374151;
     }
 
-    /* ── Collapsed State Desktop Alignment ── */
+    /* ── Mobile off-canvas drawer (ignores any collapsed class) ── */
+    #sidebarOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 40;
+    }
+    #sidebarOverlay.active { display: block; }
+
+    @media (max-width: 1023px) {
+        #sidebar,
+        #sidebar.collapsed {
+            transform: translateX(-100%);
+            width: 280px !important;
+        }
+        #sidebar.mobile-open {
+            transform: translateX(0);
+        }
+        /* Collapsed class must not break the drawer on mobile */
+        #sidebar.collapsed .nav-text,
+        #sidebar.collapsed .sidebar-header-text {
+            display: inline !important;
+            position: static !important;
+            transform: none !important;
+            width: auto !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            background: transparent !important;
+            color: inherit !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        #sidebar.collapsed nav a,
+        #sidebar.collapsed > div:last-child a {
+            position: static !important;
+            justify-content: flex-start !important;
+        }
+        #sidebar.collapsed #sidebarLogoWrapper {
+            margin: 0 !important;
+        }
+        #sidebar.collapsed #sidebarLogoWrapper img {
+            margin-right: 0.75rem !important;
+        }
+        #sidebar.collapsed #logoutLink {
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0.625rem 0.75rem !important;
+            justify-content: flex-start !important;
+            background-color: #fee2e2 !important;
+            color: #dc2626 !important;
+            border-radius: 0.5rem;
+        }
+    }
+
+    /* ── Collapsed State (Desktop only) ── */
     @media (min-width: 1024px) {
+        #sidebar.collapsed {
+            width: 80px !important;
+        }
+
+        #sidebar.collapsed .nav-text,
+        #sidebar.collapsed .sidebar-header-text {
+            display: none;
+        }
+
         /* Hide the regular toggle button when collapsed */
         #sidebar.collapsed #sidebarToggle {
             display: none;
@@ -29,6 +120,47 @@
         /* Show pointer cursor on the logo to indicate it's clickable */
         #sidebarLogoWrapper {
             cursor: pointer;
+        }
+        #sidebar.collapsed #sidebarToggle::after { content: "Open sidebar"; }
+
+        #sidebar.collapsed nav,
+        #sidebar.collapsed > div:last-child { overflow: visible !important; }
+        #sidebar.collapsed p.nav-text { display: none !important; }
+        #sidebar.collapsed nav a,
+        #sidebar.collapsed > div:last-child a { position: relative; justify-content: center !important; }
+        #sidebar.collapsed nav a .nav-text,
+        #sidebar.collapsed > div:last-child a .nav-text {
+            display: block !important;
+            position: absolute;
+            left: calc(100% + 12px);
+            top: 50%;
+            transform: translateY(-50%) translateX(8px);
+            background-color: #EA580C;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            white-space: nowrap;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f3f4f6;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            z-index: 1000;
+        }
+        #sidebar.collapsed nav a:hover .nav-text,
+        #sidebar.collapsed > div:last-child a:hover .nav-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-50%) translateX(0);
+        }
+        .dark #sidebar.collapsed nav a .nav-text,
+        .dark #sidebar.collapsed > div:last-child a .nav-text {
+            background-color: #1f2937;
+            color: #f9fafb;
+            border-color: #374151;
         }
 
         /* ── Ensure Logout button appears perfectly and matches other icons ── */
@@ -55,104 +187,10 @@
             background-color: #374151 !important;
         }
     }
-
-    #sidebarToggle { position: relative; }
-    #sidebarToggle::after {
-        content: "Close sidebar";
-        position: absolute;
-        left: calc(100% + 12px);
-        top: 50%;
-        transform: translateY(-50%) translateX(8px);
-        background-color: #EA580C;
-        color: #ffffff;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 8px 14px;
-        border-radius: 8px;
-        white-space: nowrap;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        border: 1px solid #EA580C;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-        z-index: 1000;
-    }
-    #sidebar.collapsed #sidebarToggle::after { content: "Open sidebar"; }
-    #sidebarToggle:hover::after {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(-50%) translateX(0);
-    }
-    .dark #sidebarToggle::after {
-        background-color: #1f2937;
-        color: #f9fafb;
-        border-color: #374151;
-    }
-
-    #sidebar.collapsed nav,
-    #sidebar.collapsed > div:last-child { overflow: visible !important; }
-    #sidebar.collapsed p.nav-text { display: none !important; }
-    #sidebar.collapsed nav a,
-    #sidebar.collapsed > div:last-child a { position: relative; justify-content: center !important; }
-    #sidebar.collapsed nav a .nav-text,
-    #sidebar.collapsed > div:last-child a .nav-text {
-        display: block !important;
-        position: absolute;
-        left: calc(100% + 12px);
-        top: 50%;
-        transform: translateY(-50%) translateX(8px);
-        background-color: #EA580C;
-        color: #ffffff;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 8px 14px;
-        border-radius: 8px;
-        white-space: nowrap;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        border: 1px solid #f3f4f6;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-        z-index: 1000;
-    }
-    #sidebar.collapsed nav a:hover .nav-text,
-    #sidebar.collapsed > div:last-child a:hover .nav-text {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(-50%) translateX(0);
-    }
-    .dark #sidebar.collapsed nav a .nav-text,
-    .dark #sidebar.collapsed > div:last-child a .nav-text {
-        background-color: #1f2937;
-        color: #f9fafb;
-        border-color: #374151;
-    }
-
-    /* ── Mobile off-canvas drawer ── */
-    #sidebarOverlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 40;
-    }
-    #sidebarOverlay.active { display: block; }
-
-    @media (max-width: 1023px) {
-        #sidebar {
-            transform: translateX(-100%);
-            width: 280px !important;
-        }
-        #sidebar.mobile-open {
-            transform: translateX(0);
-        }
-    }
 </style>
 
 <aside id="sidebar"
-     class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 fixed left-0 top-0 h-screen z-50">
+     class="<?php echo (($_COOKIE['admin_sidebar_collapsed'] ?? '') === '1') ? 'collapsed ' : ''; ?>w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0 fixed left-0 top-0 h-screen z-50">
 
     <!-- Sidebar Header -->
     <div class="h-16 flex items-center px-3 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
@@ -209,7 +247,7 @@
         </a>
         <a href="quiz_report.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 <?php echo basename($_SERVER['PHP_SELF']) === 'quiz_report.php' ? 'bg-brandOrange bg-opacity-10 text-brandOrange' : 'text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-brandOrange'; ?>">
             <svg class="w-5 h-5 flex-shrink-0 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            <span class="nav-text">Quiz Report</span>
+            <span class="nav-text">Quiz Attempts</span>
         </a>
         <a href="enrollments.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 <?php echo basename($_SERVER['PHP_SELF']) === 'enrollments.php' ? 'bg-brandOrange bg-opacity-10 text-brandOrange' : 'text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-gray-700 hover:text-brandOrange'; ?>">
             <svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
@@ -268,6 +306,9 @@ let sidebarOpen = false;
 // Function to toggle the desktop collapsed state
 function toggleSidebar() {
     sidebar.classList.toggle("collapsed");
+    var collapsed = sidebar.classList.contains("collapsed");
+    document.cookie = "admin_sidebar_collapsed=" + (collapsed ? "1" : "0") + "; path=/; max-age=31536000; SameSite=Lax";
+    localStorage.setItem("admin-sidebar-collapsed", collapsed ? "1" : "0");
 }
 
 btn.addEventListener("click", toggleSidebar);

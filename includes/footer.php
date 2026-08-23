@@ -72,3 +72,4 @@
 
     </div>
 </footer>
+<script src="../assets/js/custom_dialog.js"></script>

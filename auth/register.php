@@ -119,7 +119,7 @@ include_once('../includes/header.php');
                 <p id="match-text" class="text-xs mt-1"></p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="mb-4">
                 <!-- Native HTML5 phone tooltip will trigger here -->
                 <input type="tel" name="phone" placeholder="Phone (09xxxxxxxxx)" required maxlength="11" oninput="sanitizePhone(this)" pattern="09\d{9}" title="Must be 11 digits starting with 09 (e.g., 09123456789)." 
                        class="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg p-3 outline-none focus:border-brandOrange">

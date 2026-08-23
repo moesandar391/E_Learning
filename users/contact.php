@@ -5,15 +5,14 @@ require_once __DIR__ . '/../includes/admin_notification_helper.php';
 
 // Handle form submission before any output
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $firstName = trim($_POST['first-name'] ?? '');
-    $lastName = trim($_POST['last-name'] ?? '');
+    $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $subject = trim($_POST['subject'] ?? '');
     $message = trim($_POST['message'] ?? '');
     
     $errors = [];
-    if (empty($firstName)) $errors[] = 'First name is required.';
+    if (empty($name)) $errors[] = 'Name is required.';
     if (empty($email)) $errors[] = 'Email is required.';
     if (empty($subject)) $errors[] = 'Subject is required.';
     if (empty($message)) $errors[] = 'Message is required.';
@@ -23,12 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     
-    $stmt = $conn->prepare("INSERT INTO contacts (first_name, last_name, email, phone, subject, message, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
-    $stmt->bind_param("ssssss", $firstName, $lastName, $email, $phone, $subject, $message);
+    $stmt = $conn->prepare("INSERT INTO contacts (name, email, phone, subject, message, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("sssss", $name, $email, $phone, $subject, $message);
     
     if ($stmt->execute()) {
         create_admin_notification(
-            "New contact message from $firstName $lastName ($subject)",
+            "New contact message from $name ($subject)",
             "../admin/contacts.php",
             'contact'
         );
@@ -43,8 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include_once('../includes/header.php');
 
 // Pre-fill only when coming from a notification (enrollment_id in URL)
-$user_first_name = '';
-$user_last_name = '';
+$user_name = '';
 $user_email = '';
 $user_phone = '';
 $preset_subject = '';
@@ -62,14 +60,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
         WHERE e.id = $enrollId AND e.user_id = $userId
     ");
     if ($enrRes && $enrRow = $enrRes->fetch_assoc()) {
-        $full_name = $enrRow['user_name'];
-        $spacePos = strpos($full_name, ' ');
-        if ($spacePos !== false) {
-            $user_first_name = substr($full_name, 0, $spacePos);
-            $user_last_name = substr($full_name, $spacePos + 1);
-        } else {
-            $user_first_name = $full_name;
-        }
+        $user_name = $enrRow['user_name'];
         $user_email = $enrRow['email'];
         $user_phone = $enrRow['phone'] ?? '';
         $preset_subject = 'enrollment';
@@ -81,7 +72,7 @@ if ($userId && isset($_GET['enrollment_id'])) {
 <!-- <body class="bg-[#F8F9FA] font-sans antialiased min-h-screen pt-20"> -->
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-4xl md:text-5xl text-brandOchre dark:text-slate-100 mb-4">Contact Us</h1>
+            <h1 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-slate-100 mb-4">Contact Us</h1>
             <p class="text-base text-[#566473] dark:text-slate-300 max-w-2xl mx-auto">
                 Have questions? We're here to help you on your learning journey. Our support team is ready to assist you with any inquiries about our courses, enrollment, or anything else you need to know.
             </p>
@@ -102,21 +93,12 @@ if ($userId && isset($_GET['enrollment_id'])) {
             <div class="lg:col-span-7 bg-white rounded-3xl p-10 border border-gray-100 shadow-sm">
                 <form action="" method="POST" class="space-y-8">
                     <div class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <label for="first-name" class="block text-sm font-bold text-gray-500">First Name</label>
-                                <input type="text" id="first-name" name="first-name" 
+                        <div class="space-y-2">
+                            <label for="name" class="block text-sm font-bold text-gray-500">Full Name</label>
+                                <input type="text" id="name" name="name" 
                                     class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
-                                    placeholder="John"
-                                    value="<?php echo htmlspecialchars($user_first_name); ?>">
-                            </div>
-                            <div class="space-y-2">
-                                <label for="last-name" class="block text-sm font-bold text-gray-500">Last Name</label>
-                                <input type="text" id="last-name" name="last-name" 
-                                    class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 text-sm text-slate-700 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
-                                    placeholder="Doe"
-                                    value="<?php echo htmlspecialchars($user_last_name); ?>">
-                            </div>
+                                    placeholder="John Doe"
+                                    value="<?php echo htmlspecialchars($user_name); ?>">
                         </div>
                         
                         <div class="space-y-2">

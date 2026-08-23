@@ -48,7 +48,7 @@ switch ($action) {
         $module_id       = (int)($_POST['module_id'] ?? 0);
         $quiz_title      = trim($_POST['quiz_title'] ?? '');
         $passing_score   = (int)($_POST['passing_score'] ?? 70);
-        $question_limit  = (int)($_POST['question_limit'] ?? 100);
+        $question_limit  = (int)($_POST['question_limit'] ?? 10);
         $time_limit      = (int)($_POST['time_limit'] ?? 0);
         $random_q        = isset($_POST['random_questions']) ? 1 : 0;
         $random_a        = isset($_POST['random_answers']) ? 1 : 0;
@@ -75,7 +75,7 @@ switch ($action) {
         $module_id       = (int)($_POST['module_id'] ?? 0);
         $quiz_title      = trim($_POST['quiz_title'] ?? '');
         $passing_score   = (int)($_POST['passing_score'] ?? 70);
-        $question_limit  = (int)($_POST['question_limit'] ?? 100);
+        $question_limit  = (int)($_POST['question_limit'] ?? 10);
         $time_limit      = (int)($_POST['time_limit'] ?? 0);
         $random_q        = isset($_POST['random_questions']) ? 1 : 0;
         $random_a        = isset($_POST['random_answers']) ? 1 : 0;

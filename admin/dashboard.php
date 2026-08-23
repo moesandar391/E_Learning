@@ -16,18 +16,47 @@
           ORDER BY e.created_at DESC LIMIT 5
 ");
 
-// ── Enrollment chart data (Jan–Jul of current year) ──
+// ── Enrollment chart data (cumulative running total per month for the selected year) ──
+ $selYear = isset($_GET['chart_year']) ? (int)$_GET['chart_year'] : (int)date('Y');
+ if ($selYear < 2000 || $selYear > 2100) { $selYear = (int)date('Y'); }
+
+// Monthly enrollment counts for the selected year (single grouped query)
+ $monthCounts = array_fill(1, 12, 0);
+ $stmt = $conn->prepare("SELECT MONTH(created_at) AS m, COUNT(*) AS cnt FROM enrollments WHERE YEAR(created_at) = ? GROUP BY m");
+ $stmt->bind_param("i", $selYear);
+ $stmt->execute();
+ $result = $stmt->get_result();
+ while ($row = $result->fetch_assoc()) {
+     $monthCounts[(int)$row['m']] = (int)$row['cnt'];
+ }
+ $stmt->close();
+
+// Carry over every enrollment before January of the selected year
+ $beforeKey = sprintf('%04d-01-01 00:00:00', $selYear);
+ $stmt = $conn->prepare("SELECT COUNT(*) FROM enrollments WHERE created_at < ?");
+ $stmt->bind_param("s", $beforeKey);
+ $stmt->execute();
+ $carryOver = (int)($stmt->get_result()->fetch_row()[0] ?? 0);
+ $stmt->close();
+
  $chartMonths = [];
  $chartData = [];
- $thisYear = date('Y');
-for ($m = 1; $m <= 7; $m++) {
-    $month = sprintf('%s-%02d', $thisYear, $m);
-    $chartMonths[] = date('M', mktime(0, 0, 0, $m, 1));
-    $result = $conn->query("SELECT COUNT(*) AS cnt FROM enrollments WHERE DATE_FORMAT(created_at, '%Y-%m') = '$month'");
-    $chartData[] = (int)($result->fetch_assoc()['cnt'] ?? 0);
-}
+ $running = $carryOver;
+// Future months of the current year haven't happened yet, so stop at the current month
+ $lastMonth = ($selYear >= (int)date('Y')) ? (int)date('n') : 12;
+ for ($m = 1; $m <= $lastMonth; $m++) {
+     $running += $monthCounts[$m];
+     $chartMonths[] = date('M', mktime(0, 0, 0, $m, 1));
+     $chartData[] = $running;
+ }
  $chartLabels = json_encode($chartMonths);
  $chartValues = json_encode($chartData);
+ $totalToDate = $running;
+
+// Year options run from the first enrollment year up to the current one
+ $minYear = (int)($conn->query("SELECT COALESCE(MIN(YEAR(created_at)), YEAR(NOW())) FROM enrollments")->fetch_row()[0] ?? date('Y'));
+ $maxYear = (int)date('Y');
+ if ($minYear < 2000 || $minYear > $maxYear) { $minYear = $maxYear; }
 
 /* ═══════════════════════════════════════════════════════
    ── Payment Method Pie Chart Data (NEW) ──
@@ -212,9 +241,21 @@ try {
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 sm:mb-8">
             <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="font-semibold text-gray-800">Enrollment Overview</h3>
-                    <!-- <span class="text-xs text-gray-400">Last 6 months</span> -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Enrollment Overview</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            Cumulative · <?= $totalToDate ?> enrollment<?= $totalToDate == 1 ? '' : 's' ?> by <?= date('M Y', mktime(0, 0, 0, $lastMonth, 1, $selYear)) ?>
+                        </p>
+                    </div>
+                    <form method="GET" action="" class="flex items-center gap-2">
+                        <select name="chart_year" onchange="this.form.submit()"
+                                class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:border-brandOrange focus:ring-2 focus:ring-brandOrange/20 cursor-pointer">
+                            <?php for ($yy = $minYear; $yy <= $maxYear; $yy++): ?>
+                                <option value="<?= $yy ?>" <?= $yy === $selYear ? 'selected' : '' ?>><?= $yy ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </form>
                 </div>
                 <div class="h-64">
                     <canvas id="enrollmentChart"></canvas>
@@ -416,7 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { stepSize: 1, precision: 0 }
+                    ticks: { precision: 0 }
                 }
             }
         }

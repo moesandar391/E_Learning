@@ -203,20 +203,21 @@ document.getElementById('courseForm').addEventListener('submit', function(e) {
 });
 
 function deleteCourse(id) {
-    if (!confirm('Are you sure you want to delete this course?')) return;
-    fetch('courses_ajax.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: 'delete', id: id })
-    })
-    .then(r => r.json())
-    .then(d => {
-        if (d.success) {
-            location.reload();
-        } else {
-            alert(d.message || 'Delete failed.');
-        }
-    });
+    showConfirm('Are you sure you want to delete this course?', function() {
+        fetch('courses_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', id: id })
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                location.reload();
+            } else {
+                window.alert(d.message || 'Delete failed.');
+            }
+        });
+    }, { okText: 'Delete', title: 'Delete Course' });
 }
 
 document.getElementById('searchInput').addEventListener('keyup', function() {

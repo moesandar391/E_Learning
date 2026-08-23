@@ -299,17 +299,18 @@ document.getElementById('lessonForm').addEventListener('submit', function(e) {
 });
 
 function deleteLesson(id) {
-    if (!confirm('Are you sure you want to delete this lesson?')) return;
-    fetch('lessons_ajax.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: 'delete', id: id })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        if (d.success) location.reload();
-        else alert(d.message || 'Delete failed.');
-    });
+    showConfirm('Are you sure you want to delete this lesson?', function() {
+        fetch('lessons_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', id: id })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) location.reload();
+            else window.alert(d.message || 'Delete failed.');
+        });
+    }, { okText: 'Delete', title: 'Delete Lesson' });
 }
 
 document.getElementById('searchInput').addEventListener('keyup', function() {

@@ -526,7 +526,7 @@ include_once('../includes/header.php');
         var answered = Object.keys(saved).length;
         var msg = 'You have answered ' + answered + ' of ' + total + ' questions. Are you sure you want to submit?';
         if (answered < total) msg += '\n\nUnanswered questions will be marked as wrong.';
-        if (confirm(msg)) finalSubmit(false);
+        showConfirm(msg, function() { finalSubmit(false); }, { okText: 'Submit Quiz', title: 'Submit Quiz' });
     }
 
     function finalSubmit(expired) {

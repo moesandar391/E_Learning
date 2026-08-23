@@ -11,7 +11,7 @@ $total = $conn->query("SELECT COUNT(*) FROM modules WHERE status = 'active'")->f
 $totalPages = max(1, ceil($total / $limit));
 $result = $conn->query("
     SELECT m.id, m.name, m.level, m.recommended_prev_module_id, m.price, m.image, m.created_at,
-           c.course_name, p.name AS prev_module_name, pc.course_name AS prev_course_name
+           m.status, c.course_name, p.name AS prev_module_name, pc.course_name AS prev_course_name
     FROM modules m
     JOIN courses c ON m.course_id = c.id
     LEFT JOIN modules p ON p.id = m.recommended_prev_module_id
@@ -403,17 +403,18 @@ document.getElementById('moduleForm').addEventListener('submit', function(e) {
 });
 
 function deleteModule(id) {
-    if (!confirm('Are you sure you want to delete this module? It will be hidden from the module list and course catalog. Enrolled students can still continue learning.')) return;
-    fetch('modules_ajax.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: 'delete', id: id })
-    })
-    .then(r => r.json())
-    .then(d => {
-        if (d.success) location.reload();
-        else alert(d.message || 'Delete failed.');
-    });
+    showConfirm('Are you sure you want to delete this module? It will be hidden from the module list and course catalog. Enrolled students can still continue learning.', function() {
+        fetch('modules_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', id: id })
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) location.reload();
+            else window.alert(d.message || 'Delete failed.');
+        });
+    }, { okText: 'Delete', title: 'Delete Module' });
 }
 
 document.getElementById('searchInput').addEventListener('keyup', function() {

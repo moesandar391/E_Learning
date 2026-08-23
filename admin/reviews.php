@@ -3,20 +3,6 @@ require_once '../config/db.php';
 include_once('includes/header.php');
 require_once 'includes/sidebar.php';
 
-// Handle approve / reject actions
-if (isset($_GET['action'], $_GET['id'])) {
-    $id = intval($_GET['id']);
-    $action = $_GET['action'];
-    if (in_array($action, ['approve', 'reject'], true)) {
-        $newStatus = $action === 'approve' ? 'approved' : 'rejected';
-        $stmt = $conn->prepare("UPDATE reviews SET status = ? WHERE id = ?");
-        $stmt->bind_param("si", $newStatus, $id);
-        $stmt->execute();
-    }
-    header('Location: reviews.php');
-    exit;
-}
-
 $limit = 12;
 $page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
@@ -79,22 +65,6 @@ $reviews = $conn->query($stmt)->fetch_all(MYSQLI_ASSOC);
                 </div>
                 <div class="flex-1">
                     <p class="text-sm text-gray-600 leading-relaxed"><?php echo htmlspecialchars($rv['review'] ?: 'No written review'); ?></p>
-                </div>
-                <div class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2">
-                    <?php if ($rv['status'] !== 'approved'): ?>
-                        <a href="?action=approve&id=<?php echo $rv['id']; ?>" class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
-                            Approve
-                        </a>
-                    <?php else: ?>
-                        <span class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-700 border border-green-200">Approved</span>
-                    <?php endif; ?>
-                    <?php if ($rv['status'] !== 'rejected'): ?>
-                        <a href="?action=reject&id=<?php echo $rv['id']; ?>" class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
-                            Reject
-                        </a>
-                    <?php else: ?>
-                        <span class="flex-1 text-center px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 border border-red-200">Rejected</span>
-                    <?php endif; ?>
                 </div>
             </div>
 <?php endforeach; ?>

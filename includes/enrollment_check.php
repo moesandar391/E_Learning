@@ -86,7 +86,10 @@ function getEnrollmentButton($conn, $user_id, $module_id, $base_url = '../users/
                           border border-orange-600 text-orange-600
                           hover:bg-orange-600 hover:text-white
                           hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-                    Enroll Now
+                    <span class="inline-flex items-center justify-center gap-2">
+                        Enroll Now
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </span>
                 </a>';
     }
     
@@ -102,7 +105,10 @@ function getEnrollmentButton($conn, $user_id, $module_id, $base_url = '../users/
                           border border-orange-600 text-orange-600
                           hover:bg-orange-600 hover:text-white
                           hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-                    Enroll Now
+                    <span class="inline-flex items-center justify-center gap-2">
+                        Enroll Now
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </span>
                 </a>';
     }
     
@@ -133,7 +139,10 @@ function getEnrollmentButton($conn, $user_id, $module_id, $base_url = '../users/
                       border border-orange-600 text-orange-600
                       hover:bg-orange-600 hover:text-white
                       hover:shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-                Enroll Now
+                <span class="inline-flex items-center justify-center gap-2">
+                    Enroll Now
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </span>
             </a>';
 }
 ?>

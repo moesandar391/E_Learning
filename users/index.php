@@ -8,13 +8,15 @@ include_once('../includes/header.php');
  $categories = $result->fetch_all(MYSQLI_ASSOC);
 
  $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
-                        c.course_name, m.level, c.instructor_name, COUNT(l.id) AS total_lessons
+                        c.course_name, m.level, c.instructor_name, COUNT(l.id) AS total_lessons,
+                        COUNT(DISTINCT e.id) AS enroll_count
                  FROM modules m
                  JOIN courses c ON m.course_id = c.id
                  LEFT JOIN lessons l ON m.id = l.module_id
+                 LEFT JOIN enrollments e ON e.module_id = m.id AND e.status = 'confirmed'
                  WHERE m.status = 'active'
                  GROUP BY m.id, m.name, m.image, m.price, c.course_name, m.level, c.instructor_name
-                 ORDER BY m.id DESC
+                 ORDER BY enroll_count DESC, m.id DESC
                  LIMIT 6";
  $popularResult = $conn->query($popularQuery);
  $popularModules = $popularResult->fetch_all(MYSQLI_ASSOC);
@@ -70,20 +72,20 @@ function formatLearnerCount($num) {
 // Convert to percentage: 4.9/5 = 98%
  $satisfactionRate = $totalReviews > 0 ? round(($avgRating / 5) * 100) : 0;
 ?>
-    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-16 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 dark:text-gray-200">
-        
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-8 md:pt-16 pb-4 md:pb-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10 dark:text-gray-200">
+
         <div class="lg:col-span-5 space-y-6">
             <div class="inline-block bg-brandOrange text-white text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg shadow-sm">
-                EMPOWERING GLOBAL COMMUNICATORS
+                LEARN ENGLISH WITH CONFIDENCE
             </div>
 
-            <h1 class="text-4xl sm:text-5xl font-serif font-bold text-slate-500 dark:text-slate-200 leading-tight">
-                Master English for the <br>
-                <span class="text-brandOchre italic font-bold">Global Stage</span>
+            <h1 class="text-3xl sm:text-5xl font-serif font-bold text-slate-500 dark:text-slate-200 leading-tight">
+                Learn English for <br>
+                <span class="text-brandOchre italic font-bold">Your Future</span>
             </h1>
 
             <p class="text-base text-brandTextGray dark:text-slate-200 leading-relaxed max-w-lg">
-                Unlock international opportunities with structured, professional English courses designed for ambitious learners. From business mastery to academic excellence.
+                Simple, practical English courses that help you speak clearly and with confidence — for school, work, or everyday life.
             </p>
 
             <div class="pt-4 flex flex-wrap gap-4">
@@ -134,12 +136,12 @@ function formatLearnerCount($num) {
 
     </main>
 
-    <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-                <div>
-                    <h2 class="font-serif font-bold text-[30px] text-brandOchre leading-tight tracking-tight">
+    <section class="w-full bg-[#F8F9FA] dark:bg-gray-900 pt-4 pb-6 font-sans">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+             <div>
+                    <h2 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre leading-tight tracking-tight">
                         Explore Categories
                     </h2>
                     <p class="text-sm text-[#566473] dark:text-slate-200 mt-2 font-medium">
@@ -204,14 +206,14 @@ function formatLearnerCount($num) {
     <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ── HOW IT WORK SECTION (Project Colors Applied) ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-16 font-sans">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 pt-6 pb-6 font-sans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12 gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-4">
             <div>
-                <span class="text-sm font-medium text-brandTextGray dark:text-gray-200 tracking-wide">Over 1,235+ Course</span>
+                <span class="text-sm font-medium text-brandTextGray dark:text-gray-200 tracking-wide">Over 1,235+ Courses</span>
                 <h2 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-slate-200 tracking-tight mt-2">
-                    How It Work? <span class="inline-block w-16 h-1 bg-brandOrange align-middle ml-2 rounded-full"></span>
+                    How It Works? <span class="inline-block w-16 h-1 bg-brandOrange align-middle ml-2 rounded-full"></span>
                 </h2>
             </div>
         </div>
@@ -225,7 +227,7 @@ function formatLearnerCount($num) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Find Your Course</h3>
-                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">Browse our courses and pick one that fits your goals.</p>
             </div>
 
             <!-- Arrow 1: real flex child, no absolute positioning -->
@@ -239,7 +241,7 @@ function formatLearnerCount($num) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Book A Course</h3>
-                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">Enroll in a few clicks and start learning right away.</p>
             </div>
 
             <!-- ✅ Arrow 2: real flex child, no absolute positioning -->
@@ -253,7 +255,7 @@ function formatLearnerCount($num) {
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                 </div>
                 <h3 class="font-serif font-bold text-xl text-slate-800 mb-3">Get Certificate</h3>
-                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">It has survived not only centurie also leap into electronic.</p>
+                <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">Finish your lessons, pass the quiz, and earn your certificate.</p>
             </div>
 
         </div>
@@ -263,23 +265,23 @@ function formatLearnerCount($num) {
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ── IMPORTANT FOR ENGLISH LEARNING ── -->
 <!-- ═══════════════════════════════════════════════════════ -->
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 pt-6 pb-6 font-sans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
         
         <!-- Section Header -->
-        <div class="text-center max-w-2xl mx-auto mb-16">
+        <div class="text-center max-w-2xl mx-auto mb-10">
             <span class="text-sm font-medium text-brandTextGray dark:text-gray-400 tracking-wide">Why Learn English?</span>
             <h2 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-slate-200 tracking-tight mt-2 mb-4">
                 Important for English Learning
             </h2>
             <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                English is more than a language — it's a bridge to opportunities, connections, and personal growth that shapes your future.
+                English is used everywhere — in school, at work, and online. Learning it helps you speak up, make new friends, and feel more confident every day.
             </p>
         </div>
 
         <!-- Row 1: Image Left + Text Right -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-10 lg:mb-20">
-            
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-4 lg:mb-6">
+
             <div class="relative">
                 <div class="rounded-3xl overflow-hidden shadow-xl border border-gray-100">
                     <img src="../assets/English.png" alt="English Learning Classroom" 
@@ -287,8 +289,8 @@ function formatLearnerCount($num) {
                 </div>
                 <!-- Floating stat badge -->
                 <div class="absolute -bottom-5 -right-2 sm:-right-3 lg:-right-6 bg-brandOrange text-white rounded-2xl px-4 sm:px-6 py-3 sm:py-4 shadow-lg shadow-orange-200">
-                    <p class="text-xl sm:text-2xl font-bold leading-none">1.5B+</p>
-                    <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Global Speakers</p>
+                    <p class="text-xl sm:text-2xl font-bold leading-none"><?php echo $learnerText; ?></p>
+                    <p class="text-[10px] font-medium mt-1 opacity-90 uppercase tracking-wider">Active Learners</p>
                 </div>
                 <!-- Floating tag on image -->
                 <div class="absolute top-5 left-5 bg-white/90 backdrop-blur-sm text-brandOrange text-[10px] font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border border-orange-200 shadow-sm">
@@ -300,31 +302,31 @@ function formatLearnerCount($num) {
             <div class="space-y-5">
                 <div class="inline-flex items-center gap-2 bg-orange-50 text-brandOrange text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    Global Communication
+                    Communication
                 </div>
                 <h3 class="font-serif font-bold text-2xl lg:text-3xl text-brandOchre leading-tight">
-                    Connect With the World
+                    Speak with Confidence
                 </h3>
                 <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                    English is the most widely spoken second language in the world. Whether you're traveling, networking, or making friends online, English breaks down barriers and brings people together across 100+ countries.
+                    English is used everywhere — in school, at work, and online. Learning it helps you express yourself clearly and connect with more people every day.
                 </p>
                 <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                    Our smart e-learning platform tracks your progress and adapts to your learning style. From bite-sized lessons to full certifications, every step keeps you motivated and moving forward.
+                    Our lessons are simple and easy to follow. We track your progress and keep you motivated, from your first words to full fluency.
                 </p>
                 <div class="flex items-center gap-6 pt-2">
                     <div>
-                        <p class="text-xl font-bold text-slate-800">100+</p>
-                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Countries</p>
+                        <p class="text-xl font-bold text-slate-800"><?php echo $learnerText; ?></p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Active Learners</p>
                     </div>
                     <div class="w-px h-10 bg-gray-200"></div>
                     <div>
-                        <p class="text-xl font-bold text-slate-800">60%</p>
-                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Web Content</p>
+                        <p class="text-xl font-bold text-slate-800"><?php echo $satisfactionRate; ?>%</p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Satisfaction Rate</p>
                     </div>
                     <div class="w-px h-10 bg-gray-200"></div>
                     <div>
-                        <p class="text-xl font-bold text-slate-800">#1</p>
-                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Lingua Franca</p>
+                        <p class="text-xl font-bold text-slate-800">24/7</p>
+                        <p class="text-[11px] text-brandTextGray dark:text-slate-200 font-medium">Learn Any Time</p>
                     </div>
                 </div>
             </div>
@@ -332,13 +334,18 @@ function formatLearnerCount($num) {
     </div>
 </section>
 
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 pt-4 pb-6 font-sans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-            <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-orange-400 tracking-tight">
-                Popular Courses
-            </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+                <h2 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-orange-400 tracking-tight">
+                    Popular Courses
+                </h2>
+                <p class="text-sm text-[#566473] dark:text-slate-200 mt-2 font-medium">
+                    Handpicked courses our learners love most
+                </p>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -387,7 +394,7 @@ function formatLearnerCount($num) {
                                   hover:shadow-[0_0_15px_rgba(156,163,175,0.6)]">
                            <span class="inline-flex items-center justify-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                View Details
+                                View
                            </span>
                         </a>
 
@@ -449,28 +456,28 @@ function formatLearnerCount($num) {
     </div>
 </section>
 
-<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 py-10 font-sans">
+<section class="w-full bg-[#F8F9FA] dark:bg-gray-900 pt-6 pb-12 font-sans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
 <!-- Row 2: Text Left + Image Right (Gradient Fallback) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16 lg:mb-24">
-            
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-6 lg:mb-8">
+
             <div class="space-y-5 order-2 lg:order-1">
                 <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-bold tracking-wider uppercase px-4 py-2 rounded-lg">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     Career Growth
                 </div>
             <h3 class="font-serif font-bold text-2xl lg:text-3xl text-brandOchre dark:text-slate-200 leading-tight">
-                Unlock Better Opportunities
+                Build a Better Career
             </h3>
                 <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                    In today's competitive job market, English proficiency is often the deciding factor between candidates. Multinational companies across Myanmar and beyond actively seek employees who can communicate in English.
+                    Good English helps you communicate clearly at work. You'll write better emails, speak with more confidence in meetings, and stand out to employers.
                 </p>
                 <p class="text-sm text-brandTextGray dark:text-slate-200 leading-relaxed">
-                    Studies show that bilingual professionals earn up to 20% more than their peers. From client meetings to email writing, English fluency directly impacts your career trajectory and earning potential.
+                    Strong English skills also make everyday tasks easier — reading, writing, and talking with people. Our courses give you the real skills you can use right away.
                 </p>
                 <!-- Highlight quote -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border-l-4 border-blue-500">
-                    <p class="text-sm font-medium text-slate-700 italic leading-relaxed">"English is not just a skill — it's an investment that pays for itself throughout your career."</p>
+                    <p class="text-sm font-medium text-slate-700 italic leading-relaxed">"English is one of the best skills you can learn — it helps you grow at work and in life."</p>
                 </div>
             </div>
 
@@ -492,11 +499,11 @@ function formatLearnerCount($num) {
     </div>
 </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-12">
+        <div class="text-center mb-10">
+            <h1 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-slate-100 mb-6">About Us</h1>
             <p class="text-lg text-[#566473] dark:text-slate-300 max-w-3xl mx-auto">
-                We empower global communicators through immersive English language learning. Our mission is to bridge cultures and unlock international opportunities for learners worldwide.
+                Access Edu is a friendly English school that helps you speak, understand, and use English with confidence. Learning is simple, practical, and made for your goals.
             </p>
         </div>
         
@@ -505,10 +512,10 @@ function formatLearnerCount($num) {
                 <div class="space-y-6">
                     <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-slate-100">Our Story</h2>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
-                        Founded in 2020, Access Edu began as a small tutoring center in Singapore with a vision to make quality English education accessible to everyone. Over the years, we've grown into a global platform serving learners in over 50 countries.
+                        Founded in 2022, Access Edu began as a small tutoring center in Mandalay. Our goal was simple: help people learn English well, without complicated lessons or high costs.
                     </p>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
-                        Our journey started with just 5 students and one passionate tutor. Today, we boast a community of over 50,000+ active learners who have mastered English and transformed their careers through our comprehensive programs.
+                        It all started with just 5 students and one passionate tutor. Today, over <?php echo $learnerText; ?> learners have grown their skills with us and reached goals that once felt out of reach.
                     </p>
                 </div>
                 
@@ -566,7 +573,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Excellence</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We strive for teaching excellence through continuous improvement and proven methodologies that deliver real results for our learners.
+                            We focus on teaching that actually works — clear lessons, helpful feedback, and steady progress you can see.
                         </p>
                     </div>
                     
@@ -578,7 +585,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Community</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We believe in the power of community learning, where students support each other and grow together towards their goals.
+                            Learning is better together. Our students encourage and support each other on every step of the way.
                         </p>
                     </div>
                     
@@ -590,7 +597,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Innovation</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We innovate continuously, leveraging technology to create personalized learning experiences that adapt to each student's unique needs.
+                            We keep our lessons fresh and easy to follow, so you can learn in a way that fits your daily life.
                         </p>
                     </div>
                 </div>
@@ -602,7 +609,7 @@ function formatLearnerCount($num) {
                 <div class="max-w-3xl mx-auto text-center">
                     <h2 class="font-serif font-bold text-3xl mb-4">Ready to Start Your English Journey?</h2>
                     <p class="text-base text-white/90 mb-8">
-                        Join 50,000+ learners who have mastered English and unlocked new opportunities in their personal and professional lives.
+                        Join <?php echo $learnerText; ?> learners who are building their English skills and opening new doors at work and in life.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <a href="<?php echo $hasEnrollment ? 'my_learning.php' : 'enroll.php'; ?>" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">

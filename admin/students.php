@@ -149,7 +149,6 @@ if (!empty($students)) {
                             <th class="px-6 py-4">Joined</th>
                             <th class="px-6 py-4 text-center">Enrolled</th>
                             <th class="px-6 py-4 text-center">Completed</th>
-                            <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -204,21 +203,11 @@ if (!empty($students)) {
                                         <span class="text-xs text-gray-400">-</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <button onclick="viewStudent(<?= $row['id'] ?>)" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
-                                            View
-                                        </button>
-                                        <button onclick="deleteStudent(<?= $row['id'] ?>)" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
                                     <p class="text-sm text-gray-400">No students found</p>
                                 </td>
@@ -302,7 +291,7 @@ function viewStudent(id) {
                     '<span class="w-14 h-14 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 text-brandOrange flex items-center justify-center text-xl font-bold">' + u.name.charAt(0).toUpperCase() + '</span>' +
                     '<div><p class="text-lg font-bold text-gray-800">' + u.name + '</p><p class="text-sm text-gray-400">ID: #' + u.id + '</p></div>' +
                 '</div>' +
-                '<div class="grid grid-cols-3 gap-4 text-sm">' +
+                '<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">' +
                     '<div><span class="text-gray-400 block">Email</span><span class="font-medium text-gray-700">' + u.email + '</span></div>' +
                     '<div><span class="text-gray-400 block">Phone</span><span class="font-medium text-gray-700">' + (u.phone || '-') + '</span></div>' +
                     '<div><span class="text-gray-400 block">Gender</span><span class="font-medium text-gray-700">' + (u.gender || '-') + '</span></div>' +
@@ -325,19 +314,20 @@ function closeModal() {
 }
 
 function deleteStudent(id) {
-    if (!confirm('Are you sure you want to delete this student? This will also remove all their enrollments, progress, and reviews.')) return;
-    var formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('id', id);
-    fetch('students_ajax.php', { method: 'POST', body: formData })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
+    showConfirm('Are you sure you want to delete this student? This will also remove all their enrollments, progress, and reviews.', function() {
+        var formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', id);
+        fetch('students_ajax.php', { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    window.alert(data.message);
+                }
+            });
+    }, { okText: 'Delete', title: 'Delete Student' });
 }
 
 document.getElementById('studentModal')?.addEventListener('click', function(e) {

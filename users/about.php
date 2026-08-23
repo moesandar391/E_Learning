@@ -32,9 +32,9 @@ function formatLearnerCount($num) {
 
     <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="text-center mb-16">
-            <h1 class="font-serif font-bold text-5xl md:text-6xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
+            <h1 class="font-serif font-bold text-3xl md:text-4xl text-brandOchre dark:text-slate-100 mb-6">About Access Edu</h1>
             <p class="text-lg text-[#566473] dark:text-slate-300 max-w-3xl mx-auto">
-                We empower global communicators through immersive English language learning. Our mission is to bridge cultures and unlock international opportunities for learners worldwide.
+                Access Edu is a friendly English school that helps you speak, understand, and use English with confidence. Learning is simple, practical, and made for your goals.
             </p>
         </div>
         
@@ -43,10 +43,10 @@ function formatLearnerCount($num) {
                 <div class="space-y-6">
                     <h2 class="font-serif font-bold text-3xl text-brandOchre dark:text-slate-100">Our Story</h2>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
-                        Founded in 2020, Access Edu began as a small tutoring center in Singapore with a vision to make quality English education accessible to everyone. Over the years, we've grown into a global platform serving learners in over 50 countries.
+                        Founded in 2022, Access Edu began as a small tutoring center in Mandalay. Our goal was simple: help people learn English well, without complicated lessons or high costs.
                     </p>
                     <p class="text-base text-[#566473] dark:text-slate-300 leading-relaxed">
-                        Our journey started with just 5 students and one passionate tutor. Today, we boast a community of over <?php echo $learnerText; ?> active learners who have mastered English and transformed their careers through our comprehensive programs.
+                        It all started with just 5 students and one passionate tutor. Today, over <?php echo $learnerText; ?> learners have grown their skills with us and reached goals that once felt out of reach.
                     </p>
                 </div>
                 
@@ -103,7 +103,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Excellence</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We strive for teaching excellence through continuous improvement and proven methodologies that deliver real results for our learners.
+                            We focus on teaching that actually works — clear lessons, helpful feedback, and steady progress you can see.
                         </p>
                     </div>
                     
@@ -115,7 +115,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Community</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We believe in the power of community learning, where students support each other and grow together towards their goals.
+                            Learning is better together. Our students encourage and support each other on every step of the way.
                         </p>
                     </div>
                     
@@ -127,7 +127,7 @@ function formatLearnerCount($num) {
                         </div>
                         <h3 class="font-bold text-lg text-gray-500 dark:text-slate-100">Innovation</h3>
                         <p class="text-sm text-[#566473] dark:text-slate-300 leading-relaxed">
-                            We innovate continuously, leveraging technology to create personalized learning experiences that adapt to each student's unique needs.
+                            We keep our lessons fresh and easy to follow, so you can learn in a way that fits your daily life.
                         </p>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ function formatLearnerCount($num) {
                 <div class="max-w-3xl mx-auto text-center">
                     <h2 class="font-serif font-bold text-3xl mb-4">Ready to Start Your English Journey?</h2>
                     <p class="text-base text-white/90 mb-8">
-                        Join <?php echo $learnerText; ?> learners who have mastered English and unlocked new opportunities in their personal and professional lives.
+                        Join <?php echo $learnerText; ?> learners who are building their English skills and opening new doors at work and in life.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <a href="<?php echo $hasEnrollment ? 'my_learning.php' : 'index.php'; ?>" class="bg-[#FF8A00] hover:bg-[#E07A00] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg transform hover:scale-105">

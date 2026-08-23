@@ -122,7 +122,7 @@ while ($row = $revResult->fetch_assoc()) {
                 <?php endif; ?>
 
                 <div class="aspect-video bg-gray-200 rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                    <video id="lessonVideo" class="w-full h-full" controls preload="metadata" <?= $user_id && !$isCompleted ? 'onended="autoComplete(' . $activeLesson['id'] . ')"' : '' ?>>
+                    <video id="lessonVideo" class="w-full h-full" controls preload="metadata" <?= $user_id && !$isCompleted ? 'onended="autoComplete(' . $activeLesson['id'] . ', ' . (($nextIndex !== null && $nextUnlocked) ? $allLessons[$nextIndex]['id'] : 'null') . ')"' : '' ?>>
                         <source src="../admin/<?php echo htmlspecialchars($activeLesson['video']); ?>" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -423,7 +423,7 @@ function fetchCertificate(moduleId, btn) {
     xhr.send();
 }
 
-function autoComplete(lessonId) {
+function autoComplete(lessonId, nextLessonId) {
     var formData = new FormData();
     formData.append('complete_lesson', '1');
     formData.append('complete_lesson_id', lessonId);
@@ -432,7 +432,11 @@ function autoComplete(lessonId) {
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.onload = function() {
         if (xhr.status === 200) {
-            location.reload();
+            if (nextLessonId) {
+                location.href = 'lesson.php?module_id=<?= $module_id ?>&lesson_id=' + nextLessonId;
+            } else {
+                location.reload();
+            }
         }
     };
     xhr.send(formData);

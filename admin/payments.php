@@ -160,7 +160,6 @@
                             <th class="px-3 py-3">Amount</th>
                             <th class="px-3 py-3">Date</th>
                             <th class="px-3 py-3">Status</th>
-                            <th class="px-3 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -248,23 +247,11 @@
                                         <?= ucfirst($s) ?>
                                     </span>
                                 </td>
-                                <td class="px-3 py-3 whitespace-nowrap">
-                                    <div class="flex items-center gap-1.5">
-                                        <?php $isRejected = $s === 'rejected'; ?>
-                                        <button class="confirm-btn px-2 py-1 text-xs font-semibold rounded-md border transition <?= $isRejected ? 'bg-green-100 text-green-800 border-green-200 opacity-50 cursor-not-allowed' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' ?>" data-id="<?= $row['id'] ?>" <?= $isRejected ? 'disabled' : '' ?>>
-                                            Confirm
-                                        </button>
-                                        <?php $isConfirmed = $s === 'confirmed'; ?>
-                                        <button class="reject-btn px-2 py-1 text-xs font-semibold rounded-md border transition <?= $isConfirmed ? 'bg-red-100 text-red-800 border-red-200 opacity-50 cursor-not-allowed' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' ?>" data-id="<?= $row['id'] ?>" <?= $isConfirmed ? 'disabled' : '' ?>>
-                                            Reject
-                                        </button>
-                                    </div>
-                                </td>
                             </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                     <p class="text-sm text-gray-400 mb-1">No enrollments yet</p>
                                     <p class="text-xs text-gray-300">Enrollments will appear once students purchase a module.</p>
@@ -294,18 +281,6 @@
     </main>
 </div>
 
-<div id="rejectModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
-        <h3 class="font-bold text-lg mb-4">Reject Enrollment</h3>
-        <input type="hidden" id="rejectEnrollmentId">
-        <textarea id="rejectReason" class="w-full border rounded-lg p-2 mb-4" rows="3" placeholder="Enter reason for rejection..."></textarea>
-        <div class="flex justify-end gap-2">
-            <button onclick="document.getElementById('rejectModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
-            <button onclick="submitRejection()" class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg">Confirm Rejection</button>
-        </div>
-    </div>
-</div>
-
 <script>
 const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
@@ -331,74 +306,6 @@ statusFilter.addEventListener('change', function() {
     params.delete('page');
     window.location.search = params.toString();
 });
-
-document.querySelectorAll('.confirm-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var id = this.getAttribute('data-id');
-        var row = this.closest('tr');
-        if (confirm('Confirm this enrollment?')) {
-            var formData = new FormData();
-            formData.append('action', 'confirm');
-            formData.append('id', id);
-            fetch('payments_ajax.php', { method: 'POST', body: formData })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.success) {
-                        var statusCell = row.querySelector('td:nth-child(8)');
-                        statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-green-50 text-green-700 border-green-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmed</span>';
-                        var rejectBtn = row.querySelector('.reject-btn');
-                        if (rejectBtn) {
-                            rejectBtn.disabled = true;
-                            rejectBtn.className = 'reject-btn px-2 py-1 text-xs font-semibold rounded-md bg-red-100 text-red-800 border border-red-200 opacity-50 cursor-not-allowed transition';
-                        }
-                    } else {
-                        alert(data.message);
-                    }
-                });
-        }
-    });
-});
-
-document.querySelectorAll('.reject-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var id = this.getAttribute('data-id');
-        document.getElementById('rejectEnrollmentId').value = id;
-        document.getElementById('rejectReason').value = '';
-        document.getElementById('rejectModal').classList.remove('hidden');
-    });
-});
-
-function submitRejection() {
-    var id = document.getElementById('rejectEnrollmentId').value;
-    var reason = document.getElementById('rejectReason').value.trim();
-    if (!reason) {
-        alert('Please enter a reason for rejection.');
-        return;
-    }
-    var row = document.querySelector('.payment-row[data-id="' + id + '"]');
-    var formData = new FormData();
-    formData.append('action', 'reject');
-    formData.append('id', id);
-    formData.append('reason', reason);
-    fetch('payments_ajax.php', { method: 'POST', body: formData })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.success) {
-                if (row) {
-                    var statusCell = row.querySelector('td:nth-child(8)');
-                    statusCell.innerHTML = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border bg-red-50 text-red-700 border-red-200"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> Rejected</span>';
-                    var confirmBtn = row.querySelector('.confirm-btn');
-                    if (confirmBtn) {
-                        confirmBtn.disabled = true;
-                        confirmBtn.className = 'confirm-btn px-2 py-1 text-xs font-semibold rounded-md bg-green-100 text-green-800 border border-green-200 opacity-50 cursor-not-allowed transition';
-                    }
-                }
-                document.getElementById('rejectModal').classList.add('hidden');
-            } else {
-                alert(data.message);
-            }
-        });
-}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>

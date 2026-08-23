@@ -54,50 +54,10 @@ $rows = runQuery($conn, "SELECT qr.attempt_id, qr.attempt_number, qr.score, qr.t
                          $baseFrom
                          ORDER BY qr.attempt_date DESC
                          LIMIT $offset, $limit", $params);
-
-$modules = $conn->query("SELECT m.id, m.name, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id ORDER BY c.course_name, m.name");
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="font-semibold text-gray-800">Filters</h3>
-            </div>
-            <form method="GET" class="px-6 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Module</label>
-                    <select name="module_id" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
-                        <option value="">All modules</option>
-                        <?php while ($m = $modules->fetch_assoc()): ?>
-                            <option value="<?= $m['id'] ?>" <?= $module_id === (int)$m['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($m['name'] . ' (' . $m['course_name'] . ')') ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Student</label>
-                    <input type="text" name="user" value="<?= htmlspecialchars($user_search) ?>" placeholder="Name or email..."
-                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">From</label>
-                    <input type="date" name="date_from" value="<?= htmlspecialchars($date_from) ?>"
-                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">To</label>
-                    <input type="date" name="date_to" value="<?= htmlspecialchars($date_to) ?>"
-                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange">
-                </div>
-                <div class="flex items-end gap-2">
-                    <button type="submit" class="flex-1 px-4 py-2 bg-brandOrange text-white text-sm font-semibold rounded-lg hover:bg-brandOrangeHover transition shadow-sm">Filter</button>
-                    <a href="quiz_report.php" class="px-4 py-2 text-sm font-semibold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition">Reset</a>
-                </div>
-            </form>
-        </div>
-
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
             <div class="bg-white rounded-xl border border-gray-200 p-5 text-center shadow-sm">
                 <p class="text-2xl font-bold text-gray-800"><?= (int)$stats['total'] ?></p>

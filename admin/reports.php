@@ -337,7 +337,7 @@ if (!empty($payment_filter)) {
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <!-- ── Filters ── -->
         <form method="GET" class="bg-white rounded-xl border border-gray-200 p-6 mb-8 hover:shadow-lg transition-shadow duration-200 no-print">
-            <div class="grid grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1.5">Start Date</label>
                     <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brandOrange focus:border-brandOrange outline-none transition">

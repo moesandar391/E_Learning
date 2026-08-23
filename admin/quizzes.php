@@ -176,7 +176,7 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                        class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent"
                        placeholder="e.g. Module Final Quiz">
             </div>
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Passing %</label>
                     <input type="number" name="passing_score" id="passingScore" min="1" max="100" value="70"
@@ -184,7 +184,7 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Questions/attempt</label>
-                    <input type="number" name="question_limit" id="questionLimit" min="1" value="100"
+                    <input type="number" name="question_limit" id="questionLimit" min="1" value="10"
                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent">
                 </div>
                 <div>
@@ -194,7 +194,7 @@ $courses = $conn->query("SELECT id, course_name FROM courses ORDER BY course_nam
                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandOrange focus:border-transparent">
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 rounded-lg p-3">
                 <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                     <input type="checkbox" name="random_questions" id="randomQuestions" checked class="w-4 h-4 text-brandOrange focus:ring-brandOrange rounded">
                     <span>Random questions per attempt</span>
@@ -302,14 +302,15 @@ document.getElementById('quizForm').addEventListener('submit', function(e) {
 });
 
 function deleteQuiz(id) {
-    if (!confirm('Are you sure you want to delete this quiz, all of its questions, attempts and results?')) return;
-    fetch('quizzes_ajax.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: 'delete', id: id })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) { if (d.success) location.reload(); else alert(d.message || 'Delete failed.'); });
+    showConfirm('Are you sure you want to delete this quiz, all of its questions, attempts and results?', function() {
+        fetch('quizzes_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', id: id })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (d.success) location.reload(); else window.alert(d.message || 'Delete failed.'); });
+    }, { okText: 'Delete', title: 'Delete Quiz' });
 }
 
 function toggleStatus(id, status) {

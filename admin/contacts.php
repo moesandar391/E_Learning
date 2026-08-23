@@ -1,5 +1,6 @@
 <?php
 require_once '../config/db.php';
+require_once '../includes/mailer.php';
 include_once('includes/header.php');
 require_once 'includes/sidebar.php';
 require_once __DIR__ . '/../includes/admin_notification_helper.php';
@@ -16,6 +17,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $conn->prepare('UPDATE contacts SET is_read = ? WHERE id = ?');
         $stmt->bind_param('ii', $isRead, $id);
         $stmt->execute();
+    } elseif ($action === 'reply' && $id > 0) {
+        $replyBody = trim($_POST['reply_body'] ?? '');
+        $replySubject = trim($_POST['reply_subject'] ?? '');
+        if ($replyBody !== '') {
+            $stmt = $conn->prepare('SELECT name, email, subject FROM contacts WHERE id = ?');
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $c = $stmt->get_result()->fetch_assoc();
+            if ($c) {
+                $subject = $replySubject !== '' ? $replySubject : 'Re: ' . $c['subject'];
+                $body = "Dear " . $c['name'] . ",\n\n" . $replyBody . "\n\nBest regards,\n" . MAIL_FROM_NAME . " Team";
+                $sent = send_mail($c['email'], $subject, $body);
+                $conn->query("UPDATE contacts SET is_read = 1 WHERE id = $id");
+                echo '<script>location.href="contacts.php?msg=' . ($sent ? 'reply_sent' : 'reply_failed') . '"</script>';
+                exit;
+            }
+        }
     }
     echo '<script>location.href="contacts.php"</script>';
     exit;
@@ -50,6 +68,17 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
 <div class="flex-1 flex flex-col overflow-hidden">
 
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+<?php if (isset($_GET['msg']) && $_GET['msg'] === 'reply_sent'): ?>
+        <div class="mb-6 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Reply sent successfully.
+        </div>
+<?php elseif (isset($_GET['msg']) && $_GET['msg'] === 'reply_failed'): ?>
+        <div class="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Reply could not be sent. Please check the email configuration.
+        </div>
+<?php endif; ?>
         <div class="flex justify-between items-center mb-6">
             <div class="flex gap-3 items-baseline">
                 <a href="contacts.php" class="px-4 py-2 rounded-lg text-sm font-medium <?php echo $filter === '' ? 'bg-brandOrange text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'; ?>">All</a>
@@ -60,7 +89,8 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
 
 <?php if (!empty($messages)): ?>
         <div class="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-shadow duration-200">
-            <table class="w-full table-fixed" id="contactsTable">
+            <div class="overflow-x-auto">
+                <table class="w-full table-fixed" id="contactsTable">
                 <thead class="bg-orange-100/50">
                     <tr class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         <th class="px-3 py-3 w-10">#</th>
@@ -75,7 +105,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
                 </thead>
                 <tbody class="divide-y divide-gray-100">
 <?php $counter = $offset + 1; foreach ($messages as $msg):
-    $name = trim($msg['first_name'] . ' ' . $msg['last_name']);
+    $name = trim($msg['name']);
     $shortMsg = strlen($msg['message']) > 100 ? substr($msg['message'], 0, 100) . '...' : $msg['message'];
     $isMsgRead = $msg['is_read'] == 1;
     $subjectLabel = isset($subjectLabels[$msg['subject']]) ? $subjectLabels[$msg['subject']] : $msg['subject'];
@@ -85,7 +115,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
                         <td class="px-3 py-3 min-w-0">
                             <div class="flex items-center gap-2 min-w-0">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brandOrange to-orange-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                                    <?php echo strtoupper($msg['first_name'][0]) . (isset($msg['last_name'][0]) ? strtoupper($msg['last_name'][0]) : ''); ?>
+                                    <?php echo strtoupper($msg['name'][0]); ?>
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-gray-700 truncate" title="<?= htmlspecialchars($name) ?>"><?= htmlspecialchars($name) ?></p>
@@ -144,7 +174,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
                                 <form method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
                                     <input type="hidden" name="action" value="delete">
-                                    <button type="submit" class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors" title="Delete" onclick="return confirm('Delete this contact message?');">
+                                    <button type="submit" class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors" title="Delete" onclick="return confirmForm(event, this.form, 'Delete this contact message?');">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.003A2 2 0 0116.139 21H7.862a2 2 0 01-1.995-1.997L5 7m5-4h4a1 1 0 011 1v2H9V4a1 1 0 011-1z"/></svg>
                                     </button>
                                 </form>
@@ -154,6 +184,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
 <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
             <?php if ($totalPages > 1): ?>
             <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p class="text-sm text-gray-500">Page <?php echo $page; ?> of <?php echo $totalPages; ?> (<?php echo $total; ?> total)</p>
@@ -191,8 +222,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
     <div class="dialog-content" style="padding:2rem;background:white;border-radius:1.5rem">
         <h2 class="dialog-title" style="font-size:1.25rem;font-weight:700;color:#1f2937;margin-bottom:1.5rem">Message Details</h2>
         <table style="width:100%">
-            <tr><td style="padding-bottom:1rem;width:50%"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">First Name</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#374151"><?php echo htmlspecialchars($msg['first_name']); ?></p></td>
-                <td style="padding-bottom:1rem;width:50%"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Last Name</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#374151"><?php echo htmlspecialchars($msg['last_name'] ?: 'N/A'); ?></p></td></tr>
+            <tr><td style="padding-bottom:1rem;width:50%"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#374151"><?php echo htmlspecialchars($name); ?></p></td>
             <tr><td style="padding-bottom:1rem"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</span><p style="margin:0.25rem 0 0"><a href="mailto:<?php echo htmlspecialchars($msg['email']); ?>" style="color:#FF8A00"><?php echo htmlspecialchars($msg['email']); ?></a></p></td>
                 <td style="padding-bottom:1rem"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</span><p style="margin:0.25rem 0 0;font-size:0.875rem;color:#4b5563"><?php echo htmlspecialchars($msg['phone'] ?: '(Not Provided)'); ?></p></td></tr>
             <tr><td colspan="2" style="padding-bottom:1rem"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Subject</span><span class="inline-block ml-2 px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-lg"><?php echo htmlspecialchars($subjectLabel); ?></span></td></tr>
@@ -201,9 +231,24 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
         <div style="margin-top:0.5rem"><span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Message</span>
             <p style="margin:0.5rem 0 0;font-size:0.875rem;color:#1f2937;background:#f8f9fa;padding:1rem;border-radius:0.75rem;line-height:1.5"><?php echo nl2br(htmlspecialchars($msg['message'])); ?></p>
         </div>
-        <div style="margin-top:2rem;display:flex;gap:0.75rem">
-            <a href="mailto:<?php echo htmlspecialchars($msg['email']); ?>" style="flex:1;text-align:center;background:#FF8A00;color:white;border-radius:0.75rem;font-size:0.875rem;font-weight:700;padding:0.75rem;text-decoration:none;box-shadow:0 4px 12px rgba(255,138,0,0.3)">Reply via Email</a>
-            <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').close();" style="padding:0.75rem 1.5rem;background:#f3f4f6;border:none;border-radius:0.75rem;font-size:0.875rem;font-weight:500;color:#4b5563;cursor:pointer">Close</button>
+        <div style="margin-top:2rem">
+            <button type="button" id="toggle-reply-<?php echo $msg['id']; ?>" onclick="var f=document.getElementById('reply-form-<?php echo $msg['id']; ?>');f.classList.remove('hidden');this.style.display='none';" style="width:100%;text-align:center;background:#FF8A00;color:white;border-radius:0.75rem;font-size:0.875rem;font-weight:700;padding:0.75rem;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(255,138,0,0.3)">Reply via Email</button>
+            <div id="reply-form-<?php echo $msg['id']; ?>" class="hidden" style="margin-top:0.75rem">
+                <form method="POST">
+                    <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
+                    <input type="hidden" name="action" value="reply">
+                    <input type="email" name="reply_to" value="<?php echo htmlspecialchars($msg['email']); ?>" readonly style="width:100%;padding:0.6rem 0.75rem;border:1px solid #e5e7eb;border-radius:0.5rem;font-size:0.8rem;color:#6b7280;background:#f9fafb;margin-bottom:0.5rem;box-sizing:border-box">
+                    <input type="text" name="reply_subject" value="Re: <?php echo htmlspecialchars($subjectLabel); ?>" placeholder="Subject" style="width:100%;padding:0.6rem 0.75rem;border:1px solid #e5e7eb;border-radius:0.5rem;font-size:0.8rem;margin-bottom:0.5rem;box-sizing:border-box">
+                    <textarea name="reply_body" rows="4" placeholder="Write your reply here..." required style="width:100%;padding:0.6rem 0.75rem;border:1px solid #e5e7eb;border-radius:0.5rem;font-size:0.8rem;box-sizing:border-box;resize:vertical"></textarea>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+                        <button type="submit" style="flex:1;padding:0.6rem 1rem;background:#FF8A00;color:white;border:none;border-radius:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer">Send Reply</button>
+                        <button type="button" onclick="document.getElementById('reply-form-<?php echo $msg['id']; ?>').classList.add('hidden');document.getElementById('toggle-reply-<?php echo $msg['id']; ?>').style.display='';" style="padding:0.6rem 1rem;background:#f3f4f6;border:none;border-radius:0.5rem;font-size:0.8rem;color:#4b5563;cursor:pointer">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:0.75rem">
+            <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').close();" style="flex:1;padding:0.75rem 1.5rem;background:#f3f4f6;border:none;border-radius:0.75rem;font-size:0.875rem;font-weight:500;color:#4b5563;cursor:pointer">Close</button>
         </div>
         <div style="margin-top:0.75rem;display:flex;gap:0.5rem;justify-content:flex-end">
             <form method="POST" style="display:inline;">
@@ -219,7 +264,7 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
             <form method="POST" style="display:inline;">
                 <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
                 <input type="hidden" name="action" value="delete">
-                <button type="submit" style="padding:0.5rem 1rem;background:#fee2e2;border:none;border-radius:0.5rem;font-size:0.75rem;color:#991b1b;cursor:pointer" onclick="return confirm('Delete?');">Delete</button>
+                <button type="submit" style="padding:0.5rem 1rem;background:#fee2e2;border:none;border-radius:0.5rem;font-size:0.75rem;color:#991b1b;cursor:pointer" onclick="return confirmForm(event, this.form, 'Delete this contact message?');">Delete</button>
             </form>
         </div>
     </div>

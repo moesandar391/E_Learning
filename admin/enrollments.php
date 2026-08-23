@@ -21,7 +21,7 @@ $result = $conn->query("
     ORDER BY e.created_at DESC
     LIMIT $offset, $limit
 ");
- $enrollments = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+$enrollments = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
@@ -129,19 +129,20 @@ $result = $conn->query("
 
 <script>
 function deleteEnrollment(id) {
-    if (!confirm('Delete this enrollment? This cannot be undone.')) return;
-    var formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('id', id);
-    fetch('enrollments_ajax.php', { method: 'POST', body: formData })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
+    showConfirm('Delete this enrollment? This cannot be undone.', function() {
+        var formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('id', id);
+        fetch('enrollments_ajax.php', { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    window.alert(data.message);
+                }
+            });
+    }, { okText: 'Delete', title: 'Delete Enrollment' });
 }
 
 document.getElementById('searchInput').addEventListener('keyup', function() {

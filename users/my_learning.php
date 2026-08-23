@@ -178,24 +178,34 @@ foreach ($certificates as $cert) {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <?php foreach ($waitingEnrollments as $waiting): ?>
                 <div class="p-5 border border-yellow-200 rounded-2xl bg-yellow-50/50 transition-all duration-200">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="pr-4">
-                            <h4 class="font-bold text-gray-800 leading-snug">
-                                <?= htmlspecialchars($waiting['module_name']) ?>
-                            </h4>
-                            <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($waiting['course_name']) ?></p>
+                    <div class="flex items-start gap-4">
+                        <?php if (!empty($waiting['image'])): ?>
+                        <img src="../uploads/modules/<?= htmlspecialchars($waiting['image']) ?>"
+                             alt="<?= htmlspecialchars($waiting['module_name']) ?>"
+                             class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-yellow-200 flex-shrink-0"
+                             onerror="this.style.display='none'">
+                        <?php endif; ?>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="pr-4">
+                                    <h4 class="font-bold text-gray-800 leading-snug">
+                                        <?= htmlspecialchars($waiting['module_name']) ?>
+                                    </h4>
+                                    <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($waiting['course_name']) ?></p>
+                                </div>
+                                <span class="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">
+                                    <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle>
+                                        <path class="opacity-75" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 2a10 10 0 0110 10"></path>
+                                    </svg>
+                                    Waiting
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-gray-500">
+                                <svg class="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Payment received. Awaiting admin confirmation to start learning.</span>
+                            </div>
                         </div>
-                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full whitespace-nowrap">
-                            <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle>
-                                <path class="opacity-75" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M12 2a10 10 0 0110 10"></path>
-                            </svg>
-                            Waiting
-                        </span>
-                    </div>
-                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                        <svg class="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span>Payment received. Awaiting admin confirmation to start learning.</span>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -229,47 +239,55 @@ foreach ($certificates as $cert) {
                         $hasReview = !is_null($course['existing_rating']);
                     ?>
                     <div class="p-5 border border-gray-100 rounded-2xl hover:shadow-lg hover:border-brandOrange/30 transition-all duration-200 bg-gray-50/50">
-                        <a href="lesson.php?module_id=<?= $course['module_id'] ?>"
-                           class="block group">
-                            <div class="flex items-start justify-between mb-4">
-                                <div class="pr-4">
-                                    <h4 class="font-bold text-gray-800 group-hover:text-brandOrange transition-colors leading-snug">
-                                        <?= htmlspecialchars($course['module_name']) ?>
-                                    </h4>
-                                    <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($course['course_name']) ?></p>
-                                </div>
-                                <?php if ($progress == 100): ?>
-                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">Completed</span>
-                                <?php endif; ?>
-                                
-                            </div>
-                            <?php if ($hasProgress): ?>
-                            <div class="space-y-2 mt-auto">
-                                <div class="flex justify-between text-xs">
-                                    <span class="text-gray-500">Progress</span>
-                                    <span class="font-bold <?= $textColor ?>"><?= $course['completed_lessons'] ?>/<?= $course['total_lessons'] ?> Lessons</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                    <div class="h-full <?= $barColor ?> rounded-full transition-all duration-700 ease-out" style="width: <?= $progress ?>%;"></div>
-                                </div>
-                            </div>
+                        <div class="flex items-start gap-4">
+                            <?php if (!empty($course['image'])): ?>
+                            <img src="../uploads/modules/<?= htmlspecialchars($course['image']) ?>"
+                                 alt="<?= htmlspecialchars($course['module_name']) ?>"
+                                 class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-gray-200 flex-shrink-0"
+                                 onerror="this.style.display='none'">
                             <?php endif; ?>
-                            <div class="mt-4 flex items-center justify-between">
-                                <span class="text-xs text-brandOrange font-semibold flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                    Continue Learning
-                                </span>
-                                <?php if ($progress == 100 && !$hasReview): ?>
-                                    <a href="my_review.php?write=1"
-                                       class="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap bg-brandOrange text-white hover:bg-brandOrangeHover">
-                                        Write Review
+                            <div class="flex-1 min-w-0">
+                                <a href="lesson.php?module_id=<?= $course['module_id'] ?>" class="block group">
+                                    <div class="flex items-start justify-between gap-2 mb-4">
+                                        <div class="pr-4">
+                                            <h4 class="font-bold text-gray-800 group-hover:text-brandOrange transition-colors leading-snug">
+                                                <?= htmlspecialchars($course['module_name']) ?>
+                                            </h4>
+                                            <p class="text-[11px] text-gray-400 uppercase tracking-wider mt-1"><?= htmlspecialchars($course['course_name']) ?></p>
+                                        </div>
+                                        <?php if ($progress == 100): ?>
+                                            <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full flex-shrink-0">Completed</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($hasProgress): ?>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-gray-500">Progress</span>
+                                            <span class="font-bold <?= $textColor ?>"><?= $course['completed_lessons'] ?>/<?= $course['total_lessons'] ?> Lessons</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                            <div class="h-full <?= $barColor ?> rounded-full transition-all duration-700 ease-out" style="width: <?= $progress ?>%;"></div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                </a>
+                                <div class="mt-4 flex items-center justify-between gap-2">
+                                    <a href="lesson.php?module_id=<?= $course['module_id'] ?>"
+                                       class="text-xs text-brandOrange font-semibold flex items-center gap-1 hover:text-brandOrangeHover transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                        Continue Learning
                                     </a>
-                                <?php elseif ($progress == 100 && $hasReview): ?>
-                                    <span class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg whitespace-nowrap">Reviewed</span>
-                                <?php endif; ?>
+                                    <?php if ($progress == 100 && !$hasReview): ?>
+                                        <a href="my_review.php?write=1"
+                                           class="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap bg-brandOrange text-white hover:bg-brandOrangeHover">
+                                            Write Review
+                                        </a>
+                                    <?php elseif ($progress == 100 && $hasReview): ?>
+                                        <span class="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg whitespace-nowrap">Reviewed</span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </a>
-
+                        </div>
                     </div>
                     <?php endforeach; ?>
                 </div>

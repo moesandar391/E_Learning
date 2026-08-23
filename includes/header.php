@@ -267,6 +267,7 @@ function header_underline($active) {
                 }
                 ?>
 
+                    <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="relative" id="notifWrapper">
                         <button id="notifBtn" class="relative w-9 h-9 flex items-center justify-center rounded-lg border border-orange-200 bg-orange-50 text-slate-600 hover:text-brandOchre hover:bg-orange-100 transition flex-shrink-0 cursor-pointer" title="Notifications">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,6 +289,7 @@ function header_underline($active) {
                             <a href="notifications.php" class="block px-4 py-2.5 text-center text-sm text-brandOrange font-medium border-t border-gray-100 hover:bg-orange-50 transition rounded-b-xl">View All Notifications</a>
                         </div>
                     </div>
+                <?php endif; ?>
 
                 <?php if (isset($_SESSION['username'])): 
                     $initial = strtoupper(substr($_SESSION['username'], 0, 1));
@@ -328,7 +330,7 @@ function header_underline($active) {
 
                         <?php else: ?>
                     <div class="hidden lg:block">
-                        <a href="../auth/login.php?from=header" class="relative flex items-center justify-center px-6 py-1.5 bg-black text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">
+                        <a href="../auth/login.php?from=header" class="flex items-center justify-center px-6 py-2 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition text-sm">
         Login
     </a>
 </div>
@@ -341,7 +343,7 @@ function header_underline($active) {
                         </span>
 
                         <span class="relative z-10 transition-colors duration-300 group-hover:text-white">
-                        Get Started
+                        Register
                         </span>
                     </button>
                 </div>
@@ -413,7 +415,7 @@ function header_underline($active) {
                             </a>
                         <?php else: ?>
                             <a href="../auth/login.php?from=header" class="flex items-center justify-center px-6 py-3 bg-brandOrange text-white font-semibold rounded-full hover:bg-brandOrangeHover transition text-sm">Login</a>
-                            <a href="../auth/register.php" class="flex items-center justify-center px-6 py-3 border-2 border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">Get Started</a>
+                            <a href="../auth/register.php" class="flex items-center justify-center px-6 py-3 border-2 border-brandOrange text-brandOrange font-semibold rounded-full hover:bg-brandOrange hover:text-white transition text-sm">Register</a>
                         <?php endif; ?>
                     </div>
             </div>

@@ -36,18 +36,19 @@ $badge = match($s) {
 ?>
 
 <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 flex-shrink-0">
-        <div>
-            <h1 class="text-lg font-semibold text-gray-800">Enrollment Details</h1>
-            <p class="text-sm text-gray-500">#<?= $row['id'] ?></p>
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="enrollments.php" class="text-sm text-gray-500 hover:text-gray-700 transition">&larr; Back to Enrollments</a>
-        </div>
-    </header>
-
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div class="max-w-3xl mx-auto space-y-6">
+            <!-- Page Header -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                    <h1 class="text-lg font-semibold text-gray-800">Enrollment Details</h1>
+                    <p class="text-sm text-gray-500">#<?= $row['id'] ?></p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="enrollments.php" class="text-sm text-gray-500 hover:text-gray-700 transition">&larr; Back to Enrollments</a>
+                </div>
+            </div>
+
             <!-- Student Info -->
             <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Student Information</h3>
@@ -133,62 +134,121 @@ $badge = match($s) {
     </main>
 </div>
 
-<!-- Modal OUTSIDE the flex container and main -->
+<!-- Modals OUTSIDE the flex container and main -->
 <div id="rejectModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-xl mx-4">
         <h3 class="font-bold text-lg mb-4">Reject Enrollment</h3>
         <input type="hidden" id="rejectEnrollmentId">
         <textarea id="rejectReason" class="w-full border rounded-lg p-2 mb-4" rows="3" placeholder="Enter reason for rejection..."></textarea>
         <div class="flex justify-end gap-2">
-            <button onclick="document.getElementById('rejectModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
+            <button onclick="hideModal('rejectModal')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
             <button onclick="submitRejection()" class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg">Confirm Rejection</button>
         </div>
     </div>
 </div>
 
+<div id="confirmModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-xl mx-4">
+        <h3 id="confirmTitle" class="font-bold text-lg mb-2">Are you sure?</h3>
+        <p id="confirmMessage" class="text-sm text-gray-600 mb-6"></p>
+        <div class="flex justify-end gap-2">
+            <button onclick="hideModal('confirmModal')" class="px-4 py-2 text-sm text-gray-500">Cancel</button>
+            <button id="confirmActionBtn" class="px-4 py-2 text-sm text-white rounded-lg">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div id="messageModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl w-96 shadow-xl mx-4">
+        <div class="flex items-start gap-3">
+            <div id="messageIcon" class="flex-shrink-0"></div>
+            <div class="flex-1">
+                <h3 id="messageTitle" class="font-bold text-lg mb-1"></h3>
+                <p id="messageText" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 mt-6">
+            <button id="messageOkBtn" onclick="hideModal('messageModal')" class="px-4 py-2 text-sm text-white rounded-lg">OK</button>
+        </div>
+    </div>
+</div>
+
 <script>
-function updateStatus(id, action) {
-    if (!confirm('Are you sure you want to ' + action + ' this enrollment?')) return;
+function showModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+}
+function hideModal(id) {
+    document.getElementById(id).classList.add('hidden');
+}
+
+// Shared API call for confirm/reject; reloads on success.
+function callApi(action, id, reason) {
     var formData = new FormData();
     formData.append('action', action);
     formData.append('id', id);
+    if (reason) formData.append('reason', reason);
     fetch('payments_ajax.php', { method: 'POST', body: formData })
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (data.success) {
                 location.reload();
             } else {
-                alert(data.message);
+                showMessage(data.message, false);
             }
+        })
+        .catch(function() {
+            showMessage('Something went wrong. Please try again.', false);
         });
+}
+
+// Custom "alert": show a styled message box instead of the browser dialog.
+function showMessage(msg, isError) {
+    var title = isError ? 'Error' : 'Notice';
+    var color = isError ? 'bg-red-600' : 'bg-brandOrange';
+    document.getElementById('messageTitle').textContent = title;
+    document.getElementById('messageText').textContent = msg;
+    document.getElementById('messageIcon').innerHTML =
+        '<svg class="w-6 h-6 ' + (isError ? 'text-red-600' : 'text-brandOrange') + '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="' +
+        (isError ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z') +
+        '"/></svg>';
+    document.getElementById('messageOkBtn').className = 'px-4 py-2 text-sm text-white rounded-lg ' + color;
+    showModal('messageModal');
+}
+
+function updateStatus(id, action) {
+    var isConfirm = action === 'confirm';
+    document.getElementById('confirmTitle').textContent = isConfirm ? 'Confirm Enrollment' : 'Reject Enrollment';
+    document.getElementById('confirmMessage').textContent =
+        'Are you sure you want to ' + action + ' this enrollment?';
+    var btn = document.getElementById('confirmActionBtn');
+    btn.className = 'px-4 py-2 text-sm text-white rounded-lg ' + (isConfirm ? 'bg-green-600' : 'bg-red-600');
+    btn.textContent = isConfirm ? 'Confirm' : 'Reject';
+    btn.onclick = function() {
+        hideModal('confirmModal');
+        if (isConfirm) {
+            callApi('confirm', id);
+        } else {
+            openRejectModal(id);
+        }
+    };
+    showModal('confirmModal');
 }
 
 function openRejectModal(id) {
     document.getElementById('rejectEnrollmentId').value = id;
     document.getElementById('rejectReason').value = '';
-    document.getElementById('rejectModal').classList.remove('hidden');
+    showModal('rejectModal');
 }
 
 function submitRejection() {
     var id = document.getElementById('rejectEnrollmentId').value;
     var reason = document.getElementById('rejectReason').value.trim();
     if (!reason) {
-        alert('Please enter a reason for rejection.');
+        showMessage('Please enter a reason for rejection.', true);
         return;
     }
-    var formData = new FormData();
-    formData.append('action', 'reject');
-    formData.append('id', id);
-    formData.append('reason', reason);
-    fetch('payments_ajax.php', { method: 'POST', body: formData })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        });
+    hideModal('rejectModal');
+    callApi('reject', id, reason);
 }
 </script>
 

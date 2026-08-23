@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../config/db.php';
-include_once('../includes/header.php');
 
 $userId = $_SESSION['user_id'] ?? null;
 if (!$userId) {
@@ -9,32 +8,43 @@ if (!$userId) {
     exit;
 }
 
-// Handle review submission
+// Handle review submission (must run BEFORE any HTML output)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     $moduleId = intval($_POST['module_id']);
     $rating = intval($_POST['rating']);
     $review = trim($_POST['review']);
 
     if ($rating >= 1 && $rating <= 5) {
-        $stmt = $conn->prepare("INSERT INTO reviews (user_id, module_id, rating, review) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("iiis", $userId, $moduleId, $rating, $review);
-        $stmt->execute();
+        try {
+            $stmt = $conn->prepare("INSERT INTO reviews (user_id, module_id, rating, review) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iiis", $userId, $moduleId, $rating, $review);
+            $stmt->execute();
 
-        $userRes = $conn->query("SELECT name FROM users WHERE id = $userId");
-        $userName = $userRes->fetch_assoc()['name'] ?? 'A user';
-        $modRes = $conn->query("SELECT m.name, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id WHERE m.id = $moduleId");
-        $modData = $modRes->fetch_assoc();
-        $moduleName = $modData['name'] ?? 'a module';
-        $courseName = $modData['course_name'] ?? '';
+            $userRes = $conn->query("SELECT name FROM users WHERE id = $userId");
+            $userName = $userRes->fetch_assoc()['name'] ?? 'A user';
+            $modRes = $conn->query("SELECT m.name, c.course_name FROM modules m JOIN courses c ON m.course_id = c.id WHERE m.id = $moduleId");
+            $modData = $modRes->fetch_assoc();
+            $moduleName = $modData['name'] ?? 'a module';
+            $courseName = $modData['course_name'] ?? '';
 
-        require_once __DIR__ . '/../includes/admin_notification_helper.php';
-        $notifMsg = "$userName reviewed \"$moduleName\" ($courseName) with $rating star" . ($rating > 1 ? 's' : '');
-        create_admin_notification($notifMsg, "reviews.php", 'review');
+            require_once __DIR__ . '/../includes/admin_notification_helper.php';
+            $notifMsg = "$userName reviewed \"$moduleName\" ($courseName) with $rating star" . ($rating > 1 ? 's' : '');
+            create_admin_notification($notifMsg, "reviews.php", 'review');
 
-        header('Location: my_learning.php');
+            $_SESSION['review_success'] = 'Thank you! Your review has been submitted.';
+        } catch (mysqli_sql_exception $e) {
+            $_SESSION['review_error'] = 'You have already submitted a review for this course.';
+        }
+        header('Location: my_review.php');
         exit;
     }
+
+    $_SESSION['review_error'] = 'Please select a star rating before submitting.';
+    header('Location: my_review.php?write=1');
+    exit;
 }
+
+include_once('../includes/header.php');
 
 // Fetch fully completed enrollments without existing reviews
 $stmt = $conn->prepare("
@@ -85,6 +95,19 @@ $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
             </a>
         </div>
 
+        <?php if (isset($_SESSION['review_success'])): ?>
+            <div class="mx-6 mb-6 flex items-start gap-3 bg-green-50 border border-green-200 text-green-800 rounded-2xl px-5 py-4 text-sm">
+                <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span><?php echo htmlspecialchars($_SESSION['review_success']); unset($_SESSION['review_success']); ?></span>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['review_error'])): ?>
+            <div class="mx-6 mb-6 flex items-start gap-3 bg-red-50 border border-red-200 text-red-800 rounded-2xl px-5 py-4 text-sm">
+                <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span><?php echo htmlspecialchars($_SESSION['review_error']); unset($_SESSION['review_error']); ?></span>
+            </div>
+        <?php endif; ?>
+
         <?php if (isset($_GET['write']) && $_GET['write'] == 1): ?>
             <?php if (count($enrollments) > 0): ?>
                 <div class="space-y-4 px-6">
@@ -129,7 +152,8 @@ $userReviews = $userReviews ? $userReviews->fetch_all(MYSQLI_ASSOC) : [];
                                                     class="star-btn text-2xl text-gray-300 hover:text-yellow-400 transition-colors">★</button>
                                             <?php endfor; ?>
                                         </div>
-                                        <input type="hidden" name="rating" class="rating-input" value="0" required>
+                                        <input type="hidden" name="rating" class="rating-input" value="0">
+                                        <p class="rating-error hidden text-xs text-red-500 mt-1">Please tap a star to rate this course.</p>
                                     </div>
 
                                     <div>
@@ -237,7 +261,22 @@ document.querySelectorAll('.star-rating').forEach(function(container) {
                 s.classList.toggle('text-yellow-400', idx < val);
                 s.classList.toggle('text-gray-300', idx >= val);
             });
+            var err = input.closest('form').querySelector('.rating-error');
+            if (err) err.classList.add('hidden');
         });
+    });
+});
+
+// Block submit until a star rating is chosen (hidden inputs skip native validation)
+document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        var input = form.querySelector('.rating-input');
+        if (!input) return;
+        if (parseInt(input.value, 10) === 0) {
+            e.preventDefault();
+            var err = form.querySelector('.rating-error');
+            if (err) err.classList.remove('hidden');
+        }
     });
 });
 </script>

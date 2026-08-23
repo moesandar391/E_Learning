@@ -259,14 +259,15 @@ document.getElementById('questionForm').addEventListener('submit', function(e) {
 });
 
 function deleteQuestion(id) {
-    if (!confirm('Are you sure you want to delete this question?')) return;
-    fetch('questions_ajax.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: 'delete', id: id })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) { if (d.success) location.reload(); else alert(d.message || 'Delete failed.'); });
+    showConfirm('Are you sure you want to delete this question?', function() {
+        fetch('questions_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'delete', id: id })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) { if (d.success) location.reload(); else window.alert(d.message || 'Delete failed.'); });
+    }, { okText: 'Delete', title: 'Delete Question' });
 }
 </script>
 
