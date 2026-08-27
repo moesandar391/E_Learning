@@ -5,7 +5,7 @@
 <?php
  $total_students = $conn->query("SELECT COUNT(*) FROM users")->fetch_row()[0] ?? 0;
  $total_courses = $conn->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0;
- $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+ $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments e JOIN users u ON e.user_id = u.id JOIN modules m ON e.module_id = m.id JOIN courses c ON m.course_id = c.id")->fetch_row()[0] ?? 0;
  $total_revenue = $conn->query("SELECT COALESCE(SUM(m.price), 0) FROM enrollments e JOIN modules m ON e.module_id = m.id WHERE e.payment_method_id IS NOT NULL")->fetch_row()[0] ?? 0;
  $recent_enrollments = $conn->query("
           SELECT e.id, u.name AS student, c.course_name, m.name AS module_name, e.enroll_date, 'Paid' AS status 

@@ -15,7 +15,7 @@
      $where = "WHERE LOWER(e.status) = '$safeStatus'";
  }
 
- $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments e $where")->fetch_row()[0] ?? 0;
+ $total_enrollments = $conn->query("SELECT COUNT(*) FROM enrollments e JOIN users u ON e.user_id = u.id JOIN modules m ON e.module_id = m.id JOIN courses c ON m.course_id = c.id $where")->fetch_row()[0] ?? 0;
  $total_pending = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'pending'")->fetch_row()[0] ?? 0;
  $total_confirmed = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'confirmed'")->fetch_row()[0] ?? 0;
  $total_rejected = $conn->query("SELECT COUNT(*) FROM enrollments WHERE LOWER(status) = 'rejected'")->fetch_row()[0] ?? 0;

@@ -7,7 +7,7 @@ $limit = 10;
 $page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * $limit;
 
-$total = $conn->query("SELECT COUNT(*) FROM enrollments")->fetch_row()[0] ?? 0;
+$total = $conn->query("SELECT COUNT(*) FROM enrollments e JOIN users u ON e.user_id = u.id JOIN modules m ON e.module_id = m.id JOIN courses c ON m.course_id = c.id")->fetch_row()[0] ?? 0;
 $totalPages = max(1, ceil($total / $limit));
 $result = $conn->query("
     SELECT e.id, u.name AS student_name, u.email AS student_email, u.phone AS student_phone,
