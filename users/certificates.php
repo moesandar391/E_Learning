@@ -127,214 +127,349 @@ $html = <<<HTML
     body {
         margin: 0;
         padding: 0;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        font-family: Helvetica, Arial, sans-serif;
         width: 297mm;
         height: 210mm;
-        background: #fcf9f2;
+        background: #f7f5ef;
         position: relative;
+        color: #17233c;
     }
 
-    /* Certificate border */
-    .cert-border {
+    /* ================= Sidebar ================= */
+    .sidebar {
         position: absolute;
-        top: 5mm; left: 5mm; right: 5mm; bottom: 5mm;
-        border: 1.5px solid #b8962e;
+        top: 0; left: 0; bottom: 0;
+        width: 64mm;
+        background: #131f38;
+    }
+    .sidebar-shade {
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 90mm;
+        background: #0d1628;
+    }
+    .sidebar-edge {
+        position: absolute;
+        top: 0; left: 64mm; bottom: 0;
+        width: 1.4mm;
+        background: #c9a227;
     }
 
-    /* Footer */
-    .footer {
+    .brand {
         position: absolute;
-        bottom: 18mm;
-        width: 100%;
+        top: 15mm; left: 0;
+        width: 64mm;
         text-align: center;
-        font-size: 7px;
-        color: #aaa;
-        font-style: italic;
     }
-
-    /* School stamp image at bottom */
-    .stamp-img {
-        position: absolute;
-        bottom: 20mm;
-        right: 25mm;
-        width: 35mm;
-        height: auto;
-        z-index: 1;
-    }
-
-    /* Top ribbon */
-    .ribbon {
-        position: absolute;
-        top: 14mm;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #b8962e;
-        color: #fff;
-        padding: 3px 28px;
-        font-size: 10px;
-        letter-spacing: 3px;
+    .monogram {
+        width: 21mm; height: 21mm;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 0.7mm solid #c9a227;
+        border-radius: 50%;
+        color: #131f38;
+        font-size: 25px;
         font-weight: bold;
-        text-transform: uppercase;
-        z-index: 1;
+        line-height: 21mm;
+        text-align: center;
+    }
+    .brand-name {
+        margin-top: 5mm;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: bold;
+        letter-spacing: 3px;
+    }
+    .brand-sub {
+        margin-top: 2.5mm;
+        color: #8fa0c2;
+        font-size: 7.5px;
+        letter-spacing: 2.5px;
+    }
+    .brand-rule {
+        width: 22mm; height: 0.5mm;
+        background: #c9a227;
+        margin: 4mm auto 0;
     }
 
-    /* Watermark */
+    .rings { position: absolute; top: 88mm; left: 12mm; width: 40mm; height: 40mm; }
+    .ring-outer {
+        position: absolute; top: 0; left: 0;
+        width: 40mm; height: 40mm;
+        border: 0.35mm solid #3d4f75;
+        border-radius: 50%;
+    }
+    .ring-mid {
+        position: absolute; top: 3.5mm; left: 3.5mm;
+        width: 33mm; height: 33mm;
+        border: 0.3mm solid #c9a227;
+        border-radius: 50%;
+    }
+    .ring-inner {
+        position: absolute; top: 7mm; left: 7mm;
+        width: 26mm; height: 26mm;
+        border: 0.25mm solid #2c3c60;
+        border-radius: 50%;
+    }
+
+    .stamp-wrap {
+        position: absolute;
+        bottom: 13mm; left: 11.5mm;
+        width: 41mm; height: 41mm;
+        background: #ffffff;
+        border: 0.6mm solid #c9a227;
+        border-radius: 50%;
+        padding: 2.5mm;
+    }
+    .stamp-img { width: 100%; height: 100%; }
+
+    .side-foot {
+        position: absolute;
+        bottom: 6.5mm; left: 0;
+        width: 64mm;
+        text-align: center;
+        color: #7688ad;
+        font-size: 7px;
+        letter-spacing: 2px;
+    }
+
+    /* ================= Main sheet ================= */
+    .sheet {
+        position: absolute;
+        top: 10mm; left: 77mm; right: 12mm; bottom: 10mm;
+        background: #ffffff;
+    }
+    .frame-outer {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        border: 0.5mm solid #c9a227;
+    }
+    .frame-inner {
+        position: absolute; top: 2.4mm; left: 2.4mm; right: 2.4mm; bottom: 2.4mm;
+        border: 0.2mm solid #e6d49a;
+    }
+
+    .corner { position: absolute; width: 13mm; height: 13mm; }
+    .corner-tl { top: -0.6mm; left: -0.6mm; border-top: 1.3mm solid #17233c; border-left: 1.3mm solid #17233c; }
+    .corner-tr { top: -0.6mm; right: -0.6mm; border-top: 1.3mm solid #17233c; border-right: 1.3mm solid #17233c; }
+    .corner-bl { bottom: -0.6mm; left: -0.6mm; border-bottom: 1.3mm solid #17233c; border-left: 1.3mm solid #17233c; }
+    .corner-br { bottom: -0.6mm; right: -0.6mm; border-bottom: 1.3mm solid #17233c; border-right: 1.3mm solid #17233c; }
+
     .watermark {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 100px;
+        top: 92mm; left: 0; right: 0;
+        text-align: center;
+        font-size: 54px;
         font-weight: bold;
-        color: rgba(184, 150, 46, 0.06);
-        letter-spacing: 8px;
-        text-transform: uppercase;
-        pointer-events: none;
+        letter-spacing: 6px;
+        color: rgba(23, 35, 60, 0.05);
     }
 
-    /* Main content */
-    .content {
+    .inner {
         position: absolute;
-        top: 22mm;
-        left: 14mm;
-        right: 14mm;
-        bottom: 14mm;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        top: 11mm; left: 10mm; right: 10mm; bottom: 16mm;
         text-align: center;
-        z-index: 1;
     }
 
-    /* Main title */
+    .kicker {
+        font-size: 9px;
+        font-weight: bold;
+        letter-spacing: 5px;
+        color: #a3841f;
+    }
     .cert-title {
-        font-size: 38px;
+        margin-top: 3.5mm;
+        font-size: 44px;
         font-weight: bold;
-        color: #1a1a1a;
-        margin-top: 22px;
-        letter-spacing: 1.5px;
-    }
-
-    /* Award text */
-    .award-text {
-        font-size: 13px;
-        color: #555;
-        margin-top: 14px;
-        font-style: italic;
-        letter-spacing: 0.5px;
-    }
-
-    /* Student name */
-    .student-name {
-        font-size: 30px;
-        font-weight: bold;
-        color: #1a1a1a;
-        margin-top: 6px;
         letter-spacing: 1px;
+        color: #17233c;
     }
-    .name-underline {
-        width: 200px;
-        height: 0.8px;
-        background: #b8962e;
-        margin: 4px auto 0;
-    }
-
-    /* Completion text */
-    .completion-text {
-        font-size: 12px;
-        color: #555;
-        margin-top: 10px;
-        line-height: 1.5;
+    .title-rule {
+        width: 32mm; height: 0.9mm;
+        background: #c9a227;
+        margin: 4.5mm auto 0;
     }
 
-    /* Module name */
-    .module-name {
-        font-size: 20px;
-        font-weight: bold;
-        color: #8a6a1a;
-        margin-top: 2px;
-    }
-
-    /* Course and instructor */
-    .course-info {
-        font-size: 12px;
-        color: #666;
-        margin-top: 3px;
-    }
-
-    /* Details section */
-    .details {
-        display: flex;
-        justify-content: center;
-        gap: 35px;
-        margin-top: 18px;
-        width: 80%;
-    }
-    .detail {
-        text-align: center;
-        min-width: 80px;
-    }
-    .detail-label {
-        font-size: 8px;
-        color: #999;
-        letter-spacing: 1px;
+    .presented {
+        margin-top: 6mm;
+        font-size: 10px;
+        letter-spacing: 3px;
         text-transform: uppercase;
+        color: #8b95ac;
     }
-    .detail-value {
+    .student-name {
+        margin-top: 4mm;
+        font-size: 36px;
+        font-weight: bold;
+        color: #17233c;
+    }
+    .name-rule {
+        width: 72mm; height: 0.45mm;
+        background: #c9a227;
+        margin: 3mm auto 0;
+    }
+
+    .body-text {
+        margin-top: 6.5mm;
+        font-size: 12px;
+        color: #4a5670;
+    }
+    .module-name {
+        margin-top: 2mm;
+        font-size: 22px;
+        font-weight: bold;
+        color: #a3841f;
+    }
+    .course-info {
+        margin-top: 2mm;
+        font-size: 11px;
+        color: #66708a;
+    }
+
+    table.meta {
+        width: 100%;
+        margin-top: 8mm;
+        border-collapse: collapse;
+    }
+    table.meta td {
+        width: 33.33%;
+        text-align: center;
+        vertical-align: top;
+        padding: 0 4mm;
+    }
+    .meta-label {
+        font-size: 7.5px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #99a2b6;
+    }
+    .meta-value {
+        margin-top: 1.5mm;
+        font-size: 11.5px;
+        font-weight: bold;
+        color: #17233c;
+    }
+    .meta-line {
+        width: 62%;
+        height: 0.3mm;
+        background: #e6d49a;
+        margin: 1.8mm auto 0;
+    }
+
+    table.signs {
+        width: 100%;
+        margin-top: 9mm;
+        border-collapse: collapse;
+    }
+    table.signs td {
+        width: 50%;
+        text-align: center;
+        vertical-align: bottom;
+        padding: 0 12mm;
+    }
+    .sig-line { height: 0.35mm; background: #3a4763; }
+    .sig-name {
+        margin-top: 1.8mm;
         font-size: 11px;
         font-weight: bold;
-        color: #333;
-        margin-top: 3px;
+        color: #17233c;
     }
-    .detail-line {
-        width: 60%;
-        height: 0.3px;
-        background: #d4b96a;
-        margin: 4px auto 0;
+    .sig-role {
+        margin-top: 1mm;
+        font-size: 7.5px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #8b95ac;
+    }
+
+    .foot {
+        position: absolute;
+        bottom: 5mm; left: 10mm; right: 10mm;
+        text-align: center;
+        font-size: 7.5px;
+        font-style: italic;
+        color: #9aa3b6;
     }
 </style>
 </head>
 <body>
-    <div class="cert-border"></div>
-
-    <div class="ribbon">Certificate of Completion</div>
-
-    <div class="watermark">ENGLISH ACADEMY</div>
-
-    <div class="content">
-        <div class="cert-title">Certificate</div>
-
-        <div class="award-text">This is to certify that</div>
-
-        <div class="student-name">$studentName</div>
-        <div class="name-underline"></div>
-
-        <div class="completion-text">has successfully completed the module</div>
-        <div class="module-name">$moduleName</div>
-        <div class="course-info">under the course &quot;$courseName&quot; by Instructor: $instructorName</div>
-
-        <div class="details">
-            <div class="detail">
-                <div class="detail-label">Date of Completion</div>
-                <div class="detail-value">$completionDate</div>
-                <div class="detail-line"></div>
-            </div>
-            <div class="detail">
-                <div class="detail-label">Certificate ID</div>
-                <div class="detail-value">$certId</div>
-                <div class="detail-line"></div>
-            </div>
-            <div class="detail">
-                <div class="detail-label">Lessons Completed</div>
-                <div class="detail-value">$lessonCount</div>
-                <div class="detail-line"></div>
-            </div>
+    <div class="sidebar">
+        <div class="sidebar-shade"></div>
+        <div class="brand">
+            <div class="monogram">EA</div>
+            <div class="brand-name">ENGLISH<br>ACADEMY</div>
+            <div class="brand-sub">LEARN &middot; GROW &middot; SUCCEED</div>
+            <div class="brand-rule"></div>
         </div>
+        <div class="rings">
+            <div class="ring-outer"></div>
+            <div class="ring-mid"></div>
+            <div class="ring-inner"></div>
+        </div>
+        <div class="stamp-wrap"><img class="stamp-img" src="$stampSrc" alt="School Seal"></div>
+        <div class="side-foot">EST. EXCELLENCE IN EDUCATION</div>
     </div>
+    <div class="sidebar-edge"></div>
 
-    <img class="stamp-img" src="$stampSrc" alt="School Seal">
+    <div class="sheet">
+        <div class="frame-outer"></div>
+        <div class="frame-inner"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
 
-    <div class="footer">This certificate is issued by English Academy - Certificate ID: $certId</div>
+        <div class="watermark">ENGLISH ACADEMY</div>
+
+        <div class="inner">
+            <div class="kicker">ENGLISH ACADEMY</div>
+            <div class="cert-title">Certificate of Completion</div>
+            <div class="title-rule"></div>
+
+            <div class="presented">This certificate is proudly presented to</div>
+            <div class="student-name">$studentName</div>
+            <div class="name-rule"></div>
+
+            <div class="body-text">for successfully completing all lessons and passing the final assessment of the module</div>
+            <div class="module-name">$moduleName</div>
+            <div class="course-info">Course: &quot;$courseName&quot; &nbsp;&middot;&nbsp; Instructor: $instructorName</div>
+
+            <table class="meta" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>
+                        <div class="meta-label">Date of Completion</div>
+                        <div class="meta-value">$completionDate</div>
+                        <div class="meta-line"></div>
+                    </td>
+                    <td>
+                        <div class="meta-label">Lessons Completed</div>
+                        <div class="meta-value">$lessonCount Lessons</div>
+                        <div class="meta-line"></div>
+                    </td>
+                    <td>
+                        <div class="meta-label">Certificate ID</div>
+                        <div class="meta-value">$certId</div>
+                        <div class="meta-line"></div>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="signs" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>
+                        <div class="sig-line"></div>
+                        <div class="sig-name">$instructorName</div>
+                        <div class="sig-role">Course Instructor</div>
+                    </td>
+                    <td>
+                        <div class="sig-line"></div>
+                        <div class="sig-name">English Academy</div>
+                        <div class="sig-role">Platform Director</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="foot">This certificate is issued by English Academy &nbsp;&middot;&nbsp; Verify with Certificate ID: $certId</div>
+    </div>
 </body>
 </html>
 HTML;

@@ -12,10 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $conn->prepare('DELETE FROM contacts WHERE id = ?');
         $stmt->bind_param('i', $id);
         $stmt->execute();
-    } elseif (($action === 'mark_read' || $action === 'mark_unread') && $id > 0) {
-        $isRead = ($action === 'mark_read') ? 1 : 0;
-        $stmt = $conn->prepare('UPDATE contacts SET is_read = ? WHERE id = ?');
-        $stmt->bind_param('ii', $isRead, $id);
+    } elseif ($action === 'mark_read' && $id > 0) {
+        $stmt = $conn->prepare('UPDATE contacts SET is_read = 1 WHERE id = ?');
+        $stmt->bind_param('i', $id);
         $stmt->execute();
     } elseif ($action === 'reply' && $id > 0) {
         $replyBody = trim($_POST['reply_body'] ?? '');
@@ -157,20 +156,15 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
                                 <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').showModal();" class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors" title="View">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </button>
+<?php if (!$isMsgRead): ?>
                                 <form method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
-<?php if ($isMsgRead): ?>
-                                    <input type="hidden" name="action" value="mark_unread">
-                                    <button type="submit" class="p-1.5 rounded-lg text-yellow-600 hover:bg-yellow-50 transition-colors" title="Mark as Unread">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M9.377 9.377a2.909 2.909 0 010 4.246 2.91 2.91 0 01-4.112 0M13.5 6.75l3.375 2.369m0 0L17.25 12l3.375 3.75"/></svg>
-                                    </button>
-<?php else: ?>
                                     <input type="hidden" name="action" value="mark_read">
                                     <button type="submit" class="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors" title="Mark as Read">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </button>
-<?php endif; ?>
                                 </form>
+<?php endif; ?>
                                 <form method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
                                     <input type="hidden" name="action" value="delete">
@@ -251,16 +245,13 @@ if ($r2 && $r2r = $r2->fetch_assoc()) $unreadCount = $r2r['total'];
             <button onclick="document.getElementById('view-modal-<?php echo $msg['id']; ?>').close();" style="flex:1;padding:0.75rem 1.5rem;background:#f3f4f6;border:none;border-radius:0.75rem;font-size:0.875rem;font-weight:500;color:#4b5563;cursor:pointer">Close</button>
         </div>
         <div style="margin-top:0.75rem;display:flex;gap:0.5rem;justify-content:flex-end">
+            <?php if (!$isMsgRead): ?>
             <form method="POST" style="display:inline;">
                 <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
-                <?php if ($isMsgRead): ?>
-                <input type="hidden" name="action" value="mark_unread">
-                <button type="submit" style="padding:0.5rem 1rem;background:#fef3c7;border:none;border-radius:0.5rem;font-size:0.75rem;color:#92400e;cursor:pointer">Mark Unread</button>
-                <?php else: ?>
                 <input type="hidden" name="action" value="mark_read">
                 <button type="submit" style="padding:0.5rem 1rem;background:#d1fae5;border:none;border-radius:0.5rem;font-size:0.75rem;color:#065f46;cursor:pointer">Mark Read</button>
-                <?php endif; ?>
             </form>
+            <?php endif; ?>
             <form method="POST" style="display:inline;">
                 <input type="hidden" name="id" value="<?php echo $msg['id']; ?>">
                 <input type="hidden" name="action" value="delete">

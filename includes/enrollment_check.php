@@ -78,9 +78,8 @@ function getExistingEnrollment($conn, $user_id, $module_id) {
  */
 function getEnrollmentButton($conn, $user_id, $module_id, $base_url = '../users/') {
     if (!$user_id) {
-        // Not logged in - remember the module, go to login; login.php routes by status
-        $_SESSION['redirect_module'] = $module_id;
-        $loginUrl = '../auth/login.php';
+        // Not logged in - pass module via URL; login.php reads it and routes by status
+        $loginUrl = '../auth/login.php?module_id=' . urlencode($module_id);
         return '<a href="' . $loginUrl . '" 
                    class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
                           border border-orange-600 text-orange-600

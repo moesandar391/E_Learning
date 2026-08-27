@@ -3,6 +3,14 @@ session_set_cookie_params(['path' => '/']);
 session_start();
 require_once '../config/db.php';
 
+// If module_id is passed via URL (from Enroll Now buttons), store it in session
+// for the redirectAfterLogin flow. This replaces the old pattern of setting
+// $_SESSION['redirect_module'] during page rendering which caused race conditions
+// when multiple modules were rendered in a loop.
+if (isset($_GET['module_id']) && !isset($_SESSION['redirect_module'])) {
+    $_SESSION['redirect_module'] = (int)$_GET['module_id'];
+}
+
 $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

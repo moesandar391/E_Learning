@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS quizzes (
     module_id INT DEFAULT NULL,
     quiz_title VARCHAR(100) NOT NULL,
     passing_score INT NOT NULL DEFAULT 70 COMMENT 'Percentage required to pass',
-    question_limit INT NOT NULL DEFAULT 100 COMMENT 'Questions shown per attempt',
+    question_limit INT NOT NULL DEFAULT 10 COMMENT 'Questions shown per attempt',
     time_limit INT NOT NULL DEFAULT 0 COMMENT 'Time limit in minutes, 0 = none',
     random_questions TINYINT(1) NOT NULL DEFAULT 1,
     random_answers TINYINT(1) NOT NULL DEFAULT 1,

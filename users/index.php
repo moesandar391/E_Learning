@@ -117,7 +117,7 @@ function formatLearnerCount($num) {
                 </div>
 
                 <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
-                    <img src="../assets/child.jpg" alt="Learning Slide 2" class="w-full h-full object-cover">
+                    <img src="../assets/child1.jpg" alt="Learning Slide 2" class="w-full h-full object-cover">
                 </div>
             </div>
 
@@ -422,8 +422,7 @@ function formatLearnerCount($num) {
                                     </span>
                                 </a>';
                         } elseif (!$userId) {
-                            $_SESSION['redirect_module'] = $module['module_id'];
-                            echo '<a href="../auth/login.php" 
+                            echo '<a href="../auth/login.php?module_id=' . urlencode($module['module_id']) . '"
                                    class="flex-[2] text-center text-sm font-bold py-3 rounded-xl transition-all duration-300
                                           border border-orange-600 text-orange-600
                                           hover:bg-orange-600 hover:text-white

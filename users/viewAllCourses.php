@@ -51,7 +51,7 @@ require_once '../includes/enrollment_check.php';
 
 <section class="py-12 min-h-screen bg-gray-50">
     <div class="max-w-7xl mx-auto px-6">
-    <h1 class="text-brandOchre text-center font-bold font-serif text-4xl mb-2">OUR ENGLISH COURSES</h1>
+    <h1 class="text-brandOchre text-center font-bold font-serif text-4xl mb-2">Our English Courses</h1>
     <p class="text-gray-600 text-center mb-8">Comprehensive pathways to master the English language.</p>
     
     <!-- Search and Filter Bar -->

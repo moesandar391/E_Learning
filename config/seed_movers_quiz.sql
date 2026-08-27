@@ -8,7 +8,7 @@ SET @module_id = 6;  -- <-- Movers module
 
 -- 1. Create the quiz
 INSERT INTO quizzes (module_id, quiz_title, passing_score, question_limit, time_limit, random_questions, random_answers)
-VALUES (@module_id, 'Movers Module Quiz', 70, 100, 0, 1, 1);
+VALUES (@module_id, 'Movers Module Quiz', 70, 10, 0, 1, 1);
 
 SET @quiz_id = LAST_INSERT_ID();
 

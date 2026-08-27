@@ -216,7 +216,7 @@ function header_underline($active) {
         </div>
     </div>
     <a href="../users/reviews.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">
-        Review
+        Reviews
         <?php echo header_underline($header_review); ?>
     </a>
     <a href="../users/about.php" class="group relative py-2 hover:text-brandOchre transition-colors duration-300">

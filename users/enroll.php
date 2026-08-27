@@ -9,6 +9,29 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config/db.php';
+require_once '../includes/enrollment_check.php';
+
+ $userId = $_SESSION['user_id'];
+
+// Enrollment guard: redirect already-enrolled users to the appropriate page
+if ($module_id && $userId) {
+    $enrollStatus = checkEnrollmentStatus($conn, $userId, $module_id);
+    $enrollStatusLower = $enrollStatus ? strtolower($enrollStatus) : false;
+
+    if ($enrollStatusLower === 'confirmed') {
+        header("Location: lesson.php?module_id=$module_id");
+        exit();
+    }
+
+    if ($enrollStatusLower === 'pending' || $enrollStatusLower === 'needs_correction') {
+        $_SESSION['enroll_pending_message'] =
+            "Your enrollment request has been submitted successfully. " .
+            "Please wait for the administrator to approve your enrollment before accessing the lessons.";
+        header("Location: my_learning.php");
+        exit();
+    }
+}
+
 require_once '../includes/module_path_helper.php';
 
  $sql = "SELECT c.course_name, m.name AS module_name, m.price, m.image, m.status, m.level
@@ -26,7 +49,6 @@ if (!$details) {
     exit();
 }
 
- $userId = $_SESSION['user_id'];
  $prevRec = getRecommendedPrevModule($conn, $module_id);
  $prevProgress = $prevRec ? getUserModuleProgress($conn, $userId, (int)$prevRec['prev_module_id']) : null;
 
@@ -37,7 +59,6 @@ include_once('../includes/header.php');
  $price = $details['price'] ?? 0;
  $moduleImage = $details['image'] ?? null;
 
- $userId = $_SESSION['user_id'];
  $stmtUser = $conn->prepare("SELECT email, name, phone FROM users WHERE id = ?");
  $stmtUser->bind_param("i", $userId);
  $stmtUser->execute();

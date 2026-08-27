@@ -23,8 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_lesson']) &&
 require_once __DIR__ . '/../includes/enrollment_check.php';
 
 if (!$user_id) {
-    $_SESSION['redirect_module'] = $module_id;
-    header("Location: ../auth/login.php");
+    header("Location: ../auth/login.php?module_id=" . urlencode($module_id));
     exit;
 }
 
