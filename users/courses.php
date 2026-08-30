@@ -9,7 +9,7 @@ $result = $conn->query($query);
 $categories = $result->fetch_all(MYSQLI_ASSOC);
 
 $popularQuery = "SELECT m.id AS module_id, m.name AS module_name, m.image AS module_image, m.price,
-                        c.course_name, m.level, c.instructor_name, COUNT(l.id) AS total_lessons,
+                        c.course_name, m.level, c.instructor_name, COUNT(DISTINCT l.id) AS total_lessons,
                         COUNT(DISTINCT e.id) AS enroll_count
                  FROM modules m
                  JOIN courses c ON m.course_id = c.id

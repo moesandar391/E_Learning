@@ -8,6 +8,7 @@
     'quizzes.php'       => ['title' => 'Quizzes',     'subtitle' => 'Manage module quizzes'],
     'questions.php'     => ['title' => 'Questions',   'subtitle' => 'Manage the quiz question bank'],
     'quiz_report.php'   => ['title' => 'Quiz Attempts', 'subtitle' => 'Quiz attempts, pass rates and analytics'],
+    'attempt_detail.php'   => ['title' => 'Quiz Attempts Details', 'subtitle' => 'Quiz attempts Details, pass rates and analytics'],
     'enrollments.php'   => ['title' => 'Enrollments', 'subtitle' => 'Track all student enrollments'],
     'enrollment_details.php'   => ['title' => 'Enrollment Details', 'subtitle' => 'Track all student enrollment details'],
     'payments.php'      => ['title' => 'Payments',    'subtitle' => 'Manage enrollment payments'],
